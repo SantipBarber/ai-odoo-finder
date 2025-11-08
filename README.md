@@ -6,15 +6,11 @@ Un asistente inteligente impulsado por IA que ayuda a desarrolladores de Odoo a 
 
 <div align="center">
 
-```
-   ___    ____       ____       __            _______ __          __         
-  / _ |  /  _/____  / __ \___  / /__  ____   / ____(_) /__  ____/ /__ _____
- / __ | _/ / /___/ / /_/ / _ \/ _ \ / __ \ / /_  / / / _ \/ __  / _ \\/ ___/
-/ /_/ |/___/      / ____/ // / // // /_/ // __/ / / /  __/ /_/ /  __/ /    
-\___/|_/         /_/    \___/\___/ \____//_/   /_/_/\___/\__,_/\___/_/     
-                                                                             
-         🔍 AI-Powered Module Discovery for Odoo Developers
-```
+<div align="center">
+
+![AI-OdooFinder Banner](docs/logo-banner.svg)
+
+### AI-Powered Module Discovery for Odoo Developers
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
