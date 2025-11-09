@@ -219,12 +219,16 @@ Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para más detalles.
 
 ### Comparación: Antes vs. Después
 
+<div align="center">
+
 | Antes | Después |
 |-------|---------|
 | 🕐 2-3 horas buscando módulos | ⚡ 30 segundos |
 | 🎲 Módulos incompatibles | ✅ 100% compatible con tu versión |
 | 📚 Módulos abandonados | ⭐ Solo módulos de calidad |
 | 🤔 Incertidumbre | 💯 Confianza en tus elecciones |
+
+</div>
 
 ### 📊 Estadísticas del Proyecto
 
@@ -268,10 +272,10 @@ Si este proyecto te resulta útil:
 
 ## 📞 Contacto
 
-- 📧 **Email:** tu-email@ejemplo.com
-- 💼 **LinkedIn:** [Tu Perfil](https://linkedin.com/in/tu-perfil)
-- 🐙 **GitHub:** [@tu-usuario](https://github.com/tu-usuario)
-- 💬 **Discord:** [Únete a la comunidad](https://discord.gg/tu-server)
+- 📧 **Contacto:** [Contacta conmigo en GitHub Issues](https://github.com/SantipBarber/ai-odoo-finder/issues)
+- 💼 **LinkedIn:** [Santiago Barber](https://linkedin.com/in/santipbarber)
+- 🐙 **GitHub:** [@SantipBarber](https://github.com/SantipBarber)
+- 💬 **Discord:** Próximamente
 
 ---
 
@@ -285,7 +289,7 @@ Si este proyecto te resulta útil:
 
 <div align="center">
 
-**Desarrollado con ❤️ para la comunidad de Odoo**
+**💡 Desarrollado en base a la experiencia. De desarrolladores de Odoo para desarrolladores de Odoo**
 
 [⬆ Volver arriba](#-ai-odoofinder)
 
