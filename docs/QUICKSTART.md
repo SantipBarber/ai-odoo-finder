@@ -1,14 +1,10 @@
 # ⚡ Quick Start - AI-OdooFinder
 
-```
-   ___    ____       ____       __            _______ __          __         
-  / _ |  /  _/____  / __ \___  / /__  ____   / ____(_) /__  ____/ /__ _____
- / __ | _/ / /___/ / /_/ / _ \/ _ \ / __ \ / /_  / / / _ \/ __  / _ \\/ ___/
-/ /_/ |/___/      / ____/ // / // // /_/ // __/ / / /  __/ /_/ /  __/ /    
-\___/|_/         /_/    \___/\___/ \____//_/   /_/_/\___/\__,_/\___/_/     
-                                                                             
-         🔍 AI-Powered Module Discovery for Odoo Developers
-```
+<div align="center">
+
+![AI-OdooFinder Banner](logo-banner.svg)
+
+</div>
 
 Esta guía te llevará de 0 a tu primera búsqueda en **menos de 10 minutos**. ⏱️
 
@@ -313,14 +309,7 @@ Guía paso a paso para subir a Render o Railway.
 
 <div align="center">
 
-```
- ____                            _        _       _   _                 _ 
-/ ___|___  _ __   __ _ _ __ __ _| |_ _   _| | __ _| |_(_) ___  _ __  ___| |
-| |   / _ \| '_ \ / _` | '__/ _` | __| | | | |/ _` | __| |/ _ \| '_ \/ __| |
-| |__| (_) | | | | (_| | | | (_| | |_| |_| | | (_| | |_| | (_) | | | \__ \_|
-\____\___/|_| |_|\__, |_|  \__,_|\__|\__,_|_|\__,_|\__|_|\___/|_| |_|___(_)
-                  |___/                                                      
-```
+![AI-OdooFinder Banner](logo-banner.svg)
 
 **¡Felicitaciones! Ya tienes AI-OdooFinder funcionando! 🎉**
 

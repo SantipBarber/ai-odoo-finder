@@ -6,8 +6,6 @@ Un asistente inteligente impulsado por IA que ayuda a desarrolladores de Odoo a 
 
 <div align="center">
 
-<div align="center">
-
 ![AI-OdooFinder Banner](docs/logo-banner.svg)
 
 ### AI-Powered Module Discovery for Odoo Developers
@@ -73,7 +71,7 @@ Pregunta como hablarías con un colega: "Necesito algo para gestionar inventario
 
 ### Ejemplo 1: Búsqueda Básica
 
-```
+```text
 👤 Usuario: "Necesito un módulo para gestionar suscripciones en Odoo 17"
 
 🤖 Asistente: "He encontrado 3 módulos para gestión de suscripciones en Odoo 17.0:
@@ -94,7 +92,7 @@ Pregunta como hablarías con un colega: "Necesito algo para gestionar inventario
 
 ### Ejemplo 2: Con Dependencias
 
-```
+```text
 👤 Usuario: "Busco reportes avanzados para v16 que funcionen con ventas"
 
 🤖 Asistente: [Búsqueda con version="16.0" y depends=["sale"]]
@@ -164,7 +162,7 @@ curl -X POST http://localhost:8000/api/v1/search \
 
 Simplemente pregunta en lenguaje natural:
 
-```
+```text
 "Necesito un módulo para Odoo 17 que maneje pagos recurrentes 
  y se integre con ventas"
 ```
@@ -205,13 +203,13 @@ El asistente buscará automáticamente y te dará recomendaciones personalizadas
 
 ## 🤝 Contribuir
 
-¡Las contribuciones son bienvenidas! 
+¡Las contribuciones son bienvenidas!
 
-1. Fork el proyecto
-2. Crea tu rama (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+1. **Fork** el proyecto
+2. **Crea** tu rama (`git checkout -b feature/AmazingFeature`)
+3. **Commit** tus cambios (`git commit -m 'Add AmazingFeature'`)
+4. **Push** a la rama (`git push origin feature/AmazingFeature`)
+5. **Abre** un Pull Request
 
 Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para más detalles.
 
@@ -219,20 +217,7 @@ Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para más detalles.
 
 ## 🏆 ¿Por Qué Usar AI-OdooFinder?
 
-<div align="center">
-
-| Métrica | Valor |
-|---------|-------|
-| 📦 Módulos Indexados | 500+ |
-| 🏢 Repositorios | OCA (100% cobertura) |
-| 🔍 Búsquedas/día | En desarrollo |
-| ⚡ Tiempo respuesta | < 500ms |
-
-</div>
-
----
-
-## 🏆 ¿Por Qué Usar Odoo Module Finder?
+### Comparación: Antes vs. Después
 
 | Antes | Después |
 |-------|---------|
@@ -241,9 +226,7 @@ Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para más detalles.
 | 📚 Módulos abandonados | ⭐ Solo módulos de calidad |
 | 🤔 Incertidumbre | 💯 Confianza en tus elecciones |
 
----
-
-## 📊 Estadísticas
+### 📊 Estadísticas del Proyecto
 
 <div align="center">
 
@@ -259,10 +242,10 @@ Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para más detalles.
 ## 💬 Testimonios
 
 > *"Antes perdía tardes enteras buscando en GitHub. Ahora encuentro lo que necesito en minutos."*  
-> — Juan P., Desarrollador Odoo
+> <cite>— Juan P., Desarrollador Odoo</cite>
 
 > *"El análisis de dependencias me salvó de un infierno de instalaciones rotas."*  
-> — María G., Consultora Técnica
+> <cite>— María G., Consultora Técnica</cite>
 
 ---
 
@@ -276,27 +259,27 @@ Este proyecto está bajo la licencia MIT. Ver [LICENSE](LICENSE) para más detal
 
 Si este proyecto te resulta útil:
 
-- ⭐ Dale una estrella en GitHub
-- 🐛 Reporta bugs o sugiere features
-- 🤝 Contribuye con código
-- 💬 Comparte con otros desarrolladores de Odoo
+- ⭐ **Dale una estrella** en GitHub
+- 🐛 **Reporta bugs** o sugiere features
+- 🤝 **Contribuye** con código
+- 💬 **Comparte** con otros desarrolladores de Odoo
 
 ---
 
 ## 📞 Contacto
 
-- 📧 Email: tu-email@ejemplo.com
-- 💼 LinkedIn: [Tu Perfil](https://linkedin.com/in/tu-perfil)
-- 🐙 GitHub: [@tu-usuario](https://github.com/tu-usuario)
-- 💬 Discord: [Únete a la comunidad](https://discord.gg/tu-server)
+- 📧 **Email:** tu-email@ejemplo.com
+- 💼 **LinkedIn:** [Tu Perfil](https://linkedin.com/in/tu-perfil)
+- 🐙 **GitHub:** [@tu-usuario](https://github.com/tu-usuario)
+- 💬 **Discord:** [Únete a la comunidad](https://discord.gg/tu-server)
 
 ---
 
 ## 🙏 Agradecimientos
 
-- [Odoo Community Association (OCA)](https://odoo-community.org/) - Por su increíble trabajo open source
-- [Anthropic](https://www.anthropic.com/) - Por Claude y el sistema de Skills
-- Todos los [contribuidores](https://github.com/tu-usuario/ai-odoofinder/graphs/contributors) que hacen esto posible
+- **[Odoo Community Association (OCA)](https://odoo-community.org/)** - Por su increíble trabajo open source
+- **[Anthropic](https://www.anthropic.com/)** - Por Claude y el sistema de Skills
+- **Todos los [contribuidores](https://github.com/tu-usuario/ai-odoofinder/graphs/contributors)** que hacen esto posible
 
 ---
 

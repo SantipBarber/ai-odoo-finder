@@ -1,0 +1,27 @@
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#714B67;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Card background -->
+  <rect width="300" height="200" rx="15" fill="url(#cardGrad)"/>
+  
+  <!-- Border effect -->
+  <rect x="2" y="2" width="296" height="196" rx="13" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Icon -->
+  <text x="150" y="80" font-size="50" text-anchor="middle">🔍</text>
+  
+  <!-- Title -->
+  <text x="150" y="125" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    Smart Search
+  </text>
+  
+  <!-- Description -->
+  <text x="150" y="155" font-family="Arial, sans-serif" font-size="14" fill="#E5E7EB" text-anchor="middle">
+    Find modules instantly with AI
+  </text>
+</svg>

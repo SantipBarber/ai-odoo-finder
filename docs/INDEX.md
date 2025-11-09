@@ -1,13 +1,10 @@
 # 📑 Índice de Documentación - AI-OdooFinder
 
-```
-   ___    ____       ____       __            _______ __          __         
-  / _ |  /  _/____  / __ \___  / /__  ____   / ____(_) /__  ____/ /__ _____
- / __ | _/ / /___/ / /_/ / _ \/ _ \ / __ \ / /_  / / / _ \/ __  / _ \\/ ___/
-/ /_/ |/___/      / ____/ // / // // /_/ // __/ / / /  __/ /_/ /  __/ /    
-\___/|_/         /_/    \___/\___/ \____//_/   /_/_/\___/\__,_/\___/_/     
-                                                                             
-```
+<div align="center">
+
+![AI-OdooFinder Banner](logo-banner.svg)
+
+</div>
 
 Este documento te guía a través de toda la documentación del proyecto.
 

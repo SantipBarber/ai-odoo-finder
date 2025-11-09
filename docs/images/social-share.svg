@@ -1,0 +1,48 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="socialGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#714B67;stop-opacity:1" />
+    </linearGradient>
+    
+    <pattern id="socialDots" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+      <circle cx="25" cy="25" r="2" fill="#FFFFFF" opacity="0.15"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#socialGrad)"/>
+  <rect width="1200" height="630" fill="url(#socialDots)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="150" cy="150" r="100" fill="#FFFFFF" opacity="0.05"/>
+  <circle cx="1050" cy="480" r="120" fill="#FFFFFF" opacity="0.05"/>
+  
+  <!-- Main content box -->
+  <rect x="100" y="165" width="1000" height="300" rx="20" fill="#FFFFFF" opacity="0.1"/>
+  
+  <!-- Icons -->
+  <text x="200" y="280" font-size="80">🤖</text>
+  <text x="1000" y="280" font-size="80">🔍</text>
+  
+  <!-- Title -->
+  <text x="600" y="280" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    AI-OdooFinder
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="350" font-family="Arial, sans-serif" font-size="32" fill="#E5E7EB" text-anchor="middle">
+    Find the Perfect Odoo Module with AI
+  </text>
+  
+  <!-- Bottom tagline -->
+  <text x="600" y="410" font-family="Arial, sans-serif" font-size="24" fill="#D1D5DB" text-anchor="middle" font-style="italic">
+    Stop Reinventing • Start Finding
+  </text>
+  
+  <!-- GitHub URL -->
+  <text x="600" y="560" font-family="Arial, sans-serif" font-size="20" fill="#FFFFFF" text-anchor="middle" opacity="0.8">
+    github.com/your-username/ai-odoofinder
+  </text>
+</svg>
