@@ -299,7 +299,7 @@ Si este proyecto te resulta útil:
 ## 📞 Contacto
 
 - 📧 **Contacto:** [Contacta conmigo en GitHub Issues](https://github.com/SantipBarber/ai-odoo-finder/issues)
-- 💼 **LinkedIn:** [Santiago Barber](https://linkedin.com/in/santipbarber)
+- 💼 **LinkedIn:** [Santiago Pérez Barber](https://linkedin.com/in/santipbarber)
 - 🐙 **GitHub:** [@SantipBarber](https://github.com/SantipBarber)
 - 💬 **Discord:** Próximamente
 
@@ -315,7 +315,7 @@ Si este proyecto te resulta útil:
 
 <div align="center">
 
-**💡 Desarrollado en base a la experiencia. De desarrolladores de Odoo para desarrolladores de Odoo**
+**💡 Basado en la experiencia, para desarrolladores de Odoo**
 
 [⬆ Volver arriba](#-ai-odoofinder)
 
