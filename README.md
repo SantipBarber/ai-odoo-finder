@@ -67,6 +67,32 @@ Pregunta como hablarías con un colega: "Necesito algo para gestionar inventario
 
 ---
 
+## 🛠️ Stack Tecnológico
+
+### Backend & Datos
+- **Base de Datos:** [Neon](https://neon.com) - PostgreSQL Serverless con pgVector
+  - Scale-to-zero para costos óptimos
+  - Provisioning en ~300ms
+  - Branching como Git
+- **API:** FastAPI (Python 3.10+) en [Render.com](https://render.com)
+- **ORM:** SQLAlchemy + Alembic
+
+### IA & Embeddings
+- **Modelo:** Qwen3-Embedding-8B (open source)
+- **Hosting:** [OpenRouter.ai](https://openrouter.ai)
+- **Alternativa local:** Ollama (para desarrollo)
+- **Búsqueda vectorial:** pgVector (HNSW index)
+
+### Interfaz Usuario
+- **Claude Skill** - Interfaz conversacional en claude.ai
+- Sin frontend web (MVP)
+
+### Integración
+- **GitHub API** - Obtención de módulos OCA
+- **ETL Pipeline** - Python scripts + GitHub Actions (opcional)
+
+---
+
 ## 🎬 Demo
 
 ### Ejemplo 1: Búsqueda Básica

@@ -20,25 +20,42 @@ Al final de esta guía tendrás:
 
 ---
 
-## 📋 Pre-requisitos
+## 🔧 Requisitos Previos
 
-Verifica que tengas instalado:
+### Cuentas Necesarias
+1. **[Neon](https://console.neon.tech/signup)** - PostgreSQL serverless (Free tier)
+2. **[OpenRouter](https://openrouter.ai/keys)** - Embeddings con Qwen3 (~$10 crédito inicial)
+3. **[GitHub](https://github.com/settings/tokens)** - Token personal (scope: `public_repo`)
+4. **[Render](https://render.com)** - Hosting API (Free tier para empezar)
 
+### Software Local
 ```bash
 # Python 3.10+
-python --version  # Debe mostrar 3.10 o superior
-
-# PostgreSQL 15+
-psql --version
+python --version
 
 # Git
 git --version
+
+# Opcional: Docker (para desarrollo local)
+docker --version
 ```
 
-Si falta algo, instálalo primero:
-- **Python**: [python.org](https://www.python.org/downloads/)
-- **PostgreSQL**: [postgresql.org](https://www.postgresql.org/download/)
-- **Git**: [git-scm.com](https://git-scm.com/downloads)
+### Variables de Entorno
+Crear archivo `.env` en raíz:
+```bash
+# Neon Database
+DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/ai_odoofinder?sslmode=require
+
+# OpenRouter API
+OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxx
+
+# GitHub API
+GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+
+# Opcional: Desarrollo local
+ENVIRONMENT=development
+LOG_LEVEL=INFO
+```
 
 ---
 

@@ -18,19 +18,19 @@ Un asistente de IA conversacional que ayuda a desarrolladores de Odoo a encontra
 ### Stack Tecnológico
 
 ```yaml
-Backend:
-  - FastAPI (API REST)
-  - PostgreSQL 15+ con pgVector
-  - Qwen3-Embedding (4B u 8B parameter)
-  - OpenRouter (hosting de modelos)
+Backend & Datos:
+  - Neon Postgres Serverless (con pgVector)
+  - FastAPI en Render.com (API REST)
+  - OpenRouter + Qwen3-Embedding-8B
+  - SQLAlchemy + Alembic
 
-Frontend:
-  - Claude Skill (interfaz conversacional)
+Interfaz:
+  - Claude Skill (conversacional en claude.ai)
   - Sin UI web en MVP
 
-Datos:
-  - GitHub API (OCA repositories)
-  - ~500-1000 módulos de Odoo
+Integración:
+  - GitHub API (repositorios OCA)
+  - ~500-1000 módulos de Odoo indexados
 ```
 
 ### Timeline
@@ -301,7 +301,45 @@ ai-odoofinder/
 └── README.md
 ```
 
-#### 3.2 Modelos de Datos
+#### 3.2 Configuración de Neon
+
+**Crear cuenta y proyecto:**
+```bash
+# 1. Ir a https://neon.com y crear cuenta
+# 2. Crear nuevo proyecto: "ai-odoofinder"
+# 3. Seleccionar región más cercana
+# 4. Copiar connection string
+```
+
+**Habilitar pgVector:**
+```sql
+-- En Neon SQL Editor
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Verificar instalación
+SELECT * FROM pg_extension WHERE extname = 'vector';
+```
+
+**Variables de entorno (.env):**
+```bash
+# Neon Database
+DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/dbname?sslmode=require
+
+# OpenRouter
+OPENROUTER_API_KEY=sk-or-v1-xxxxx
+
+# GitHub
+GITHUB_TOKEN=ghp_xxxxx
+```
+
+**Ventajas de Neon para este proyecto:**
+- ✅ Scale-to-zero: Solo pagas cuando se usa
+- ✅ Provisioning instantáneo: 300ms vs varios minutos
+- ✅ Branching: Crear copias de BD para testing
+- ✅ pgVector optimizado para IA
+- ✅ Free tier generoso: 0.5GB storage + 191 compute hours/mes
+
+#### 3.3 Modelos de Datos
 
 ```python
 # backend/app/models.py
@@ -1146,29 +1184,47 @@ curl -X POST https://tu-api.com/api/v1/search \
 
 #### 3. Deploy API (Para que Claude pueda acceder)
 
-**Opción A: Render.com (Recomendado)**
+**Configuración en Render.com:**
 ```bash
-# En tu proyecto, crear render.yaml
-services:
-  - type: web
-    name: ai-odoofinder
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
-    envVars:
-      - key: DATABASE_URL
-        sync: false
-      - key: OPENROUTER_API_KEY
-        sync: false
+# 1. Crear cuenta en https://render.com
+# 2. Conectar tu repositorio de GitHub
+# 3. Crear Web Service con estos parámetros:
+
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+
+Environment Variables:
+  DATABASE_URL: [Tu Neon connection string]
+  OPENROUTER_API_KEY: [Tu OpenRouter key]
+  GITHUB_TOKEN: [Tu GitHub token]
 ```
 
-1. Push a GitHub
-2. Conectar Render a tu repo
-3. Deploy automático
-4. Obtener URL: `https://ai-odoofinder.onrender.com`
+**Render se encarga de:**
+- ✅ Build automático en cada push
+- ✅ SSL/HTTPS automático
+- ✅ Health checks
+- ✅ Logs centralizados
 
-**Opción B: Railway**
-Similar a Render, conectar repo y deploy.
+**Obtendrás URL pública:**
+```
+https://ai-odoofinder.onrender.com
+```
+
+**Alternativas a Render:**
+- Railway.app (similar, un poco más caro)
+- Fly.io (más control, más complejo)
+- Vercel (solo para Python con limitaciones)
+
+**¿Por qué Render + Neon y no solo Neon Data API?**
+
+El Neon Data API es solo para operaciones CRUD básicas (GET/POST/PATCH/DELETE).
+Nuestro caso requiere:
+- ✅ Generar embeddings on-the-fly con Qwen3
+- ✅ Búsqueda híbrida (SQL + vectorial)
+- ✅ Scoring y ranking personalizado
+- ✅ Lógica de negocio compleja
+
+Por eso necesitamos FastAPI custom en Render conectándose a Neon.
 
 #### 4. Probar Claude Skill
 

@@ -1251,13 +1251,55 @@ export default function SearchBar() {
 
 ## 🛠️ Stack Tecnológico
 
-### Backend
-- **Framework**: FastAPI 0.104+
-- **Base de Datos**: PostgreSQL 15+ con pgVector
-- **ORM**: SQLAlchemy 2.0
-- **Embeddings**: OpenAI `text-embedding-3-small`
-- **Cache**: Redis 7+
+### Backend & Datos
+- **Base de Datos:** [Neon](https://neon.com) - PostgreSQL Serverless con pgVector
+  - Scale-to-zero para costos óptimos
+  - Provisioning en ~300ms
+  - Branching como Git
+- **Framework**: FastAPI 0.104+ en [Render.com](https://render.com)
+- **ORM**: SQLAlchemy 2.0 + Alembic
+- **Embeddings**: Qwen3-Embedding-8B via [OpenRouter.ai](https://openrouter.ai)
+- **Cache**: Redis 7+ (opcional)
 - **Testing**: pytest, httpx
+
+### Configuración de Neon Postgres
+
+**1. Crear Proyecto:**
+```bash
+# Web: https://console.neon.tech
+# 1. New Project → "ai-odoofinder"
+# 2. Region: Seleccionar más cercana
+# 3. Postgres version: 16 (recomendado)
+```
+
+**2. Habilitar pgVector:**
+```sql
+-- En Neon SQL Editor o via psql
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Verificar versión
+SELECT extversion FROM pg_extension WHERE extname = 'vector';
+-- Debería ser >= 0.8.0
+```
+
+**3. Crear Tablas:**
+```sql
+-- Script completo en: backend/app/models.py
+-- Se ejecuta con: alembic upgrade head
+```
+
+**4. Connection String:**
+```python
+# backend/app/config.py
+DATABASE_URL = os.getenv("DATABASE_URL")
+# Formato: postgresql://user:pass@ep-xxx.aws.neon.tech/dbname?sslmode=require
+```
+
+**Características de Neon relevantes:**
+- **Autoscaling:** Ajusta compute según carga (0.25 - 4 CU en Free)
+- **Scale-to-zero:** Se apaga tras 5 min inactividad (Free tier)
+- **Branching:** Crear copias para testing sin duplicar storage
+- **Connection pooling:** Incluido nativamente
 
 ### Frontend (Fase 2)
 - **Framework**: Next.js 14
@@ -1303,11 +1345,16 @@ pip install -r backend/requirements.txt
 cp .env.example .env
 # Editar .env con tus credenciales
 
-# 5. Crear base de datos
-createdb odoo_finder
-psql odoo_finder -c "CREATE EXTENSION vector;"
+# 5. Crear base de datos con Neon
+# Ir a https://neon.com y crear cuenta
+# Crear proyecto "ai-odoofinder"
+# Copiar connection string a .env
 
-# 6. Ejecutar migraciones
+# 6. Habilitar pgVector en Neon
+# En Neon SQL Editor:
+# CREATE EXTENSION IF NOT EXISTS vector;
+
+# 7. Ejecutar migraciones
 alembic upgrade head
 
 # 7. Cargar datos iniciales (ETL)
@@ -1407,6 +1454,63 @@ Claude: "He encontrado 3 módulos que cumplen tus requisitos:
 - **Código**: Seguir PEP 8 para Python
 - **Tests**: Cobertura mínima 70%
 - **Documentación**: Actualizar README si añades features
+
+---
+
+## Deployment
+
+### Arquitectura de Producción
+```
+Usuario (claude.ai)
+    ↓
+Claude Skill
+    ↓ HTTPS
+Render.com (FastAPI)
+    ↓ PostgreSQL protocol
+Neon (Postgres + pgVector)
+```
+
+### Desplegar en Render
+
+**1. Preparar repositorio:**
+```bash
+# Asegurar que existe:
+- requirements.txt
+- backend/app/main.py
+- .env.example (sin valores reales)
+```
+
+**2. Crear Web Service en Render:**
+- Conectar GitHub repo
+- Build: `pip install -r requirements.txt`
+- Start: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
+
+**3. Variables de entorno en Render:**
+```
+DATABASE_URL=postgresql://...@ep-xxx.neon.tech/...
+OPENROUTER_API_KEY=sk-or-v1-...
+GITHUB_TOKEN=ghp_...
+```
+
+**4. Verificar deployment:**
+```bash
+curl https://ai-odoofinder.onrender.com/health
+# Respuesta: {"status": "healthy", "database": "connected"}
+```
+
+### Costos Estimados
+
+**Free Tier (MVP):**
+- Neon: $0 (0.5GB storage, 191h compute/mes)
+- Render: $0 (750h/mes, sleep tras inactividad)
+- OpenRouter: ~$0.50/mes (embeddings)
+- **Total: ~$0.50/mes**
+
+**Producción (500+ usuarios):**
+- Neon Launch: $19/mes (3GB storage, autoscaling)
+- Render: $7-25/mes (según uso)
+- OpenRouter: $10-20/mes (embeddings + búsquedas)
+- **Total: ~$36-64/mes**
 
 ---
 
