@@ -21,7 +21,7 @@ Un asistente de IA conversacional que ayuda a desarrolladores de Odoo a encontra
 Backend & Datos:
   - Neon Postgres Serverless (con pgVector)
   - FastAPI en Render.com (API REST)
-  - OpenRouter + Qwen3-Embedding-8B
+  - OpenRouter + Qwen3-Embedding-4B
   - SQLAlchemy + Alembic
 
 Interfaz:
@@ -68,7 +68,7 @@ pip install fastapi uvicorn sqlalchemy psycopg2-binary pgvector httpx python-dot
 
 **Modelos disponibles:**
 - `Qwen/Qwen3-Embedding-4B` (ligero, rápido)
-- `Qwen/Qwen3-Embedding-8B` (mejor calidad)
+- `Qwen/Qwen3-Embedding-4B` (mejor calidad)
 
 **Opción A: Via OpenRouter (Recomendado para MVP)**
 ```python

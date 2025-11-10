@@ -78,7 +78,7 @@ Pregunta como hablarías con un colega: "Necesito algo para gestionar inventario
 - **ORM:** SQLAlchemy + Alembic
 
 ### IA & Embeddings
-- **Modelo:** Qwen3-Embedding-8B (open source)
+- **Modelo:** Qwen3-Embedding-4B (open source)
 - **Hosting:** [OpenRouter.ai](https://openrouter.ai)
 - **Alternativa local:** Ollama (para desarrollo)
 - **Búsqueda vectorial:** pgVector (HNSW index)

@@ -1258,7 +1258,7 @@ export default function SearchBar() {
   - Branching como Git
 - **Framework**: FastAPI 0.104+ en [Render.com](https://render.com)
 - **ORM**: SQLAlchemy 2.0 + Alembic
-- **Embeddings**: Qwen3-Embedding-8B via [OpenRouter.ai](https://openrouter.ai)
+- **Embeddings**: Qwen3-Embedding-4B via [OpenRouter.ai](https://openrouter.ai)
 - **Cache**: Redis 7+ (opcional)
 - **Testing**: pytest, httpx
 
