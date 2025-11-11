@@ -205,3 +205,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+*.pyc
+*.pyo
+*.db
+*.sqlite
+logs/
+.DS_Store
+.cursorignore
