@@ -66,6 +66,7 @@ async def health_check(db: Session = Depends(get_db)):
         logger.error(f"Health check failed: {e}")
         raise HTTPException(status_code=503, detail="Service unavailable")
 
+@app.get("/search")
 @app.post("/search")
 async def search_modules(
     query: str = Query(..., description="Consulta en lenguaje natural"),
@@ -78,8 +79,11 @@ async def search_modules(
     """
     Búsqueda híbrida de módulos de Odoo.
 
+    Acepta tanto GET como POST requests.
+
     **Ejemplo:**
     ```
+    GET /search?query=sales+subscriptions&version=17.0&limit=5
     POST /search?query=sales+subscriptions&version=17.0&limit=5
     ```
 
