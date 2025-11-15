@@ -165,6 +165,41 @@ class GitHubService:
 
         return None
 
+    def get_readme_content(self, repo_name: str, version: str, module_path: str) -> Optional[str]:
+        """
+        Obtener el contenido del README de un módulo.
+
+        Args:
+            repo_name: Nombre del repo
+            version: Versión de Odoo
+            module_path: Path al módulo (ej: "sale_order_type/__manifest__.py")
+
+        Returns:
+            Contenido del README como string, o None si no existe
+        """
+        # Extraer el directorio del módulo
+        module_dir = module_path.rsplit('/', 1)[0] if '/' in module_path else module_path.replace('__manifest__.py', '')
+
+        # Probar diferentes nombres de README
+        readme_names = ['README.md', 'README.rst', 'README.MD', 'README.RST', 'readme.md']
+
+        for readme_name in readme_names:
+            readme_path = f"{module_dir}/{readme_name}"
+            url = f"{self.base_url}/repos/OCA/{repo_name}/contents/{readme_path}?ref={version}"
+
+            try:
+                response = requests.get(url, headers=self.headers, timeout=10)
+
+                if response.status_code == 200:
+                    data = response.json()
+                    # Decodificar contenido (está en base64)
+                    content = base64.b64decode(data['content']).decode('utf-8', errors='ignore')
+                    return content
+            except Exception:
+                continue
+
+        return None
+
 
 # Singleton
 _github_service = None

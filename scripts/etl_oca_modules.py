@@ -24,7 +24,7 @@ TARGET_REPOS: List[str] = [
     "purchase-workflow",
 ]
 
-ODOO_VERSIONS: List[str] = ["16.0", "17.0", "18.0"]
+ODOO_VERSIONS: List[str] = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
 
 
 def process_module(
@@ -71,13 +71,22 @@ def process_module(
         print("❌ No se pudo parsear")
         return
 
+    # Obtener README (si existe)
+    readme_content = github.get_readme_content(repo_name, version, manifest_path)
+
     # Preparar texto para embedding
     name = manifest.get("name", technical_name)
     summary = manifest.get("summary", "")
     description = manifest.get("description", "")
 
-    # Combinar textos relevantes
-    text_for_embedding = f"{name}. {summary}. {description}"
+    # Combinar textos relevantes (incluyendo README si existe)
+    text_parts = [name, summary, description]
+    if readme_content:
+        # Limitar README a primeros 2000 caracteres para no saturar el embedding
+        readme_preview = readme_content[:2000]
+        text_parts.append(readme_preview)
+
+    text_for_embedding = ". ".join(filter(None, text_parts))
 
     # Generar embedding
     try:
@@ -96,6 +105,7 @@ def process_module(
         license=manifest.get("license", "AGPL-3"),
         summary=summary,
         description=description,
+        readme=readme_content,  # Guardar README completo
         repo_name=repo_name,
         repo_url=f"https://github.com/OCA/{repo_name}",
         module_path=manifest_path,

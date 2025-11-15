@@ -24,6 +24,7 @@ class OdooModule(Base):
     # Descripciones
     summary = Column(String)
     description = Column(Text)
+    readme = Column(Text)  # Contenido del README.md/README.rst
 
     # GitHub info
     repo_name = Column(String, nullable=False)
