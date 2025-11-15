@@ -281,9 +281,9 @@ Lee nuestra [Guía de Contribución](docs/CONTRIBUTING.md) para más detalles.
 
 | Métrica | Valor |
 |---------|-------|
-| 📦 Módulos Indexados | ~1,550+ |
+| 📦 Módulos Indexados | **2,508** |
 | 🎯 Versiones de Odoo | 8 (v12.0 - v19.0) |
-| 📝 Con README completo | ~560 módulos |
+| 📝 Con README completo | **1,515** (60%) |
 | 🏢 Repositorios | OCA (5 principales) |
 | ⚡ Tiempo respuesta | < 500ms |
 | 🔄 Actualización | Diaria (GitHub Actions) |
@@ -296,16 +296,16 @@ Lee nuestra [Guía de Contribución](docs/CONTRIBUTING.md) para más detalles.
 
 | Versión | Módulos | Estado |
 |---------|---------|--------|
-| 12.0 | ~184 | ✅ Activo |
-| 13.0 | ~122 | ✅ Activo |
-| 14.0 | ~149 | ✅ Activo |
-| 15.0 | ~99 | ✅ Activo |
-| 16.0 (LTS) | ~421 | ✅ Activo |
-| 17.0 | ~264 | ✅ Activo |
-| 18.0 | ~306 | ✅ Activo |
-| 19.0 | ~6 | 🔄 En crecimiento |
+| 12.0 | 353 | ✅ Activo |
+| 13.0 | 336 | ✅ Activo |
+| 14.0 | 454 | ✅ Activo |
+| 15.0 | 364 | ✅ Activo |
+| 16.0 (LTS) | 421 | ✅ Activo |
+| 17.0 | 264 | ✅ Activo |
+| 18.0 | 307 | ✅ Activo |
+| 19.0 | 9 | 🔄 En crecimiento |
 
-**Total:** ~1,551 módulos indexados
+**Total:** 2,508 módulos indexados
 
 </div>
 

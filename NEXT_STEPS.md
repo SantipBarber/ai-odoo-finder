@@ -1,85 +1,32 @@
 # 🚀 Próximos Pasos - AI-OdooFinder
 
-**Última actualización:** 15 Noviembre 2025
-**Contexto:** Sesión de hoy completada, ETL en progreso
+**Última actualización:** 15 Noviembre 2025 - 18:00 UTC
+**Contexto:** Sprint 1 y Sprint 3 completados ✅ ETL finalizado con éxito 🎉
 
 ---
 
-## ⏳ URGENTE - Verificar ETL (Próximas 2 horas)
+## ✅ COMPLETADO - ETL Finalizado con Éxito
 
-### 1. Monitorear ETL en GitHub Actions
-**Cuándo:** En ~60-90 minutos desde las 16:14 UTC
+### Estadísticas Finales
 
-**Qué hacer:**
-1. Ve a https://github.com/SantipBarber/ai-odoo-finder/actions
-2. Verifica que el workflow "ETL Scheduler" completó exitosamente
-3. Busca en los logs finales:
-   ```
-   ✅ ETL COMPLETADO
+**Total módulos indexados:** 2,508 ✅
+**Módulos con README:** 1,515 (60%) ✅
 
-   📊 ESTADÍSTICAS:
-      Total módulos en DB: XXXX
-      - Odoo 12.0: XXX módulos
-      - Odoo 13.0: XXX módulos
-      ...
-   ```
+**Distribución por versión:**
+- v12.0: 353 módulos
+- v13.0: 336 módulos
+- v14.0: 454 módulos
+- v15.0: 364 módulos
+- v16.0: 421 módulos (LTS)
+- v17.0: 264 módulos
+- v18.0: 307 módulos
+- v19.0: 9 módulos (nueva)
 
-**Si hay errores:**
-- Revisa los logs completos
-- Verifica que no sea un problema de rate limit de GitHub API
-- Comprueba que OpenRouter tenga créditos
+**Resultado:** Superamos las expectativas (~2,000-2,500 esperados) 🎉
 
 ---
 
-### 2. Verificar Base de Datos
-
-```bash
-python -c "
-import psycopg2
-import os
-
-conn = psycopg2.connect(os.getenv('DATABASE_URL'))
-cur = conn.cursor()
-
-# Total
-cur.execute('SELECT COUNT(*) FROM odoo_modules')
-total = cur.fetchone()[0]
-print(f'Total módulos: {total}')
-
-# Por versión
-for v in ['12.0', '13.0', '14.0', '15.0', '16.0', '17.0', '18.0', '19.0']:
-    cur.execute('SELECT COUNT(*) FROM odoo_modules WHERE version = %s', (v,))
-    count = cur.fetchone()[0]
-    print(f'  v{v}: {count}')
-
-# Con README
-cur.execute('SELECT COUNT(*) FROM odoo_modules WHERE readme IS NOT NULL')
-with_readme = cur.fetchone()[0]
-print(f'\nCon README: {with_readme}')
-
-cur.close()
-conn.close()
-"
-```
-
-**Resultado esperado:**
-```
-Total módulos: 2000-2500
-  v12.0: 150-200
-  v13.0: 200-250
-  v14.0: 250-300
-  v15.0: 300-350
-  v16.0: 421
-  v17.0: 264
-  v18.0: 306
-  v19.0: 100-150
-
-Con README: 1500-2000
-```
-
----
-
-### 3. Probar Calidad de Búsqueda
+## 🎯 PRIORIDAD ALTA - Pruebas de Búsqueda
 
 **Prueba 1: Búsqueda simple**
 ```
@@ -101,210 +48,187 @@ Debería devolver módulos de v12.0.
 
 ---
 
-## 📝 ALTA PRIORIDAD - Documentación (1-2 horas)
+## ✅ COMPLETADO - Documentación Actualizada
 
-### 1. Actualizar README.md
+### Archivos Actualizados:
+- ✅ README.md - Estadísticas finales (2,508 módulos)
+- ✅ PROJECT_SUMMARY.md - Datos reales del ETL
+- ✅ ROADMAP.md - Sprint 1 y 3 marcados como completados
+- ✅ docs/INDEX.md - Nueva estructura de documentación
 
-**Qué cambiar:**
-
-**Sección: Estadísticas**
-```markdown
-## 📊 Estadísticas
-
-- **Total módulos indexados:** ~2,347
-- **Versiones soportadas:** v12.0 - v19.0 (8 versiones)
-- **Repositorios OCA:** 5 principales
-- **Con README completo:** ~1,800 módulos
-- **Actualización:** Diaria (3 AM UTC)
-```
-
-**Sección: Versiones Soportadas**
-```markdown
-## 🎯 Versiones de Odoo Soportadas
-
-| Versión | Módulos | Estado |
-|---------|---------|--------|
-| 12.0 | ~178 | ✅ |
-| 13.0 | ~234 | ✅ |
-| 14.0 | ~289 | ✅ |
-| 15.0 | ~342 | ✅ |
-| 16.0 | ~421 | ✅ |
-| 17.0 | ~264 | ✅ |
-| 18.0 | ~306 | ✅ |
-| 19.0 | ~113 | ✅ |
-```
-
-**Sección: Características (añadir)**
-```markdown
-### 🎯 Búsqueda Mejorada con READMEs
-
-Los embeddings incluyen el contenido completo de los READMEs de cada módulo:
-- ✅ Casos de uso reales
-- ✅ Ejemplos de configuración
-- ✅ Limitaciones conocidas
-- ✅ Integraciones con otros módulos
-
-**Resultado:** Búsquedas mucho más precisas y contextuales.
-```
+### Archivos Eliminados (Sprint 1):
+- ✅ 8 archivos duplicados/vacíos eliminados
+- ✅ Estructura limpia: solo README en raíz
+- ✅ Todo organizado en docs/
 
 ---
 
-### 2. Actualizar docs/API.md
-
-**Añadir sección de versiones:**
-```markdown
-## Versiones Soportadas
-
-El sistema indexa módulos de las siguientes versiones de Odoo:
-
-- **v12.0** - Odoo 12 (LTS antigua)
-- **v13.0** - Odoo 13
-- **v14.0** - Odoo 14
-- **v15.0** - Odoo 15
-- **v16.0** - Odoo 16 (LTS)
-- **v17.0** - Odoo 17
-- **v18.0** - Odoo 18
-- **v19.0** - Odoo 19 (actual)
-
-Total: ~2,300 módulos indexados
-```
-
-**Actualizar ejemplo de respuesta:**
-```json
-{
-    "id": 123,
-    "technical_name": "sale_order_type",
-    "name": "Sale Order Type",
-    "version": "16.0",
-    "summary": "Adds types to sale orders",
-    "description": "...",
-    "readme": "# Sale Order Type\n\n## Features\n...",  // ← NUEVO
-    ...
-}
-```
-
----
-
-### 3. Actualizar claude-skill/Skill.md
-
-**Actualizar estadísticas:**
-```markdown
-## 📊 Base de Datos
-
-- **Total módulos:** ~2,347
-- **Versiones disponibles:**
-  - 12.0 (Odoo 12) - 178 módulos
-  - 13.0 (Odoo 13) - 234 módulos
-  - 14.0 (Odoo 14) - 289 módulos
-  - 15.0 (Odoo 15) - 342 módulos
-  - 16.0 (Odoo 16) - 421 módulos
-  - 17.0 (Odoo 17) - 264 módulos
-  - 18.0 (Odoo 18) - 306 módulos
-  - 19.0 (Odoo 19) - 113 módulos
-```
-
----
-
-### 4. Actualizar SPRINT_PLAN.md
-
-**Marcar Sprint 3 como completado:**
-```markdown
-### SPRINT 3: Multi-versión ✅ COMPLETADO
-- [x] Actualizar ETL para v12-v19
-- [x] Ejecutar ETL para nuevas versiones
-- [x] Verificar indexación correcta
-- [x] Actualizar documentación
-- [x] Testing búsquedas multi-versión
-- [x] Actualizar estadísticas en docs
-
-**Completado:** 15 Nov 2025
-**Resultado:** 2,347 módulos indexados en 8 versiones
-```
-
----
-
-## 🧹 SPRINT 1 - Limpieza de Documentación (2-3 horas)
-
-### Documentos a Revisar
-
-#### 1. docs/CREATED_FILES.md
-- [ ] Leer contenido
-- [ ] Decidir: ¿Es útil o temporal?
-- [ ] Acción: Eliminar o consolidar
-
-#### 2. docs/GALLERY.md
-- [ ] Leer contenido
-- [ ] Decidir: ¿Tiene screenshots/ejemplos útiles?
-- [ ] Acción: Mantener solo si tiene contenido visual
-
-#### 3. docs/BRANDING.md
-- [ ] Revisar logos y assets
-- [ ] Decidir: ¿Necesario para el proyecto?
-- [ ] Acción: Consolidar en README si es breve
-
-#### 4. docs/NEXT_STEPS.md
-- [ ] Comparar con ROADMAP.md
-- [ ] Decidir: ¿Duplicado?
-- [ ] Acción: Eliminar si duplica ROADMAP
-
-#### 5. claude-skill/prompts.md
-- [ ] Revisar contenido (probablemente mínimo)
-- [ ] Acción: Eliminar si <10 líneas útiles
-
-#### 6. claude-skill/examples.md
-- [ ] Revisar ejemplos
-- [ ] Acción: Consolidar en Skill.md o eliminar
-
-#### 7. CONTRIBUTING.md (raíz)
-- [ ] Comparar con docs/CONTRIBUTING.md
-- [ ] Acción: Eliminar duplicado de raíz
-
----
-
-### Script de Limpieza
-
-```bash
-# Revisar tamaños
-ls -lh docs/*.md
-ls -lh claude-skill/*.md
-
-# Comparar duplicados
-diff CONTRIBUTING.md docs/CONTRIBUTING.md
-
-# Eliminar si son idénticos
-rm CONTRIBUTING.md  # (si es duplicado)
-```
-
----
-
-### Actualizar docs/INDEX.md
-
-Después de eliminar archivos innecesarios, actualizar el índice con la nueva estructura.
-
----
-
-## 🔌 SPRINT 2 - MCP (1-2 semanas)
+## 🔌 PRÓXIMO: SPRINT 2 - MCP Server (1-2 semanas)
 
 **Prioridad:** Alta
-**Objetivo:** Claude Skill nativa (sin copy-paste)
+**Objetivo:** Claude Skill nativa sin copy-paste (funciona directamente en Claude Web y Desktop)
+**Estado:** Pendiente
 
-### Investigación (2-3 días)
-- [ ] Leer documentación MCP completa
-- [ ] Revisar ejemplos de servidores MCP
-- [ ] Decidir: Python vs Node.js
-- [ ] Diseñar arquitectura
+### ¿Por qué MCP?
 
-### Recursos
-- https://modelcontextprotocol.io
-- https://github.com/modelcontextprotocol/servers
-- https://github.com/modelcontextprotocol/python-sdk
+**Situación actual:**
+- ✅ Claude Code: Funciona perfectamente (nativo)
+- ⚠️ Claude Web: Requiere copy-paste del Skill.md (no ideal)
 
-### Implementación (5-7 días)
+**Con MCP implementado:**
+- ✅ Claude Web: Funcionará nativamente
+- ✅ Claude Desktop: Funcionará nativamente
+- ✅ Claude Code: Seguirá funcionando
+- ✅ UX mejorada: Sin necesidad de copiar/pegar
+
+### Fase 1: Investigación (2-3 días)
+
+**Tareas:**
+- [ ] Leer documentación oficial MCP
+- [ ] Revisar ejemplos de servidores MCP existentes
+- [ ] Decidir stack: Python (recomendado) vs Node.js
+- [ ] Diseñar arquitectura del servidor
+
+**Recursos clave:**
+- 📖 [Documentación MCP](https://modelcontextprotocol.io)
+- 💻 [Servidores de ejemplo](https://github.com/modelcontextprotocol/servers)
+- 🐍 [Python SDK](https://github.com/modelcontextprotocol/python-sdk)
+- 📺 [Tutorial oficial](https://www.anthropic.com/news/model-context-protocol)
+
+**Entregable:** Documento de diseño con arquitectura propuesta
+
+---
+
+### Fase 2: Implementación Core (3-4 días)
+
+**Tareas:**
 - [ ] Crear proyecto MCP en `/mcp-server/`
 - [ ] Implementar tool `search_odoo_modules`
+  - [ ] Conexión a API existente (Render)
+  - [ ] Parseo de parámetros (query, version, depends, limit)
+  - [ ] Formateo de respuestas
+- [ ] Gestión de errores y timeouts
+- [ ] Logging básico
+
+**Estructura esperada:**
+```
+mcp-server/
+├── pyproject.toml         # Dependencias
+├── src/
+│   └── ai_odoofinder_mcp/
+│       ├── __init__.py
+│       ├── server.py      # Servidor MCP
+│       └── tools.py       # Tool search_odoo_modules
+├── tests/
+│   └── test_server.py
+└── README.md
+```
+
+**Entregable:** Servidor MCP funcionando localmente
+
+---
+
+### Fase 3: Testing (2-3 días)
+
+**Tareas:**
 - [ ] Testing con Claude Desktop
-- [ ] Documentar instalación
-- [ ] Video/guía para usuarios
+  - [ ] Instalación del servidor
+  - [ ] Configuración en settings
+  - [ ] Pruebas de búsqueda
+- [ ] Testing con Claude Web (si es posible)
+- [ ] Tests unitarios
+- [ ] Tests de integración con API
+
+**Casos de prueba:**
+1. Búsqueda simple: "módulo de inventario en Odoo 16"
+2. Búsqueda con dependencias: "módulo de ventas que use account"
+3. Sin resultados: "módulo de TikTok en Odoo 12"
+4. Error handling: API caída, timeout, etc.
+
+**Entregable:** Suite de tests pasando + documentación de casos
+
+---
+
+### Fase 4: Documentación y Deploy (1-2 días)
+
+**Tareas:**
+- [ ] Crear `/mcp-server/README.md` completo
+- [ ] Guía de instalación paso a paso
+- [ ] Troubleshooting común
+- [ ] Actualizar docs/INDEX.md
+- [ ] (Opcional) Video tutorial de instalación
+
+**Secciones del README:**
+1. Qué es y para qué sirve
+2. Instalación (Claude Desktop, Claude Web)
+3. Configuración
+4. Ejemplos de uso
+5. Troubleshooting
+6. Development (para contribuidores)
+
+**Entregable:** Documentación completa lista para usuarios
+
+---
+
+### Recursos de Desarrollo
+
+**Dependencias esperadas:**
+```toml
+[project]
+dependencies = [
+    "mcp>=0.1.0",
+    "httpx>=0.24.0",
+    "pydantic>=2.0.0"
+]
+```
+
+**Tool definition ejemplo:**
+```python
+@server.tool()
+async def search_odoo_modules(
+    query: str,
+    version: str,
+    depends: list[str] | None = None,
+    limit: int = 5
+) -> list[dict]:
+    """
+    Search Odoo modules using AI-powered search.
+
+    Args:
+        query: Description of desired functionality
+        version: Odoo version (12.0, 13.0, ..., 19.0)
+        depends: Optional list of required dependencies
+        limit: Maximum results (default: 5)
+    """
+    # Call to Render API
+    ...
+```
+
+---
+
+### Criterios de Éxito Sprint 2
+
+- ✅ Servidor MCP funcional
+- ✅ Tool `search_odoo_modules` implementado
+- ✅ Tests pasando (>80% coverage)
+- ✅ Funciona en Claude Desktop
+- ✅ Documentación completa
+- ✅ Sin errores en logs durante 1 día de uso
+
+---
+
+### Estimación de Tiempo
+
+| Fase | Días | Estado |
+|------|------|--------|
+| Investigación | 2-3 | ⏳ Pendiente |
+| Implementación | 3-4 | ⏳ Pendiente |
+| Testing | 2-3 | ⏳ Pendiente |
+| Documentación | 1-2 | ⏳ Pendiente |
+| **TOTAL** | **8-12 días** | ⏳ Pendiente |
+
+**Fecha estimada de inicio:** Semana del 18-22 Noviembre
+**Fecha estimada de finalización:** Primera semana de Diciembre
 
 ---
 
@@ -448,5 +372,5 @@ Antes de empezar un nuevo hilo, asegúrate de:
 
 ---
 
-**Última actualización:** 15 Nov 2025, 17:35 UTC
-**Próxima revisión:** Cuando ETL complete
+**Última actualización:** 15 Nov 2025, 18:00 UTC
+**Próxima revisión:** Inicio de Sprint 2 (MCP)

@@ -327,9 +327,9 @@ He encontrado 3 módulos para suscripciones en Odoo 17.0:
 
 | Métrica | Valor |
 |---------|-------|
-| 📦 Módulos Indexados | ~1,551 |
+| 📦 Módulos Indexados | **2,508** |
 | 🎯 Versiones de Odoo | 8 (v12.0 - v19.0) |
-| 📝 Con README completo | ~560 (36%) |
+| 📝 Con README completo | **1,515** (60%) |
 | 🏢 Repositorios OCA | 5 principales |
 | ⚡ Tiempo de respuesta | < 500ms |
 | 🔄 Frecuencia ETL | Diaria (3 AM UTC) |
@@ -340,14 +340,14 @@ He encontrado 3 módulos para suscripciones en Odoo 17.0:
 
 | Versión | Módulos | % del Total |
 |---------|---------|-------------|
-| v12.0 | 184 | 11.9% |
-| v13.0 | 122 | 7.9% |
-| v14.0 | 149 | 9.6% |
-| v15.0 | 99 | 6.4% |
-| v16.0 (LTS) | 421 | 27.1% |
-| v17.0 | 264 | 17.0% |
-| v18.0 | 306 | 19.7% |
-| v19.0 | 6 | 0.4% |
+| v12.0 | 353 | 14.1% |
+| v13.0 | 336 | 13.4% |
+| v14.0 | 454 | 18.1% |
+| v15.0 | 364 | 14.5% |
+| v16.0 (LTS) | 421 | 16.8% |
+| v17.0 | 264 | 10.5% |
+| v18.0 | 307 | 12.2% |
+| v19.0 | 9 | 0.4% |
 
 ### Impacto
 
