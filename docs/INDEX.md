@@ -14,9 +14,9 @@ Este documento te guía a través de toda la documentación del proyecto.
 
 Si eres nuevo en el proyecto, comienza en este orden:
 
-1. **[README.md](README.md)** - Descripción general del proyecto ⏱️ 5 min
+1. **[README.md](../README.md)** - Descripción general del proyecto ⏱️ 5 min
 2. **[QUICKSTART.md](QUICKSTART.md)** - Setup rápido en 10 minutos ⏱️ 10 min
-3. **[docs/TECHNICAL_GUIDE.md](docs/TECHNICAL_GUIDE.md)** - Guía técnica completa ⏱️ 30 min
+3. **[TECHNICAL_GUIDE.md](TECHNICAL_GUIDE.md)** - Guía técnica completa ⏱️ 30 min
 
 ---
 
@@ -26,17 +26,34 @@ Si eres nuevo en el proyecto, comienza en este orden:
 
 | Documento | Descripción | Audiencia |
 |-----------|-------------|-----------|
-| **[README.md](README.md)** | Introducción comercial al proyecto | Todos |
+| **[README.md](../README.md)** | Introducción comercial al proyecto | Todos |
 | **[QUICKSTART.md](QUICKSTART.md)** | Instalación y primera búsqueda | Nuevos usuarios |
-| **[BRANDING.md](BRANDING.md)** | Logos y arte ASCII | Diseñadores / Docs |
+| **[BRANDING.md](BRANDING.md)** | Logos, paleta de colores y guía de estilo | Diseñadores / Docs |
+| **[GALLERY.md](GALLERY.md)** | Galería de assets SVG | Diseñadores / UI |
 
 ### 🔧 Para Desarrolladores
 
 | Documento | Descripción | Audiencia |
 |-----------|-------------|-----------|
-| **[docs/TECHNICAL_GUIDE.md](docs/TECHNICAL_GUIDE.md)** | Arquitectura e implementación detallada | Desarrolladores |
+| **[TECHNICAL_GUIDE.md](TECHNICAL_GUIDE.md)** | Arquitectura e implementación detallada | Desarrolladores |
 | **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** | Estructura de archivos y directorios | Desarrolladores |
 | **[CONTRIBUTING.md](CONTRIBUTING.md)** | Guía para contribuir al proyecto | Contribuidores |
+| **[NEON_SETUP.md](NEON_SETUP.md)** | Setup de base de datos PostgreSQL | DevOps / Developers |
+
+### 📊 Planificación y Roadmap
+
+| Documento | Descripción | Audiencia |
+|-----------|-------------|-----------|
+| **[ROADMAP.md](ROADMAP.md)** | Plan de desarrollo futuro | Product Managers / Stakeholders |
+| **[SPRINT_PLAN.md](../SPRINT_PLAN.md)** | Plan detallado de sprints | Equipo de desarrollo |
+| **[NEXT_STEPS.md](../NEXT_STEPS.md)** | Próximas tareas y acciones | Desarrolladores activos |
+
+### 🎓 Proyecto Final
+
+| Documento | Descripción | Audiencia |
+|-----------|-------------|-----------|
+| **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** | Resumen completo para presentación del proyecto final | Evaluadores / Presentación |
+| **[SESSION_2025-11-15.md](SESSION_2025-11-15.md)** | Documentación de sesión de desarrollo | Histórico |
 
 ### ⚙️ Archivos de Configuración
 
@@ -264,12 +281,12 @@ Si eres nuevo en el proyecto, comienza en este orden:
 
 | Métrica | Valor |
 |---------|-------|
-| 📄 Total de documentos | 9 archivos |
-| 📝 Palabras totales | ~15,000+ palabras |
-| ⏱️ Tiempo de lectura total | ~2 horas |
-| 💻 Líneas de código ejemplo | 500+ líneas |
-| 🎨 Logos ASCII | 8 variantes |
-| ✅ Ejemplos prácticos | 30+ ejemplos |
+| 📄 Total de documentos | 15 archivos |
+| 📝 Palabras totales | ~25,000+ palabras |
+| ⏱️ Tiempo de lectura total | ~3 horas |
+| 💻 Líneas de código ejemplo | 800+ líneas |
+| 🎨 Assets SVG | 7 archivos |
+| ✅ Ejemplos prácticos | 40+ ejemplos |
 
 ---
 
@@ -313,14 +330,11 @@ Si crees que falta documentación o algo no está claro:
 
 ---
 
-## 🎯 Próximos Documentos Planificados
+## 🎯 Documentos Futuros (Opcional)
 
-- [ ] **API.md** - Referencia completa de endpoints
-- [ ] **ARCHITECTURE.md** - Diagramas detallados
-- [ ] **DEPLOYMENT.md** - Guía de producción
-- [ ] **CHANGELOG.md** - Registro de versiones
 - [ ] **FAQ.md** - Preguntas frecuentes
 - [ ] **TUTORIALS/** - Carpeta con tutoriales paso a paso
+- [ ] **VIDEO_GUIDE.md** - Guía para el vídeo de presentación
 
 ---
 
@@ -336,8 +350,8 @@ Si crees que falta documentación o algo no está claro:
 ╚════════════════════════════════════════════════════╝
 ```
 
-**Última actualización:** 2025-01-06  
-**Versión de docs:** 0.1.0  
-**Estado:** ✅ Completo para MVP
+**Última actualización:** 2025-11-15
+**Versión de docs:** 1.0.0
+**Estado:** ✅ Completo y listo para presentación
 
 </div>

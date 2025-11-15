@@ -12,7 +12,7 @@ Un asistente inteligente impulsado por IA que ayuda a desarrolladores de Odoo a 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Odoo](https://img.shields.io/badge/Odoo-16.0%20|%2017.0%20|%2018.0-714B67)](https://www.odoo.com)
+[![Odoo](https://img.shields.io/badge/Odoo-12.0%20to%2019.0-714B67)](https://www.odoo.com)
 [![AI Powered](https://img.shields.io/badge/AI-Powered-blueviolet)](https://www.anthropic.com)
 
 [Demo](#-demo) • [Características](#-características) • [Instalación](#-instalación-rápida) • [Documentación](docs/TECHNICAL_GUIDE.md)
@@ -51,7 +51,7 @@ Como desarrollador de Odoo, ¿cuántas veces has...?
 Combina búsqueda semántica (RAG) con filtrado determinista para resultados precisos y relevantes.
 
 ### 🎯 Versionado Estricto
-Solo muestra módulos compatibles con tu versión específica de Odoo (16.0, 17.0, 18.0).
+Solo muestra módulos compatibles con tu versión específica de Odoo (12.0 a 19.0).
 
 ### 📊 Sistema de Scoring
 Evalúa módulos por:
@@ -199,9 +199,28 @@ El asistente buscará automáticamente y te dará recomendaciones personalizadas
 
 ## 📚 Documentación
 
+### 📖 Guías Principales
+- **[Guía de Inicio Rápido](docs/QUICKSTART.md)** - Setup en 10 minutos
 - **[Guía Técnica Completa](docs/TECHNICAL_GUIDE.md)** - Arquitectura, implementación y desarrollo
-- **[API Reference](docs/API.md)** - Endpoints y ejemplos
-- **[Claude Skill Setup](docs/CLAUDE_SKILL.md)** - Configurar el asistente conversacional
+- **[Estructura del Proyecto](docs/PROJECT_STRUCTURE.md)** - Organización del código
+- **[Roadmap](docs/ROADMAP.md)** - Plan de desarrollo y futuro del proyecto
+
+### 🔧 Setup y Configuración
+- **[Configuración Neon](docs/NEON_SETUP.md)** - Setup de base de datos PostgreSQL
+- **[Claude Skill](claude-skill/ai-odoofinder-skill/Skill.md)** - Configurar el asistente conversacional
+
+### 🎨 Diseño y Branding
+- **[Branding](docs/BRANDING.md)** - Paleta de colores, logos y guía de estilo
+- **[Gallery](docs/GALLERY.md)** - Galería de imágenes y assets SVG
+
+### 🤝 Contribución
+- **[Guía de Contribución](docs/CONTRIBUTING.md)** - Cómo contribuir al proyecto
+- **[Changelog](docs/CHANGELOG.md)** - Historial de cambios
+
+### 📊 Información de Desarrollo
+- **[Plan de Sprints](SPRINT_PLAN.md)** - Plan detallado de desarrollo
+- **[Próximos Pasos](NEXT_STEPS.md)** - Tareas pendientes y siguientes pasos
+- **[Sesiones de Desarrollo](docs/SESSION_2025-11-15.md)** - Documentación de sesiones
 
 ---
 
@@ -237,7 +256,7 @@ El asistente buscará automáticamente y te dará recomendaciones personalizadas
 4. **Push** a la rama (`git push origin feature/AmazingFeature`)
 5. **Abre** un Pull Request
 
-Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para más detalles.
+Lee nuestra [Guía de Contribución](docs/CONTRIBUTING.md) para más detalles.
 
 ---
 
@@ -262,10 +281,31 @@ Lee nuestra [Guía de Contribución](CONTRIBUTING.md) para más detalles.
 
 | Métrica | Valor |
 |---------|-------|
-| 📦 Módulos Indexados | 500+ |
-| 🏢 Repositorios | OCA (100% cobertura) |
-| 🔍 Búsquedas/día | En desarrollo |
+| 📦 Módulos Indexados | ~1,550+ |
+| 🎯 Versiones de Odoo | 8 (v12.0 - v19.0) |
+| 📝 Con README completo | ~560 módulos |
+| 🏢 Repositorios | OCA (5 principales) |
 | ⚡ Tiempo respuesta | < 500ms |
+| 🔄 Actualización | Diaria (GitHub Actions) |
+
+</div>
+
+### 🎯 Versiones de Odoo Soportadas
+
+<div align="center">
+
+| Versión | Módulos | Estado |
+|---------|---------|--------|
+| 12.0 | ~184 | ✅ Activo |
+| 13.0 | ~122 | ✅ Activo |
+| 14.0 | ~149 | ✅ Activo |
+| 15.0 | ~99 | ✅ Activo |
+| 16.0 (LTS) | ~421 | ✅ Activo |
+| 17.0 | ~264 | ✅ Activo |
+| 18.0 | ~306 | ✅ Activo |
+| 19.0 | ~6 | 🔄 En crecimiento |
+
+**Total:** ~1,551 módulos indexados
 
 </div>
 
