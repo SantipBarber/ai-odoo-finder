@@ -81,92 +81,99 @@ Debería devolver módulos de v12.0.
 - ✅ Claude Code: Seguirá funcionando
 - ✅ UX mejorada: Sin necesidad de copiar/pegar
 
-### Fase 1: Investigación (2-3 días)
+### Fase 1: Investigación (2-3 días) ✅ COMPLETADA
 
 **Tareas:**
-- [ ] Leer documentación oficial MCP
-- [ ] Revisar ejemplos de servidores MCP existentes
-- [ ] Decidir stack: Python (recomendado) vs Node.js
-- [ ] Diseñar arquitectura del servidor
+- [x] Leer documentación oficial MCP
+- [x] Revisar ejemplos de servidores MCP existentes
+- [x] Decidir stack: **Python con FastMCP** (integrado en FastAPI existente)
+- [x] Diseñar arquitectura del servidor
 
-**Recursos clave:**
+**Decisión clave:** 🎯 **MCP Remoto en Render** (HTTP/SSE)
+- Integrado en mismo proceso que API FastAPI
+- Conectores personalizados de Claude Web (beta)
+- Cero instalación para usuarios (solo URL)
+- Un solo deployment, cero latencia
+
+**Recursos investigados:**
 - 📖 [Documentación MCP](https://modelcontextprotocol.io)
 - 💻 [Servidores de ejemplo](https://github.com/modelcontextprotocol/servers)
 - 🐍 [Python SDK](https://github.com/modelcontextprotocol/python-sdk)
-- 📺 [Tutorial oficial](https://www.anthropic.com/news/model-context-protocol)
+- 🔧 [FastMCP](https://gofastmcp.com)
 
-**Entregable:** Documento de diseño con arquitectura propuesta
-
----
-
-### Fase 2: Implementación Core (3-4 días)
-
-**Tareas:**
-- [ ] Crear proyecto MCP en `/mcp-server/`
-- [ ] Implementar tool `search_odoo_modules`
-  - [ ] Conexión a API existente (Render)
-  - [ ] Parseo de parámetros (query, version, depends, limit)
-  - [ ] Formateo de respuestas
-- [ ] Gestión de errores y timeouts
-- [ ] Logging básico
-
-**Estructura esperada:**
-```
-mcp-server/
-├── pyproject.toml         # Dependencias
-├── src/
-│   └── ai_odoofinder_mcp/
-│       ├── __init__.py
-│       ├── server.py      # Servidor MCP
-│       └── tools.py       # Tool search_odoo_modules
-├── tests/
-│   └── test_server.py
-└── README.md
-```
-
-**Entregable:** Servidor MCP funcionando localmente
+**Entregables:** ✅
+- [docs/MCP_DESIGN.md](docs/MCP_DESIGN.md) - Diseño completo v2.0
+- [docs/MCP_REMOTE_SUMMARY.md](docs/MCP_REMOTE_SUMMARY.md) - Resumen ejecutivo
 
 ---
 
-### Fase 3: Testing (2-3 días)
+### Fase 2: Implementación Core (2-3 días) 🔄 ACTUALIZADO
 
 **Tareas:**
-- [ ] Testing con Claude Desktop
-  - [ ] Instalación del servidor
-  - [ ] Configuración en settings
-  - [ ] Pruebas de búsqueda
-- [ ] Testing con Claude Web (si es posible)
-- [ ] Tests unitarios
-- [ ] Tests de integración con API
+- [ ] Instalar `fastmcp` en `backend/requirements.txt`
+- [ ] Integrar FastMCP en `backend/app/main.py`
+  - [ ] Importar FastMCP y crear instancia desde app FastAPI
+  - [ ] Configurar CORS para Claude Web
+- [ ] Crear `backend/app/mcp_tools.py`
+  - [ ] Tool `search_odoo_modules`
+  - [ ] Llamada directa a SearchService (NO HTTP)
+  - [ ] Formateo de respuestas para Claude
+  - [ ] Gestión de errores
+- [ ] Testing local con `fastmcp dev`
+
+**Estructura actualizada:**
+```
+backend/
+└── app/
+    ├── main.py              # API + MCP integrados ✅
+    ├── mcp_tools.py         # Tools de MCP (NUEVO)
+    ├── services/
+    │   └── search_service.py  # Reutilizado por MCP
+    └── requirements.txt     # + fastmcp
+```
+
+**Entregable:** Servidor MCP remoto funcionando en Render (endpoint `/mcp`)
+
+---
+
+### Fase 3: Testing (1-2 días) 🔄 ACTUALIZADO
+
+**Tareas:**
+- [ ] Deploy a Render (staging/producción)
+- [ ] Verificar endpoint `/mcp` accesible vía HTTPS
+- [ ] Configurar conector personalizado en Claude Web
+  - [ ] Settings → Integrations → Add Custom Connector
+  - [ ] URL: `https://ai-odoo-finder.onrender.com/mcp`
+- [ ] Testing funcional end-to-end
+- [ ] Tests unitarios para `mcp_tools.py`
 
 **Casos de prueba:**
 1. Búsqueda simple: "módulo de inventario en Odoo 16"
 2. Búsqueda con dependencias: "módulo de ventas que use account"
 3. Sin resultados: "módulo de TikTok en Odoo 12"
-4. Error handling: API caída, timeout, etc.
+4. Error handling: Versión inválida, límite excedido, etc.
 
-**Entregable:** Suite de tests pasando + documentación de casos
+**Entregable:** Servidor funcionando en producción + Claude Web conectado ✅
 
 ---
 
-### Fase 4: Documentación y Deploy (1-2 días)
+### Fase 4: Documentación (1 día) 🔄 ACTUALIZADO
 
 **Tareas:**
-- [ ] Crear `/mcp-server/README.md` completo
-- [ ] Guía de instalación paso a paso
-- [ ] Troubleshooting común
+- [ ] Crear `docs/MCP_USER_GUIDE.md`
+  - [ ] Cómo configurar conector en Claude Web
+  - [ ] Screenshots paso a paso
+  - [ ] Ejemplos de uso
+  - [ ] Troubleshooting
+- [ ] Actualizar README principal
+  - [ ] Sección "Uso con Claude Web"
+  - [ ] Badge de MCP
 - [ ] Actualizar docs/INDEX.md
-- [ ] (Opcional) Video tutorial de instalación
+- [ ] (Opcional) Video tutorial corto
 
-**Secciones del README:**
-1. Qué es y para qué sirve
-2. Instalación (Claude Desktop, Claude Web)
-3. Configuración
-4. Ejemplos de uso
-5. Troubleshooting
-6. Development (para contribuidores)
+**Entregable:** Guía de usuario lista para compartir
 
-**Entregable:** Documentación completa lista para usuarios
+**Nota:** Ya no se requiere instalación local, solo documentar configuración del conector
 
 ---
 
