@@ -1,8 +1,465 @@
 # 🗺️ Hoja de Ruta AI-OdooFinder - Plan de Implementación
 
-**Versión:** 1.1 (Actualizada con Qwen3-Embedding + Claude Skill)  
-**Fecha:** Enero 2025  
+**Versión:** 2.0 (Actualizada con MCP + Multi-versión + Odoo Store)
+**Fecha:** Noviembre 2025
 **Objetivo:** Sistema de búsqueda inteligente de módulos Odoo con IA
+
+---
+
+## 🎯 FASE ACTUAL: Post-MVP - Mejoras y Expansión
+
+**Estado Actual del Proyecto:**
+- ✅ MVP Funcional desplegado en Render
+- ✅ API REST funcionando con FastAPI
+- ✅ Base de datos Neon con pgVector
+- ✅ Claude Skill básica (requiere copy-paste en Claude Web)
+- ✅ ~991 módulos indexados (v16.0, v17.0, v18.0)
+- ⚠️ GitHub Actions ETL con errores
+- ❌ MCP no implementado
+- ❌ Módulos propios no soportados
+
+---
+
+## 📋 PLAN DE TRABAJO INMEDIATO
+
+### SPRINT 1: Limpieza y Corrección (1 semana)
+
+#### ✅ Tarea 1.1: Corregir GitHub Actions ETL
+**Problema:** El job nocturno falla con `ModuleNotFoundError: No module named 'sqlalchemy'`
+
+**Solución:**
+- [ ] Agregar step de instalación de dependencias en `.github/workflows/etl.yml`
+- [ ] Configurar variables de entorno necesarias (DATABASE_URL, etc.)
+- [ ] Decidir si queremos mantener el ETL automático o deshabilitarlo
+- [ ] Documentar el propósito del ETL automático
+
+**Archivos a modificar:**
+- `.github/workflows/etl.yml`
+
+**Tiempo estimado:** 2 horas
+
+---
+
+#### ✅ Tarea 1.2: Auditoría y Limpieza de Documentación
+**Objetivo:** Identificar documentos desactualizados, duplicados o innecesarios
+
+**Documentos a revisar:**
+
+**MANTENER Y ACTUALIZAR:**
+- ✅ `README.md` - Documento principal
+- ✅ `docs/ROADMAP.md` - Este documento (actualizar con nuevo plan)
+- ✅ `docs/TECHNICAL_GUIDE.md` - Guía técnica
+- ✅ `docs/API.md` - Referencia de API
+- ✅ `docs/QUICKSTART.md` - Guía rápida
+- ✅ `claude-skill/README.md` - Guía de la skill
+- ✅ `claude-skill/ai-odoofinder-skill/Skill.md` - Definición de la skill
+
+**REVISAR Y POSIBLEMENTE ELIMINAR:**
+- ⚠️ `docs/CREATED_FILES.md` - Posible documento temporal
+- ⚠️ `docs/GALLERY.md` - ¿Tiene contenido útil?
+- ⚠️ `docs/BRANDING.md` - ¿Es necesario para el proyecto?
+- ⚠️ `docs/NEXT_STEPS.md` - Posible duplicado del ROADMAP
+- ⚠️ `claude-skill/prompts.md` - Contenido mínimo
+- ⚠️ `claude-skill/examples.md` - Contenido mínimo
+- ⚠️ `CONTRIBUTING.md` (raíz) - Duplicado de `docs/CONTRIBUTING.md`
+
+**Acciones:**
+- [ ] Revisar cada documento marcado con ⚠️
+- [ ] Eliminar duplicados innecesarios
+- [ ] Consolidar información útil
+- [ ] Actualizar INDEX.md con la nueva estructura
+
+**Tiempo estimado:** 3-4 horas
+
+---
+
+#### ✅ Tarea 1.3: Actualizar Documentación Clave
+
+**Documentos a actualizar:**
+
+1. **README.md**
+   - [ ] Actualizar estadísticas de módulos (991 total)
+   - [ ] Añadir nota sobre Claude Skill (funciona diferente en Web vs Code)
+   - [ ] Actualizar roadmap con nuevas features planeadas
+
+2. **docs/TECHNICAL_GUIDE.md**
+   - [ ] Documentar arquitectura actual
+   - [ ] Explicar cómo funciona la búsqueda híbrida
+   - [ ] Añadir diagramas si es posible
+
+3. **docs/API.md**
+   - [ ] Documentar endpoint `/search` GET y POST
+   - [ ] Ejemplos de requests/responses actualizados
+   - [ ] Parámetros disponibles
+
+4. **claude-skill/README.md**
+   - [ ] Ya actualizado con diferencias Web vs Code
+   - [ ] Revisar que esté completo
+
+**Tiempo estimado:** 4-5 horas
+
+---
+
+### SPRINT 2: Implementación MCP (1-2 semanas)
+
+#### 🚀 Tarea 2.1: Investigación y Setup MCP
+**Objetivo:** Implementar servidor MCP para que la skill funcione nativamente en Claude Web
+
+**Recursos:**
+- Documentación MCP: https://modelcontextprotocol.io
+- Ejemplos de servidores MCP
+- Claude Code MCP integration
+
+**Pasos:**
+- [ ] Estudiar protocolo MCP y arquitectura
+- [ ] Diseñar estructura del servidor MCP
+- [ ] Configurar proyecto MCP (Node.js o Python)
+- [ ] Implementar herramienta `search_odoo_modules` en MCP
+- [ ] Testing local con Claude Desktop
+- [ ] Documentar instalación para usuarios
+
+**Entregables:**
+- [ ] Servidor MCP funcional en `/mcp-server/`
+- [ ] Documentación de instalación
+- [ ] README específico para MCP
+
+**Tiempo estimado:** 5-7 días
+
+---
+
+#### 🚀 Tarea 2.2: Integración y Testing
+- [ ] Probar servidor MCP con Claude Desktop
+- [ ] Probar con Claude Web (si es posible)
+- [ ] Crear ejemplos de uso
+- [ ] Actualizar Skill.md con instrucciones MCP
+- [ ] Video tutorial (opcional)
+
+**Tiempo estimado:** 2-3 días
+
+---
+
+### SPRINT 3: Expansión de Versiones (1 semana)
+
+#### 📦 Tarea 3.1: Soporte Multi-Versión (v12 - v19)
+**Objetivo:** Ampliar cobertura de versiones de Odoo
+
+**Versiones a añadir:**
+- v12.0 (LTS antigua)
+- v13.0
+- v14.0
+- v15.0
+- v19.0 (actual)
+
+**Cambios necesarios:**
+
+1. **Base de datos:**
+   - [ ] No requiere cambios (campo `version` ya es string)
+
+2. **ETL Script:**
+   - [ ] Actualizar `scripts/etl_oca_modules.py`
+   - [ ] Añadir versiones 12.0, 13.0, 14.0, 15.0, 19.0 a `ODOO_VERSIONS`
+   - [ ] Probar que GitHub API tenga ramas para estas versiones
+
+3. **API:**
+   - [ ] Actualizar validación de versiones en schemas
+   - [ ] Documentar nuevas versiones en API.md
+
+4. **Skill:**
+   - [ ] Actualizar Skill.md con nuevas versiones disponibles
+   - [ ] Actualizar estadísticas de módulos por versión
+
+**Pasos de implementación:**
+- [ ] Modificar `ODOO_VERSIONS` en ETL
+- [ ] Ejecutar ETL para nuevas versiones
+- [ ] Verificar indexación correcta
+- [ ] Actualizar documentación
+- [ ] Testing con búsquedas multi-versión
+
+**Tiempo estimado:** 3-4 días
+
+**Estimación de módulos:**
+- v12.0: ~150-200 módulos
+- v13.0: ~200-250 módulos
+- v14.0: ~250-300 módulos
+- v15.0: ~300-350 módulos
+- v19.0: ~100-150 módulos (nueva, crecerá)
+- **Total nuevo:** ~1000-1250 módulos adicionales
+- **Gran total:** ~2000-2250 módulos
+
+---
+
+### SPRINT 4: Integración Odoo App Store (2 semanas)
+
+#### 🏪 Tarea 4.1: Scraping Odoo App Store
+**Objetivo:** Añadir módulos oficiales y de terceros del Odoo App Store
+
+**Desafíos:**
+- Odoo App Store no tiene API pública oficial
+- Requiere scraping o acceso con cuenta
+
+**Opciones de implementación:**
+
+**Opción A: Scraping (Recomendada para MVP)**
+- [ ] Investigar estructura HTML de apps.odoo.com
+- [ ] Implementar scraper con BeautifulSoup/Scrapy
+- [ ] Extraer: nombre, descripción, versión, autor, precio
+- [ ] Manejar paginación y rate limiting
+- [ ] Almacenar en tabla separada `odoo_store_modules`
+
+**Opción B: API no oficial**
+- [ ] Investigar si existe API no documentada
+- [ ] Reverse engineering de la web app
+
+**Opción C: Manual curado**
+- [ ] Lista manual de módulos comerciales populares
+- [ ] Actualización mensual manual
+
+**Implementación:**
+
+1. **Nuevo script:** `scripts/scrape_odoo_store.py`
+```python
+# Estructura básica
+def scrape_odoo_store(version: str, category: str = None):
+    # Scraping lógica
+    pass
+
+def parse_module_page(url: str):
+    # Extraer info del módulo
+    pass
+```
+
+2. **Nueva tabla en DB:**
+```python
+class OdooStoreModule(Base):
+    __tablename__ = "odoo_store_modules"
+    # Similar a OdooModule pero con campos adicionales:
+    # - price (Decimal)
+    # - is_commercial (Boolean)
+    # - rating (Float)
+    # - downloads (Integer)
+    # - store_url (String)
+```
+
+3. **Actualizar servicio de búsqueda:**
+- [ ] Modificar `search_service.py` para buscar en ambas tablas
+- [ ] Añadir filtro `source` (oca, store, custom)
+- [ ] Combinar resultados y rankear
+
+**Tiempo estimado:** 7-10 días
+
+---
+
+#### 🏪 Tarea 4.2: Testing y Documentación
+- [ ] Probar scraping en diferentes categorías
+- [ ] Verificar calidad de datos extraídos
+- [ ] Documentar limitaciones (módulos de pago, etc.)
+- [ ] Actualizar API docs con nuevo parámetro `source`
+- [ ] Actualizar Skill.md con info sobre Odoo Store
+
+**Tiempo estimado:** 2-3 días
+
+---
+
+### SPRINT 5: Módulos Propios/Custom (1 semana)
+
+#### 🏢 Tarea 5.1: Soporte para Módulos Propios
+**Objetivo:** Permitir indexar módulos desarrollados internamente
+
+**Flujo de trabajo:**
+
+1. **Usuario crea README del módulo custom:**
+```markdown
+# my_custom_module
+
+**Versión:** 17.0
+**Dependencias:** sale, stock
+**Autor:** Mi Empresa
+
+Descripción detallada del módulo...
+
+## Características
+- Feature 1
+- Feature 2
+```
+
+2. **Usuario ejecuta script de indexación:**
+```bash
+python scripts/index_custom_module.py \
+  --path /path/to/my_custom_module \
+  --company "Mi Empresa"
+```
+
+3. **Script genera embedding y guarda en Neon**
+
+**Implementación:**
+
+**Script:** `scripts/index_custom_module.py`
+```python
+def index_custom_module(
+    module_path: str,
+    company: str,
+    version: str = "17.0"
+):
+    # 1. Leer __manifest__.py
+    # 2. Leer README.md si existe
+    # 3. Generar embedding
+    # 4. Guardar en custom_modules table
+```
+
+**Nueva tabla:**
+```python
+class CustomModule(Base):
+    __tablename__ = "custom_modules"
+    # Similar a OdooModule
+    # Campos adicionales:
+    # - company (String) - Empresa propietaria
+    # - is_private (Boolean) - Si es privado
+    # - custom_tags (ARRAY) - Tags custom
+```
+
+**Actualizar búsqueda:**
+- [ ] Añadir parámetro `include_custom` (bool)
+- [ ] Filtrar por empresa si es necesario
+- [ ] Combinar resultados de las 3 fuentes
+
+**Seguridad:**
+- [ ] Autenticación para módulos privados
+- [ ] Filtrado por tenant/empresa
+- [ ] No mostrar módulos privados en búsquedas públicas
+
+**Pasos:**
+- [ ] Crear script `index_custom_module.py`
+- [ ] Crear tabla `custom_modules`
+- [ ] Modificar servicio de búsqueda
+- [ ] Implementar autenticación básica
+- [ ] Documentar proceso en docs/CUSTOM_MODULES.md
+- [ ] Testing con módulos reales
+
+**Tiempo estimado:** 5-6 días
+
+---
+
+#### 🏢 Tarea 5.2: UI/CLI para Gestión Custom
+- [ ] Crear comando CLI para gestión
+- [ ] Implementar endpoints API para CRUD custom modules
+- [ ] Documentar best practices
+- [ ] Ejemplo completo end-to-end
+
+**Tiempo estimado:** 2-3 días
+
+---
+
+## 📊 RESUMEN DEL PLAN
+
+### Timeline General
+
+```
+SPRINT 1: Limpieza y Corrección          [Semana 1]
+├─ Tarea 1.1: Fix GitHub Actions         [2h]
+├─ Tarea 1.2: Auditoría docs             [4h]
+└─ Tarea 1.3: Actualizar docs            [5h]
+
+SPRINT 2: MCP                            [Semanas 2-3]
+├─ Tarea 2.1: Implementar MCP            [5-7 días]
+└─ Tarea 2.2: Testing MCP                [2-3 días]
+
+SPRINT 3: Multi-versión                  [Semana 4]
+└─ Tarea 3.1: v12-v19                    [3-4 días]
+
+SPRINT 4: Odoo Store                     [Semanas 5-6]
+├─ Tarea 4.1: Scraping                   [7-10 días]
+└─ Tarea 4.2: Testing/Docs               [2-3 días]
+
+SPRINT 5: Módulos Custom                 [Semana 7]
+├─ Tarea 5.1: Core implementation        [5-6 días]
+└─ Tarea 5.2: UI/CLI                     [2-3 días]
+```
+
+**Total estimado:** 7-8 semanas
+
+---
+
+## ✅ CHECKLIST DE TAREAS
+
+### SPRINT 1: Limpieza ✨
+- [ ] Corregir GitHub Actions ETL
+- [ ] Auditar documentación
+- [ ] Eliminar documentos duplicados/innecesarios
+- [ ] Actualizar README.md
+- [ ] Actualizar TECHNICAL_GUIDE.md
+- [ ] Actualizar API.md
+- [ ] Actualizar INDEX.md
+
+### SPRINT 2: MCP 🔌
+- [ ] Investigar protocolo MCP
+- [ ] Configurar proyecto MCP
+- [ ] Implementar servidor MCP
+- [ ] Implementar tool `search_odoo_modules`
+- [ ] Testing con Claude Desktop
+- [ ] Documentar instalación MCP
+- [ ] Actualizar Skill.md con instrucciones MCP
+- [ ] Video/guía de instalación
+
+### SPRINT 3: Multi-versión 📦
+- [ ] Actualizar ETL para v12-v19
+- [ ] Ejecutar ETL para nuevas versiones
+- [ ] Actualizar validación de API
+- [ ] Actualizar documentación
+- [ ] Testing búsquedas multi-versión
+- [ ] Actualizar estadísticas en docs
+
+### SPRINT 4: Odoo Store 🏪
+- [ ] Investigar estructura Odoo App Store
+- [ ] Implementar scraper
+- [ ] Crear tabla `odoo_store_modules`
+- [ ] Probar scraping
+- [ ] Integrar en servicio de búsqueda
+- [ ] Añadir filtro `source` en API
+- [ ] Testing con datos reales
+- [ ] Documentar limitaciones
+- [ ] Actualizar API docs
+- [ ] Actualizar Skill.md
+
+### SPRINT 5: Módulos Custom 🏢
+- [ ] Diseñar flujo de indexación custom
+- [ ] Crear script `index_custom_module.py`
+- [ ] Crear tabla `custom_modules`
+- [ ] Implementar autenticación
+- [ ] Modificar servicio de búsqueda
+- [ ] Testing con módulos reales
+- [ ] Crear docs/CUSTOM_MODULES.md
+- [ ] Implementar CLI management
+- [ ] Crear endpoints API CRUD
+- [ ] Ejemplo end-to-end
+
+---
+
+## 🎯 OBJETIVOS DEL PLAN
+
+### Al finalizar este roadmap tendremos:
+
+**Cobertura:**
+- ✅ 2000-2500 módulos indexados
+- ✅ 8 versiones de Odoo (v12-v19)
+- ✅ Módulos OCA + Odoo Store + Custom
+
+**Funcionalidad:**
+- ✅ MCP implementado (búsqueda nativa en Claude)
+- ✅ Búsqueda multi-fuente (OCA, Store, Custom)
+- ✅ Soporte para módulos privados/empresariales
+
+**Documentación:**
+- ✅ Docs actualizados y sin duplicados
+- ✅ Guías de instalación MCP
+- ✅ Guía de módulos custom
+- ✅ API completa documentada
+
+**Automatización:**
+- ✅ GitHub Actions funcionando correctamente
+- ✅ ETL automático (opcional)
+- ✅ CI/CD mejorado
+
+---
 
 ---
 

@@ -41,7 +41,7 @@ def _safe_ast_eval(node: ast.AST) -> Any:
 
 class GitHubService:
     def __init__(self):
-        self.token = settings.github_token
+        self.token = settings.gh_token
         self.headers = {"Authorization": f"token {self.token}"}
         self.base_url = "https://api.github.com"
 

@@ -10,7 +10,7 @@ load_dotenv()
 def test_github():
     """Test GitHub API"""
     print("\n🔍 Testing GitHub API...")
-    token = os.getenv("GITHUB_TOKEN")
+    token = os.getenv("GH_TOKEN")
     
     response = requests.get(
         "https://api.github.com/repos/OCA/server-tools",

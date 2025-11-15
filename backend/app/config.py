@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     # APIs
     openrouter_api_key: str
-    github_token: str
+    gh_token: str
 
     # App
     environment: str = "development"
