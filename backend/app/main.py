@@ -109,10 +109,10 @@ async def search_modules(
         logger.info(f"Búsqueda: query='{query[:50]}...', version={version}, limit={limit}")
 
         # Validar versión
-        if version not in ["14.0", "15.0", "16.0", "17.0", "18.0"]:
+        if version not in ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]:
             raise HTTPException(
                 status_code=400,
-                detail=f"Versión inválida. Use: 14.0, 15.0, 16.0, 17.0 o 18.0"
+                detail=f"Versión inválida. Use: 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 o 19.0"
             )
 
         # Buscar
@@ -201,7 +201,7 @@ async def get_stats(db: Session = Depends(get_db)):
 
         # Por versión
         by_version = {}
-        for version in ["14.0", "15.0", "16.0", "17.0", "18.0"]:
+        for version in ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]:
             count = db.query(OdooModule).filter(OdooModule.version == version).count()
             if count > 0:
                 by_version[version] = count
