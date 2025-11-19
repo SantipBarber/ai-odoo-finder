@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from contextlib import asynccontextmanager
 import logging
 
 from .database import get_db, init_db
@@ -16,13 +17,33 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Crear app
+# Crear MCP app primero (necesitamos su lifespan)
+mcp_app = mcp.http_app(path="/")  # path="/" porque montaremos en /mcp
+
+# Crear lifespan combinado (app + MCP)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("🚀 Iniciando AI-OdooFinder API...")
+    init_db()
+    logger.info("✅ Base de datos inicializada")
+
+    # Inicializar MCP lifespan
+    async with mcp_app.lifespan(app):
+        logger.info("✅ MCP server initialized")
+        yield
+
+    # Shutdown (si necesitamos algo)
+    logger.info("👋 Apagando servidor...")
+
+# Crear app con lifespan combinado
 app = FastAPI(
     title="AI-OdooFinder API",
     description="Búsqueda inteligente de módulos de Odoo usando RAG híbrido",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan  # ← IMPORTANTE: Lifespan combinado
 )
 
 # CORS (permitir requests desde cualquier origen)
@@ -35,17 +56,8 @@ app.add_middleware(
 )
 
 # Montar servidor MCP en /mcp
-# Esto permite que Claude y otros clientes MCP se conecten vía HTTP/SSE
-mcp_app = mcp.http_app(path="/mcp")
 app.mount("/mcp", mcp_app)
 logger.info("✅ MCP server mounted at /mcp")
-
-# Inicializar DB al arrancar
-@app.on_event("startup")
-async def startup_event():
-    logger.info("🚀 Iniciando AI-OdooFinder API...")
-    init_db()
-    logger.info("✅ Base de datos inicializada")
 
 @app.get("/")
 async def root():
