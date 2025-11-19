@@ -7,6 +7,7 @@ import logging
 from .database import get_db, init_db
 from .services.search_service import get_search_service
 from .models import OdooModule
+from .mcp_tools import mcp
 
 # Configurar logging
 logging.basicConfig(
@@ -33,6 +34,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Montar servidor MCP en /mcp
+# Esto permite que Claude y otros clientes MCP se conecten vía HTTP/SSE
+mcp_app = mcp.http_app(path="/mcp")
+app.mount("/mcp", mcp_app)
+logger.info("✅ MCP server mounted at /mcp")
+
 # Inicializar DB al arrancar
 @app.on_event("startup")
 async def startup_event():
@@ -47,7 +54,13 @@ async def root():
         "name": "AI-OdooFinder API",
         "version": "1.0.0",
         "status": "running",
-        "docs": "/docs"
+        "docs": "/docs",
+        "mcp": {
+            "endpoint": "/mcp",
+            "protocol": "HTTP/SSE",
+            "tools": ["search_odoo_modules"],
+            "description": "Model Context Protocol server for Claude and other AI assistants"
+        }
     }
 
 @app.get("/health")
