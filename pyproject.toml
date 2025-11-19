@@ -1,15 +1,34 @@
+[project]
+name = "ai-odoo-finder"
+version = "1.0.0"
+description = "AI-powered search engine for Odoo modules using hybrid RAG"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi~=0.121",
+    "httpx~=0.28",
+    "pgvector~=0.4",
+    "psycopg2-binary~=2.9",
+    "pydantic~=2.12",
+    "pydantic-settings~=2.12",
+    "python-dotenv~=1.2",
+    "requests~=2.32",
+    "sqlalchemy~=2.0",
+    "uvicorn[standard]~=0.38",
+]
+
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py313"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 strict = false
 ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py313"
 select = ["E", "F", "I"]
 
 

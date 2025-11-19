@@ -11,9 +11,10 @@ Un asistente inteligente impulsado por IA que ayuda a desarrolladores de Odoo a 
 ### AI-Powered Module Discovery for Odoo Developers
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![Odoo](https://img.shields.io/badge/Odoo-12.0%20to%2019.0-714B67)](https://www.odoo.com)
 [![AI Powered](https://img.shields.io/badge/AI-Powered-blueviolet)](https://www.anthropic.com)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 [Demo](#-demo) • [Características](#-características) • [Instalación](#-instalación-rápida) • [Documentación](docs/TECHNICAL_GUIDE.md)
 
@@ -74,8 +75,9 @@ Pregunta como hablarías con un colega: "Necesito algo para gestionar inventario
   - Scale-to-zero para costos óptimos
   - Provisioning en ~300ms
   - Branching como Git
-- **API:** FastAPI (Python 3.10+) en [Render.com](https://render.com)
+- **API:** FastAPI (Python 3.14+) en [Render.com](https://render.com)
 - **ORM:** SQLAlchemy + Alembic
+- **Gestión de dependencias:** [uv](https://docs.astral.sh/uv/) - Extremadamente rápido (10-100x vs pip)
 
 ### IA & Embeddings
 - **Modelo:** Qwen3-Embedding-4B (open source)
@@ -150,22 +152,25 @@ docker-compose up -d
 ### Opción 2: Instalación Local
 
 ```bash
-# Crear entorno virtual
-python3.10 -m venv venv
-source venv/bin/activate
+# Instalar uv (gestor de dependencias moderno)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Instalar dependencias
-pip install -r requirements.txt
+# Clonar repositorio
+git clone https://github.com/SantipBarber/ai-odoo-finder.git
+cd ai-odoo-finder
+
+# Instalar dependencias (crea automáticamente .venv)
+uv sync
 
 # Configurar base de datos
 createdb odoo_finder
 psql odoo_finder -c "CREATE EXTENSION vector;"
 
 # Cargar datos iniciales
-python scripts/etl_oca_modules.py
+uv run python scripts/etl_oca_modules.py
 
 # Iniciar servidor
-uvicorn app.main:app --reload
+uv run uvicorn backend.app.main:app --reload
 ```
 
 ---
