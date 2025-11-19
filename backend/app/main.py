@@ -68,10 +68,15 @@ async def root():
         "status": "running",
         "docs": "/docs",
         "mcp": {
-            "endpoint": "/mcp",
+            "sse_endpoint": "/mcp/sse",
+            "messages_endpoint": "/mcp/messages",
             "protocol": "HTTP/SSE",
             "tools": ["search_odoo_modules"],
-            "description": "Model Context Protocol server for Claude and other AI assistants"
+            "description": "Model Context Protocol server for Claude and other AI assistants",
+            "claude_config": {
+                "url": "https://ai-odoo-finder.onrender.com/mcp/sse",
+                "protocol": "SSE"
+            }
         }
     }
 
