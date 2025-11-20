@@ -68,13 +68,13 @@ async def root():
         "status": "running",
         "docs": "/docs",
         "mcp": {
-            "endpoint": "/mcp",
-            "protocol": "HTTP",
+            "endpoint": "/mcp/",
+            "protocol": "HTTP/SSE",
             "tools": ["search_odoo_modules"],
             "description": "Model Context Protocol server for Claude and other AI assistants",
             "claude_config": {
-                "url": "https://ai-odoo-finder.onrender.com/mcp",
-                "note": "Use this URL in Claude Web MCP settings"
+                "url": "https://ai-odoo-finder.onrender.com/mcp/",
+                "note": "IMPORTANT: Use this URL with trailing slash in Claude Web → Settings → Integrations → MCP"
             }
         }
     }
