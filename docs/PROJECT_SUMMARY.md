@@ -57,7 +57,7 @@ Como desarrollador de Odoo, uno de los mayores desafíos es **descubrir módulos
 
 #### ✅ Preparación de Tareas
 - Definición del MVP: API REST + Claude Skill
-- División en sprints (ver [SPRINT_PLAN.md](../SPRINT_PLAN.md))
+- División en sprints (ver [NEXT_STEPS.md](../NEXT_STEPS.md))
 - Investigación de tecnologías:
   - Neon PostgreSQL (serverless)
   - pgVector (búsqueda vectorial)

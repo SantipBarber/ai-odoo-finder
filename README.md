@@ -223,9 +223,9 @@ El asistente buscará automáticamente y te dará recomendaciones personalizadas
 - **[Changelog](docs/CHANGELOG.md)** - Historial de cambios
 
 ### 📊 Información de Desarrollo
-- **[Plan de Sprints](SPRINT_PLAN.md)** - Plan detallado de desarrollo
-- **[Próximos Pasos](NEXT_STEPS.md)** - Tareas pendientes y siguientes pasos
-- **[Sesiones de Desarrollo](docs/SESSION_2025-11-15.md)** - Documentación de sesiones
+- **[Próximos Pasos](NEXT_STEPS.md)** - Plan detallado y tareas pendientes
+- **[Plan de Mejoras](docs/MEJORAS_BUSQUEDA.md)** - Roadmap de optimizaciones
+- **[Documentación MCP](docs/MCP_DESIGN.md)** - Servidor Model Context Protocol
 
 ---
 
