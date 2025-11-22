@@ -13,13 +13,22 @@ Este directorio contiene todas las especificaciones técnicas para implementar l
 ```
 specs/
 ├── README.md                          # Este archivo
-├── phase-1-diagnostico/              # Fase 1: Benchmark y Diagnóstico
+├── phase-1-diagnostico/              # Fase 1: Benchmark y Diagnóstico ✅
 │   ├── README.md                     # Overview de Fase 1
+│   ├── QUICKSTART.md                 # Guía de inicio rápido
 │   ├── SPEC-001-benchmark-queries.md # Dataset de queries
 │   ├── SPEC-002-benchmark-script.md  # Script de ejecución
 │   ├── SPEC-003-metrics.md           # Cálculo de métricas
-│   └── SPEC-004-acceptance-criteria.md # Criterios de éxito
-├── phase-2-hybrid-search/            # Fase 2: BM25 + Vector [PRÓXIMAMENTE]
+│   ├── SPEC-004-acceptance-criteria.md # Criterios de éxito
+│   └── benchmark_queries_example.json # Template de queries
+├── phase-2-hybrid-search/            # Fase 2: BM25 + Vector ✅
+│   ├── README.md                     # Overview de Fase 2
+│   ├── QUICKSTART.md                 # Guía de inicio rápido
+│   ├── SPEC-101-database-migration.md # Migration SQL
+│   ├── SPEC-102-hybrid-search-service.md # Servicio híbrido
+│   ├── SPEC-103-rrf-algorithm.md     # Algoritmo RRF
+│   ├── SPEC-104-search-integration.md # Integración
+│   └── SPEC-105-acceptance-criteria.md # Criterios de éxito
 ├── phase-3-enrichment/               # Fase 3: Enriquecimiento [PRÓXIMAMENTE]
 ├── phase-4-reranking/                # Fase 4: LLM Reranking [PRÓXIMAMENTE]
 └── phase-5-testing/                  # Fase 5: Testing Final [PRÓXIMAMENTE]
@@ -30,7 +39,7 @@ specs/
 ## 🎯 Roadmap de Implementación
 
 ### ✅ Fase 1: Diagnóstico y Benchmark (Día 1)
-**Estado:** 🔴 Pendiente de implementación
+**Estado:** 🟢 Specs completas
 **Objetivo:** Establecer baseline y patrones de fallo
 **Specs:**
 - [SPEC-001: Benchmark Queries](./phase-1-diagnostico/SPEC-001-benchmark-queries.md)
@@ -47,9 +56,22 @@ specs/
 
 ---
 
-### 🔜 Fase 2: Hybrid Search (Días 2-3)
-**Estado:** 🔵 Pendiente de specs
-**Objetivo:** Combinar vector similarity + BM25 full-text
+### ✅ Fase 2: Hybrid Search (Días 2-3)
+**Estado:** 🟢 Specs completas
+**Objetivo:** Combinar vector similarity + BM25 full-text con RRF
+**Specs:**
+- [SPEC-101: Database Migration](./phase-2-hybrid-search/SPEC-101-database-migration.md)
+- [SPEC-102: Hybrid Search Service](./phase-2-hybrid-search/SPEC-102-hybrid-search-service.md)
+- [SPEC-103: RRF Algorithm](./phase-2-hybrid-search/SPEC-103-rrf-algorithm.md)
+- [SPEC-104: Search Integration](./phase-2-hybrid-search/SPEC-104-search-integration.md)
+- [SPEC-105: Acceptance Criteria](./phase-2-hybrid-search/SPEC-105-acceptance-criteria.md)
+
+**Entregables:**
+- ✅ PostgreSQL full-text search con tsvector + GIN
+- ✅ HybridSearchService implementado
+- ✅ Reciprocal Rank Fusion (RRF) funcional
+- ✅ Integration en SearchService
+- ✅ Benchmark con mejora >15%
 
 **Mejora esperada:** +15-20% en Precision@3
 
