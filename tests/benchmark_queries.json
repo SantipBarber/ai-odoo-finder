@@ -1,0 +1,281 @@
+{
+  "benchmark_queries": [
+    {
+      "id": 1,
+      "query": "facturación electrónica España AEAT",
+      "version": "16.0",
+      "expected_modules": [
+        "l10n_es_facturae",
+        "l10n_es_aeat"
+      ],
+      "category": "localization_spain",
+      "difficulty": "easy",
+      "notes": "Términos muy específicos de localización española - coincidencia exacta esperada"
+    },
+    {
+      "id": 2,
+      "query": "separar flujos B2B y B2C en ventas",
+      "version": "16.0",
+      "expected_modules": [
+        "sale_b2b_b2c",
+        "portal_partner_type",
+        "sale_partner_type"
+      ],
+      "category": "sales_workflow",
+      "difficulty": "medium",
+      "notes": "Requiere entender conceptos B2B/B2C en contexto Odoo"
+    },
+    {
+      "id": 3,
+      "query": "portal clientes con documentos personalizados",
+      "version": "16.0",
+      "expected_modules": [
+        "portal_document",
+        "portal_partner_document",
+        "dms_portal"
+      ],
+      "category": "portal",
+      "difficulty": "hard",
+      "notes": "Multi-concepto: portal + gestión documental + personalización"
+    },
+    {
+      "id": 4,
+      "query": "trazabilidad de lotes y números de serie",
+      "version": "17.0",
+      "expected_modules": [
+        "stock_production_lot",
+        "product_expiry",
+        "stock_lot_traceability"
+      ],
+      "category": "inventory",
+      "difficulty": "easy",
+      "notes": "Términos estándar de inventario - búsqueda directa"
+    },
+    {
+      "id": 5,
+      "query": "descuentos automáticos por volumen en ventas",
+      "version": "16.0",
+      "expected_modules": [
+        "sale_discount_volume",
+        "product_pricelist_volume"
+      ],
+      "category": "sales_pricing",
+      "difficulty": "easy",
+      "notes": "Caso de uso común de pricing"
+    },
+    {
+      "id": 6,
+      "query": "conciliación bancaria automática",
+      "version": "16.0",
+      "expected_modules": [
+        "account_bank_reconciliation",
+        "account_reconciliation_widget"
+      ],
+      "category": "accounting",
+      "difficulty": "easy",
+      "notes": "Terminología contable estándar"
+    },
+    {
+      "id": 7,
+      "query": "workflow aprobación de presupuestos",
+      "version": "17.0",
+      "expected_modules": [
+        "sale_order_approval",
+        "sale_order_validation"
+      ],
+      "category": "sales_workflow",
+      "difficulty": "medium",
+      "notes": "Búsqueda de funcionalidad específica de workflow"
+    },
+    {
+      "id": 8,
+      "query": "informes financieros personalizados",
+      "version": "17.0",
+      "expected_modules": [
+        "account_financial_report",
+        "mis_builder"
+      ],
+      "category": "accounting",
+      "difficulty": "medium",
+      "notes": "Módulos populares pero technical_names no intuitivos"
+    },
+    {
+      "id": 9,
+      "query": "gestión de kits y productos compuestos",
+      "version": "16.0",
+      "expected_modules": [
+        "mrp_bom",
+        "sale_product_set",
+        "product_pack"
+      ],
+      "category": "inventory",
+      "difficulty": "medium",
+      "notes": "Múltiples formas de implementar kits en Odoo"
+    },
+    {
+      "id": 10,
+      "query": "integrar tienda online con gestión de stock y envíos",
+      "version": "16.0",
+      "expected_modules": [
+        "website_sale_stock",
+        "delivery_integration",
+        "website_sale_delivery"
+      ],
+      "category": "website",
+      "difficulty": "hard",
+      "notes": "Multi-concepto: ecommerce + inventario + logística"
+    },
+    {
+      "id": 11,
+      "query": "libro de IVA España",
+      "version": "16.0",
+      "expected_modules": [
+        "l10n_es_vat_book",
+        "l10n_es_aeat_mod303"
+      ],
+      "category": "localization_spain",
+      "difficulty": "easy",
+      "notes": "Requisito fiscal específico español"
+    },
+    {
+      "id": 12,
+      "query": "gestión de nóminas y seguros sociales",
+      "version": "16.0",
+      "expected_modules": [
+        "hr_payroll",
+        "l10n_es_hr_payroll"
+      ],
+      "category": "hr",
+      "difficulty": "medium",
+      "notes": "HR con localización española"
+    },
+    {
+      "id": 13,
+      "query": "cross-docking con proveedores y rutas automáticas",
+      "version": "18.0",
+      "expected_modules": [
+        "stock_dropshipping",
+        "stock_route",
+        "purchase_stock"
+      ],
+      "category": "inventory",
+      "difficulty": "hard",
+      "notes": "Concepto avanzado de logística - versión reciente"
+    },
+    {
+      "id": 14,
+      "query": "factura proforma en ventas",
+      "version": "17.0",
+      "expected_modules": [
+        "sale_proforma",
+        "account_invoice_proforma"
+      ],
+      "category": "sales_workflow",
+      "difficulty": "medium",
+      "notes": "Caso de uso específico de ventas internacionales"
+    },
+    {
+      "id": 15,
+      "query": "gestión documental DMS con etiquetas",
+      "version": "16.0",
+      "expected_modules": [
+        "dms",
+        "document_tag",
+        "dms_category"
+      ],
+      "category": "document_management",
+      "difficulty": "medium",
+      "notes": "Sistema de gestión documental"
+    },
+    {
+      "id": 16,
+      "query": "control de calidad en manufactura",
+      "version": "17.0",
+      "expected_modules": [
+        "quality_control",
+        "mrp_quality",
+        "quality_check"
+      ],
+      "category": "manufacturing",
+      "difficulty": "medium",
+      "notes": "QC integrado con MRP"
+    },
+    {
+      "id": 17,
+      "query": "multi-empresa con consolidación contable",
+      "version": "16.0",
+      "expected_modules": [
+        "account_consolidation",
+        "multi_company_account"
+      ],
+      "category": "accounting",
+      "difficulty": "hard",
+      "notes": "Feature empresarial avanzada"
+    },
+    {
+      "id": 18,
+      "query": "subcontratación en órdenes de fabricación",
+      "version": "18.0",
+      "expected_modules": [
+        "mrp_subcontracting",
+        "purchase_subcontracting"
+      ],
+      "category": "manufacturing",
+      "difficulty": "medium",
+      "notes": "Funcionalidad específica de MRP"
+    },
+    {
+      "id": 19,
+      "query": "portal de proveedores con cotizaciones",
+      "version": "17.0",
+      "expected_modules": [
+        "portal_purchase",
+        "purchase_quotation_portal",
+        "supplier_portal"
+      ],
+      "category": "portal",
+      "difficulty": "hard",
+      "notes": "Portal específico para proveedores"
+    },
+    {
+      "id": 20,
+      "query": "seguimiento de gastos de empleados",
+      "version": "16.0",
+      "expected_modules": [
+        "hr_expense",
+        "hr_expense_invoice"
+      ],
+      "category": "hr",
+      "difficulty": "easy",
+      "notes": "Funcionalidad estándar de RRHH"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-11-22T10:00:00Z",
+    "total_queries": 20,
+    "version": "1.0",
+    "categories": [
+      "localization_spain",
+      "sales_workflow",
+      "portal",
+      "inventory",
+      "sales_pricing",
+      "accounting",
+      "website",
+      "document_management",
+      "manufacturing",
+      "hr"
+    ],
+    "difficulty_distribution": {
+      "easy": 5,
+      "medium": 10,
+      "hard": 5
+    },
+    "version_distribution": {
+      "16.0": 10,
+      "17.0": 6,
+      "18.0": 4
+    },
+    "notes": "Este es un ejemplo de estructura de benchmark queries. Los expected_modules son ilustrativos y deben validarse contra la base de datos real antes de usar en producción."
+  }
+}
