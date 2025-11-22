@@ -45,15 +45,22 @@ Si eres nuevo en el proyecto, comienza en este orden:
 | Documento | Descripción | Audiencia |
 |-----------|-------------|-----------|
 | **[ROADMAP.md](ROADMAP.md)** | Plan de desarrollo futuro | Product Managers / Stakeholders |
-| **[SPRINT_PLAN.md](../SPRINT_PLAN.md)** | Plan detallado de sprints | Equipo de desarrollo |
-| **[NEXT_STEPS.md](../NEXT_STEPS.md)** | Próximas tareas y acciones | Desarrolladores activos |
+| **[NEXT_STEPS.md](../NEXT_STEPS.md)** | Próximas tareas y acciones detalladas | Desarrolladores activos |
+| **[MEJORAS_BUSQUEDA.md](MEJORAS_BUSQUEDA.md)** | Plan de mejoras del sistema de búsqueda | Equipo de desarrollo |
+
+### 🔌 MCP (Model Context Protocol)
+
+| Documento | Descripción | Audiencia |
+|-----------|-------------|-----------|
+| **[MCP_DESIGN.md](MCP_DESIGN.md)** | Diseño completo del servidor MCP | Desarrolladores / Arquitectos |
+| **[MCP_REMOTE_SUMMARY.md](MCP_REMOTE_SUMMARY.md)** | Resumen ejecutivo MCP remoto | Product / Stakeholders |
+| **[Claude_Skill_v2.md](Claude_Skill_v2.md)** | Skill inteligente para búsquedas optimizadas | Usuarios Claude / Desarrolladores |
 
 ### 🎓 Proyecto Final
 
 | Documento | Descripción | Audiencia |
 |-----------|-------------|-----------|
 | **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** | Resumen completo para presentación del proyecto final | Evaluadores / Presentación |
-| **[SESSION_2025-11-15.md](SESSION_2025-11-15.md)** | Documentación de sesión de desarrollo | Histórico |
 
 ### ⚙️ Archivos de Configuración
 
@@ -282,11 +289,12 @@ Si eres nuevo en el proyecto, comienza en este orden:
 | Métrica | Valor |
 |---------|-------|
 | 📄 Total de documentos | 15 archivos |
-| 📝 Palabras totales | ~25,000+ palabras |
-| ⏱️ Tiempo de lectura total | ~3 horas |
-| 💻 Líneas de código ejemplo | 800+ líneas |
+| 📝 Palabras totales | ~30,000+ palabras |
+| ⏱️ Tiempo de lectura total | ~4 horas |
+| 💻 Líneas de código ejemplo | 1000+ líneas |
 | 🎨 Assets SVG | 7 archivos |
-| ✅ Ejemplos prácticos | 40+ ejemplos |
+| ✅ Ejemplos prácticos | 50+ ejemplos |
+| 🔌 Documentación MCP | 3 archivos nuevos |
 
 ---
 
@@ -350,8 +358,8 @@ Si crees que falta documentación o algo no está claro:
 ╚════════════════════════════════════════════════════╝
 ```
 
-**Última actualización:** 2025-11-15
-**Versión de docs:** 1.0.0
-**Estado:** ✅ Completo y listo para presentación
+**Última actualización:** 2025-11-19
+**Versión de docs:** 1.1.0
+**Estado:** ✅ Completo - MCP implementado + Plan de mejoras
 
 </div>
