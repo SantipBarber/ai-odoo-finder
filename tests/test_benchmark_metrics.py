@@ -1,6 +1,12 @@
 """
 Tests unitarios para el módulo de métricas de benchmark.
 """
+import sys
+from pathlib import Path
+
+# Add parent directory to path to import backend modules
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import pytest
 from backend.app.metrics.benchmark_metrics import MetricsCalculator, IRMetrics, ReportAggregator
 

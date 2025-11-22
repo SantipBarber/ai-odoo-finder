@@ -1,0 +1,731 @@
+{
+  "metadata": {
+    "timestamp": "2025-11-22T18:14:54.081048",
+    "total_queries": 20,
+    "valid_queries": 20,
+    "failed_queries": 0,
+    "search_mode": "vector",
+    "limit": 10,
+    "execution_time_seconds": 20.43265
+  },
+  "aggregate_metrics": {
+    "precision@3": 0.0,
+    "precision@5": 0.0,
+    "recall@10": 0.0,
+    "mrr": 0.0
+  },
+  "per_difficulty": {
+    "easy": {
+      "count": 6,
+      "precision@3": 0.0,
+      "precision@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
+    "medium": {
+      "count": 9,
+      "precision@3": 0.0,
+      "precision@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    },
+    "hard": {
+      "count": 5,
+      "precision@3": 0.0,
+      "precision@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0
+    }
+  },
+  "detailed_results": [
+    {
+      "query_id": 1,
+      "query": "facturación electrónica España AEAT",
+      "version": "16.0",
+      "category": "localization_spain",
+      "difficulty": "easy",
+      "expected_modules": [
+        "l10n_es_facturae",
+        "l10n_es_aeat"
+      ],
+      "returned_modules": [
+        "account_fiscal_position_vat_check",
+        "account_move_name_sequence",
+        "account_fiscal_year_auto_create",
+        "account_chart_update_multilang",
+        "account_sequence_option",
+        "sale_invoice_blocking",
+        "account_chart_update",
+        "account_move_line_tax_editable",
+        "account_move_fiscal_month",
+        "sale_order_invoicing_picking_filter"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 2090.6090000000004,
+      "error": null
+    },
+    {
+      "query_id": 2,
+      "query": "separar flujos B2B y B2C en ventas",
+      "version": "16.0",
+      "category": "sales_workflow",
+      "difficulty": "medium",
+      "expected_modules": [
+        "sale_b2b_b2c",
+        "portal_partner_type",
+        "sale_partner_type"
+      ],
+      "returned_modules": [
+        "sale_automatic_workflow_job",
+        "partner_sale_pivot",
+        "sale_invoice_blocking",
+        "sale_stock_picking_blocking",
+        "sale_order_product_assortment",
+        "sell_only_by_packaging",
+        "sale_order_recurrence",
+        "portal_sale_order_search",
+        "sale_invoice_split_payment",
+        "sale_order_carrier_auto_assign"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 994.323,
+      "error": null
+    },
+    {
+      "query_id": 3,
+      "query": "portal clientes con documentos personalizados",
+      "version": "16.0",
+      "category": "portal",
+      "difficulty": "hard",
+      "expected_modules": [
+        "portal_document",
+        "portal_partner_document",
+        "dms_portal"
+      ],
+      "returned_modules": [
+        "sale_order_note_template",
+        "account_dashboard_banner",
+        "portal_sale_order_search",
+        "account_chart_update_multilang",
+        "sale_fully_invoiced",
+        "purchase_invoice_plan",
+        "account_chart_update",
+        "sales_team_security",
+        "purchase_fully_invoiced",
+        "sale_automatic_workflow_job"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 1202.068,
+      "error": null
+    },
+    {
+      "query_id": 4,
+      "query": "trazabilidad de lotes y números de serie",
+      "version": "17.0",
+      "category": "inventory",
+      "difficulty": "easy",
+      "expected_modules": [
+        "stock_production_lot",
+        "product_expiry",
+        "stock_lot_traceability"
+      ],
+      "returned_modules": [
+        "account_asset_management_stock_lot",
+        "sale_order_lot_generator",
+        "account_move_name_sequence",
+        "sale_order_lot_selection",
+        "account_sequence_option",
+        "purchase_tier_validation",
+        "purchase_order_weight_volume",
+        "sale_stock_picking_blocking",
+        "purchase_request_tier_validation",
+        "web_timeline"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 923.224,
+      "error": null
+    },
+    {
+      "query_id": 5,
+      "query": "descuentos automáticos por volumen en ventas",
+      "version": "16.0",
+      "category": "sales_pricing",
+      "difficulty": "easy",
+      "expected_modules": [
+        "sale_discount_volume",
+        "product_pricelist_volume"
+      ],
+      "returned_modules": [
+        "sale_fixed_discount",
+        "sale_order_general_discount_triple",
+        "sale_order_general_discount",
+        "sale_automatic_workflow_job",
+        "sale_global_discount",
+        "sale_automatic_workflow",
+        "purchase_order_product_recommendation",
+        "sale_order_product_recommendation",
+        "sale_stock_product_recommendation",
+        "sale_packaging_default"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 1140.3000000000002,
+      "error": null
+    },
+    {
+      "query_id": 6,
+      "query": "conciliación bancaria automática",
+      "version": "16.0",
+      "category": "accounting",
+      "difficulty": "easy",
+      "expected_modules": [
+        "account_bank_reconciliation",
+        "account_reconciliation_widget"
+      ],
+      "returned_modules": [
+        "account_move_name_sequence",
+        "account_chart_update",
+        "account_bank_statement_chatter",
+        "account_move_transfer_partner",
+        "account_sequence_option",
+        "account_fiscal_year_auto_create",
+        "account_cash_deposit",
+        "account_fiscal_position_vat_check",
+        "account_move_template",
+        "account_move_line_repair_info"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 876.72,
+      "error": null
+    },
+    {
+      "query_id": 7,
+      "query": "workflow aprobación de presupuestos",
+      "version": "17.0",
+      "category": "sales_workflow",
+      "difficulty": "medium",
+      "expected_modules": [
+        "sale_order_approval",
+        "sale_order_validation"
+      ],
+      "returned_modules": [
+        "account_move_budget",
+        "purchase_request_tier_validation",
+        "purchase_order_approved",
+        "account_chart_update",
+        "purchase_requisition_tier_validation",
+        "purchase_invoice_plan",
+        "purchase_tier_validation",
+        "purchase_request",
+        "account_sequence_option",
+        "purchase_force_invoiced"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 1168.183,
+      "error": null
+    },
+    {
+      "query_id": 8,
+      "query": "informes financieros personalizados",
+      "version": "17.0",
+      "category": "accounting",
+      "difficulty": "medium",
+      "expected_modules": [
+        "account_financial_report",
+        "mis_builder"
+      ],
+      "returned_modules": [
+        "account_chart_update",
+        "account_move_budget",
+        "account_move_name_sequence",
+        "purchase_invoice_plan",
+        "purchase_order_product_recommendation",
+        "account_move_template",
+        "account_sequence_option",
+        "sale_order_product_recommendation",
+        "account_move_post_date_user",
+        "account_check_deposit"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 957.979,
+      "error": null
+    },
+    {
+      "query_id": 9,
+      "query": "gestión de kits y productos compuestos",
+      "version": "16.0",
+      "category": "inventory",
+      "difficulty": "medium",
+      "expected_modules": [
+        "mrp_bom",
+        "sale_product_set",
+        "product_pack"
+      ],
+      "returned_modules": [
+        "stock_account_anglo_saxon_cogs_kit",
+        "sale_packaging_default",
+        "purchase_only_by_packaging",
+        "sale_order_product_assortment",
+        "sell_only_by_packaging",
+        "purchase_order_product_recommendation",
+        "sale_order_product_recommendation_packaging_default",
+        "account_asset_management_stock_lot",
+        "sale_numeric_step",
+        "sale_stock_product_recommendation"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 740.019,
+      "error": null
+    },
+    {
+      "query_id": 10,
+      "query": "integrar tienda online con gestión de stock y envíos",
+      "version": "16.0",
+      "category": "website",
+      "difficulty": "hard",
+      "expected_modules": [
+        "website_sale_stock",
+        "delivery_integration",
+        "website_sale_delivery"
+      ],
+      "returned_modules": [
+        "sale_numeric_step",
+        "sale_stock_product_recommendation",
+        "sale_order_product_availability_inline",
+        "purchase_order_product_recommendation",
+        "sale_stock_picking_blocking",
+        "sale_packaging_default",
+        "purchase_order_weight_volume",
+        "purchase_only_by_packaging",
+        "sale_order_product_assortment",
+        "sell_only_by_packaging"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 1246.932,
+      "error": null
+    },
+    {
+      "query_id": 11,
+      "query": "libro de IVA España",
+      "version": "16.0",
+      "category": "localization_spain",
+      "difficulty": "easy",
+      "expected_modules": [
+        "l10n_es_vat_book",
+        "l10n_es_aeat_mod303"
+      ],
+      "returned_modules": [
+        "account_fiscal_position_vat_check",
+        "account_move_line_tax_editable",
+        "account_chart_update_multilang",
+        "account_move_name_sequence",
+        "sale_numeric_step",
+        "sale_invoice_blocking",
+        "account_chart_update",
+        "purchase_tier_validation",
+        "purchase_order_product_recommendation",
+        "purchase_force_invoiced"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 922.034,
+      "error": null
+    },
+    {
+      "query_id": 12,
+      "query": "gestión de nóminas y seguros sociales",
+      "version": "16.0",
+      "category": "hr",
+      "difficulty": "medium",
+      "expected_modules": [
+        "hr_payroll",
+        "l10n_es_hr_payroll"
+      ],
+      "returned_modules": [
+        "account_fiscal_year_auto_create",
+        "account_move_name_sequence",
+        "account_chart_update",
+        "web_select_all_companies",
+        "account_move_budget",
+        "account_dashboard_banner",
+        "account_sequence_option",
+        "account_move_fiscal_month",
+        "web_calendar_slot_duration",
+        "purchase_order_product_recommendation"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 808.14,
+      "error": null
+    },
+    {
+      "query_id": 13,
+      "query": "cross-docking con proveedores y rutas automáticas",
+      "version": "18.0",
+      "category": "inventory",
+      "difficulty": "hard",
+      "expected_modules": [
+        "stock_dropshipping",
+        "stock_route",
+        "purchase_stock"
+      ],
+      "returned_modules": [
+        "vendor_transport_lead_time",
+        "sale_stock_picking_blocking",
+        "purchase_delivery_split_date",
+        "sale_order_carrier_auto_assign",
+        "purchase_order_product_recommendation",
+        "sale_packaging_default",
+        "sale_manual_delivery",
+        "sale_automatic_workflow_stock",
+        "sale_automatic_workflow_job",
+        "sale_automatic_workflow"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 1310.779,
+      "error": null
+    },
+    {
+      "query_id": 14,
+      "query": "factura proforma en ventas",
+      "version": "17.0",
+      "category": "sales_workflow",
+      "difficulty": "medium",
+      "expected_modules": [
+        "sale_proforma",
+        "account_invoice_proforma"
+      ],
+      "returned_modules": [
+        "sale_invoice_plan",
+        "sale_invoice_blocking",
+        "sale_force_invoiced",
+        "purchase_force_invoiced",
+        "purchase_invoice_plan",
+        "product_supplierinfo_for_customer_sale",
+        "sale_fixed_discount",
+        "sale_quotation_number",
+        "sale_delivery_state",
+        "sale_order_archive"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 821.577,
+      "error": null
+    },
+    {
+      "query_id": 15,
+      "query": "gestión documental DMS con etiquetas",
+      "version": "16.0",
+      "category": "document_management",
+      "difficulty": "medium",
+      "expected_modules": [
+        "dms",
+        "document_tag",
+        "dms_category"
+      ],
+      "returned_modules": [
+        "url_attachment_search_fuzzy",
+        "web_tree_dynamic_colored_field",
+        "sale_order_line_tag",
+        "web_advanced_search",
+        "account_dashboard_banner",
+        "account_chart_update",
+        "sale_order_tag",
+        "purchase_tag",
+        "sales_team_security",
+        "account_move_name_sequence"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 895.85,
+      "error": null
+    },
+    {
+      "query_id": 16,
+      "query": "control de calidad en manufactura",
+      "version": "17.0",
+      "category": "manufacturing",
+      "difficulty": "medium",
+      "expected_modules": [
+        "quality_control",
+        "mrp_quality",
+        "quality_check"
+      ],
+      "returned_modules": [
+        "purchase_order_product_recommendation",
+        "purchase_order_weight_volume",
+        "purchase_v12_control_menu",
+        "purchase_tier_validation",
+        "purchase_request",
+        "purchase_request_tier_validation",
+        "web_timeline",
+        "procurement_purchase_requisition_generation",
+        "purchase_requisition_order_remaining_qty",
+        "sale_order_lot_generator"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 869.423,
+      "error": null
+    },
+    {
+      "query_id": 17,
+      "query": "multi-empresa con consolidación contable",
+      "version": "16.0",
+      "category": "accounting",
+      "difficulty": "hard",
+      "expected_modules": [
+        "account_consolidation",
+        "multi_company_account"
+      ],
+      "returned_modules": [
+        "web_select_all_companies",
+        "account_chart_update",
+        "account_move_name_sequence",
+        "account_fiscal_position_vat_check",
+        "account_fiscal_year_auto_create",
+        "account_chart_update_multilang",
+        "account_sequence_option",
+        "account_move_fiscal_month",
+        "account_move_transfer_partner",
+        "account_dashboard_banner"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 952.408,
+      "error": null
+    },
+    {
+      "query_id": 18,
+      "query": "subcontratación en órdenes de fabricación",
+      "version": "18.0",
+      "category": "manufacturing",
+      "difficulty": "medium",
+      "expected_modules": [
+        "mrp_subcontracting",
+        "purchase_subcontracting"
+      ],
+      "returned_modules": [
+        "purchase_order_product_recommendation",
+        "sale_order_note_template",
+        "sale_mail_autosubscribe",
+        "purchase_order_secondary_unit",
+        "sale_order_split_strategy",
+        "purchase_tier_validation",
+        "purchase_delivery_split_date",
+        "vendor_transport_lead_time",
+        "sale_order_product_assortment",
+        "portal_sale_order_search"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 893.23,
+      "error": null
+    },
+    {
+      "query_id": 19,
+      "query": "portal de proveedores con cotizaciones",
+      "version": "17.0",
+      "category": "portal",
+      "difficulty": "hard",
+      "expected_modules": [
+        "portal_purchase",
+        "purchase_quotation_portal",
+        "supplier_portal"
+      ],
+      "returned_modules": [
+        "purchase_order_product_recommendation",
+        "product_supplierinfo_disable_autocreation",
+        "purchase_invoice_plan",
+        "sale_order_product_recommendation",
+        "purchase_tier_validation",
+        "purchase_order_supplierinfo_update",
+        "purchase_request",
+        "purchase_request_tier_validation",
+        "purchase_order_weight_volume",
+        "product_supplierinfo_for_customer_sale"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 791.808,
+      "error": null
+    },
+    {
+      "query_id": 20,
+      "query": "seguimiento de gastos de empleados",
+      "version": "16.0",
+      "category": "hr",
+      "difficulty": "easy",
+      "expected_modules": [
+        "hr_expense",
+        "hr_expense_invoice"
+      ],
+      "returned_modules": [
+        "account_move_budget",
+        "account_chart_update",
+        "account_move_name_sequence",
+        "account_fiscal_year_auto_create",
+        "account_move_fiscal_month",
+        "account_chart_update_multilang",
+        "account_fiscal_position_vat_check",
+        "account_spread_cost_revenue",
+        "purchase_fully_invoiced",
+        "account_move_template"
+      ],
+      "metrics": {
+        "precision@3": 0.0,
+        "precision@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hits_in_top_3": 0,
+        "hits_in_top_5": 0,
+        "first_relevant_position": null
+      },
+      "execution_time_ms": 826.047,
+      "error": null
+    }
+  ]
+}
