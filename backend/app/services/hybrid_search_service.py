@@ -76,9 +76,10 @@ class HybridSearchService:
 
         logger.info(f"Hybrid search: query='{query}', version={version}, limit={limit}")
 
-        # Validate embedding
-        if len(query_embedding) != 1024:
-            raise ValueError(f"Expected embedding dimension 1024, got {len(query_embedding)}")
+        # Validate embedding (updated for current embedding model dimension)
+        expected_dim = 2560  # Current embedding model dimension
+        if len(query_embedding) != expected_dim:
+            raise ValueError(f"Expected embedding dimension {expected_dim}, got {len(query_embedding)}")
 
         # 1. Vector similarity search
         logger.debug(f"Executing vector search (top {top_candidates})")
@@ -123,45 +124,72 @@ class HybridSearchService:
     ) -> List[SearchResult]:
         """Búsqueda vectorial por similitud."""
 
-        query_sql = text("""
-            SELECT
-                id,
-                technical_name,
-                name,
-                summary,
-                version,
-                depends,
-                github_stars,
-                1 - (embedding <=> :embedding::vector) as similarity_score
-            FROM odoo_modules
-            WHERE version = :version
-                AND (:deps::text[] IS NULL OR depends && :deps)
-            ORDER BY embedding <=> :embedding::vector
-            LIMIT :limit
-        """)
+        # Convert embedding to PostgreSQL vector format
+        embedding_str = '[' + ','.join(map(str, embedding)) + ']'
 
-        result = self.db.execute(query_sql, {
-            "embedding": embedding,
-            "version": version,
-            "deps": dependencies,
-            "limit": limit
-        })
+        # Use raw psycopg3 connection
+        raw_conn = self.db.connection().connection
 
-        rows = result.fetchall()
+        if dependencies:
+            query_sql = """
+                SELECT
+                    id,
+                    technical_name,
+                    name,
+                    summary,
+                    version,
+                    depends,
+                    github_stars,
+                    1 - (embedding <=> %s::vector) as similarity_score
+                FROM odoo_modules
+                WHERE version = %s
+                    AND depends && %s
+                ORDER BY embedding <=> %s::vector
+                LIMIT %s
+            """
+            params = (embedding_str, version, dependencies, embedding_str, limit)
+        else:
+            query_sql = """
+                SELECT
+                    id,
+                    technical_name,
+                    name,
+                    summary,
+                    version,
+                    depends,
+                    github_stars,
+                    1 - (embedding <=> %s::vector) as similarity_score
+                FROM odoo_modules
+                WHERE version = %s
+                ORDER BY embedding <=> %s::vector
+                LIMIT %s
+            """
+            params = (embedding_str, version, embedding_str, limit)
+
+        cursor = raw_conn.cursor()
+        cursor.execute(query_sql, params)
+        rows = cursor.fetchall()
+
+        # Get column names
+        columns = [desc[0] for desc in cursor.description]
+
+        # Convert to dictionaries
+        result_dicts = [dict(zip(columns, row)) for row in rows]
+        cursor.close()
 
         return [
             SearchResult(
-                id=row.id,
-                technical_name=row.technical_name,
-                name=row.name or '',
-                summary=row.summary or '',
-                version=row.version,
-                depends=row.depends or [],
-                github_stars=row.github_stars or 0,
-                vector_score=float(row.similarity_score),
+                id=row['id'],
+                technical_name=row['technical_name'],
+                name=row['name'] or '',
+                summary=row['summary'] or '',
+                version=row['version'],
+                depends=row['depends'] or [],
+                github_stars=row['github_stars'] or 0,
+                vector_score=float(row['similarity_score']),
                 vector_rank=i + 1
             )
-            for i, row in enumerate(rows)
+            for i, row in enumerate(result_dicts)
         ]
 
     def _fulltext_search(
@@ -173,47 +201,73 @@ class HybridSearchService:
     ) -> List[SearchResult]:
         """Búsqueda BM25 full-text."""
 
-        query_sql = text("""
-            SELECT
-                id,
-                technical_name,
-                name,
-                summary,
-                version,
-                depends,
-                github_stars,
-                ts_rank_cd(searchable_text, query) as bm25_score
-            FROM odoo_modules,
-                 plainto_tsquery('english', :query) query
-            WHERE version = :version
-                AND (:deps::text[] IS NULL OR depends && :deps)
-                AND searchable_text @@ query
-            ORDER BY bm25_score DESC
-            LIMIT :limit
-        """)
+        # Use raw psycopg3 connection for consistency
+        raw_conn = self.db.connection().connection
 
-        result = self.db.execute(query_sql, {
-            "query": query,
-            "version": version,
-            "deps": dependencies,
-            "limit": limit
-        })
+        if dependencies:
+            query_sql = """
+                SELECT
+                    id,
+                    technical_name,
+                    name,
+                    summary,
+                    version,
+                    depends,
+                    github_stars,
+                    ts_rank_cd(searchable_text, q) as bm25_score
+                FROM odoo_modules,
+                     plainto_tsquery('english', %s) q
+                WHERE version = %s
+                    AND depends && %s
+                    AND searchable_text @@ q
+                ORDER BY bm25_score DESC
+                LIMIT %s
+            """
+            params = (query, version, dependencies, limit)
+        else:
+            query_sql = """
+                SELECT
+                    id,
+                    technical_name,
+                    name,
+                    summary,
+                    version,
+                    depends,
+                    github_stars,
+                    ts_rank_cd(searchable_text, q) as bm25_score
+                FROM odoo_modules,
+                     plainto_tsquery('english', %s) q
+                WHERE version = %s
+                    AND searchable_text @@ q
+                ORDER BY bm25_score DESC
+                LIMIT %s
+            """
+            params = (query, version, limit)
 
-        rows = result.fetchall()
+        cursor = raw_conn.cursor()
+        cursor.execute(query_sql, params)
+        rows = cursor.fetchall()
+
+        # Get column names
+        columns = [desc[0] for desc in cursor.description]
+
+        # Convert to dictionaries
+        result_dicts = [dict(zip(columns, row)) for row in rows]
+        cursor.close()
 
         return [
             SearchResult(
-                id=row.id,
-                technical_name=row.technical_name,
-                name=row.name or '',
-                summary=row.summary or '',
-                version=row.version,
-                depends=row.depends or [],
-                github_stars=row.github_stars or 0,
-                bm25_score=float(row.bm25_score),
+                id=row['id'],
+                technical_name=row['technical_name'],
+                name=row['name'] or '',
+                summary=row['summary'] or '',
+                version=row['version'],
+                depends=row['depends'] or [],
+                github_stars=row['github_stars'] or 0,
+                bm25_score=float(row['bm25_score']),
                 bm25_rank=i + 1
             )
-            for i, row in enumerate(rows)
+            for i, row in enumerate(result_dicts)
         ]
 
     def _reciprocal_rank_fusion(
