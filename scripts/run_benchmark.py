@@ -5,6 +5,7 @@ Script de ejecución de benchmark de búsqueda.
 Este script ejecuta todas las queries del benchmark, calcula métricas IR
 y genera un reporte estructurado con resultados detallados y agregados.
 """
+import argparse
 import json
 import sys
 from datetime import datetime
@@ -23,17 +24,19 @@ from backend.app.metrics.benchmark_metrics import MetricsCalculator, ReportAggre
 class BenchmarkRunner:
     """Ejecuta benchmark de búsqueda y genera reporte."""
 
-    def __init__(self, db_session):
+    def __init__(self, db_session, search_mode: str = "hybrid"):
         """
         Inicializa el runner.
 
         Args:
             db_session: Sesión de base de datos
+            search_mode: Modo de búsqueda ("vector", "bm25", "hybrid")
         """
         self.db = db_session
         self.search_service = SearchService(db_session)
         self.metrics_calculator = MetricsCalculator()
         self.report_aggregator = ReportAggregator()
+        self.search_mode = search_mode
 
     def run(
         self,
@@ -140,7 +143,8 @@ class BenchmarkRunner:
             search_results = self.search_service.search(
                 query=query_data['query'],
                 version=query_data['version'],
-                limit=limit
+                limit=limit,
+                search_mode=self.search_mode
             )
 
             # Extract module technical names
@@ -245,7 +249,7 @@ class BenchmarkRunner:
                 'total_queries': len(results),
                 'valid_queries': len(valid_results),
                 'failed_queries': len(results) - len(valid_results),
-                'search_mode': 'vector',
+                'search_mode': self.search_mode,
                 'limit': 10,
                 'execution_time_seconds': execution_time
             },
@@ -268,7 +272,7 @@ class BenchmarkRunner:
         Path(output_dir).mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"baseline_{timestamp}.json"
+        filename = f"{self.search_mode}_{timestamp}.json"
         filepath = Path(output_dir) / filename
 
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -318,11 +322,22 @@ class BenchmarkRunner:
 
 def main():
     """Entry point."""
-    print("\n🚀 Starting benchmark...\n")
+    parser = argparse.ArgumentParser(
+        description='Run search benchmark with specified search mode'
+    )
+    parser.add_argument(
+        '--search-mode',
+        choices=['vector', 'bm25', 'hybrid'],
+        default='hybrid',
+        help='Search mode to benchmark (default: hybrid)'
+    )
+    args = parser.parse_args()
+
+    print(f"\n🚀 Starting benchmark with search_mode={args.search_mode}...\n")
 
     db = SessionLocal()
     try:
-        runner = BenchmarkRunner(db)
+        runner = BenchmarkRunner(db, search_mode=args.search_mode)
         report = runner.run(verbose=True)
 
         # Return exit code based on success

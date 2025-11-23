@@ -6,9 +6,14 @@ from .models import Base
 
 settings = get_settings()
 
+# Force psycopg3 driver by replacing postgresql:// with postgresql+psycopg://
+database_url = settings.database_url
+if database_url.startswith("postgresql://"):
+    database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
 # Crear engine
 engine = create_engine(
-    settings.database_url,
+    database_url,
     pool_pre_ping=True,  # Verificar conexión antes de usar
     pool_recycle=3600,   # Reciclar conexiones cada hora
     echo=False           # True para debug SQL
