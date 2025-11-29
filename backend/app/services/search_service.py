@@ -77,10 +77,6 @@ class SearchService:
             else:
                 raise ValueError(f"Invalid search_mode: {search_mode}")
 
-            # Apply reranking if enabled
-            if use_reranking and results:
-                results = self._apply_reranking(query, results, limit)
-
             return results
 
         except Exception as e:
@@ -91,46 +87,6 @@ class SearchService:
             except Exception:
                 pass
             return []
-
-    def _apply_reranking(self, query: str, candidates: List[Dict], limit: int) -> List[Dict]:
-        """
-        Apply reranking to search results using Qwen3-Reranker-4B.
-
-        Args:
-            query: Original search query
-            candidates: List of search results to rerank
-            limit: Number of results to return
-
-        Returns:
-            Reranked list of results
-        """
-        try:
-            reranking_service = _get_reranking_service()
-
-            # Enrich candidates with ai_description and keywords for better reranking
-            enriched_candidates = []
-            for candidate in candidates:
-                module = self.db.query(OdooModule).filter(OdooModule.id == candidate["id"]).first()
-
-                if module:
-                    enriched = candidate.copy()
-                    enriched["ai_description"] = module.ai_description or ""
-                    enriched["keywords"] = module.keywords or []
-                    enriched_candidates.append(enriched)
-                else:
-                    enriched_candidates.append(candidate)
-
-            # Rerank
-            reranked = reranking_service.rerank(
-                query=query, candidates=enriched_candidates, top_k=limit
-            )
-
-            logger.info(f"Reranking complete: {len(reranked)} results")
-            return reranked
-
-        except Exception as e:
-            logger.error(f"Reranking failed, returning original order: {e}")
-            return candidates[:limit]
 
     def _search_hybrid(
         self,
