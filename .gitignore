@@ -220,8 +220,10 @@ logs/
 
 # Environment files (NEVER commit secrets!)
 .env
-.env.*
+.env.local
+.env.production
 !.env.example
+!.env.docker.example
 
 # Checkpoints and temporary files
 scripts/.embedding_*.json
