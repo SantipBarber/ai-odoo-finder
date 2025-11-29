@@ -92,6 +92,79 @@ class GitHubService:
 
         return sorted(odoo_versions)
 
+    def get_all_oca_repos(self, min_stars: int = 0) -> List[str]:
+        """
+        Obtener todos los repositorios activos de la organización OCA.
+
+        Args:
+            min_stars: Mínimo de estrellas para incluir el repo (filtro de calidad)
+
+        Returns:
+            Lista de nombres de repositorios activos
+        """
+        all_repos = []
+        page = 1
+        per_page = 100
+
+        print("🔍 Descubriendo repositorios de OCA...")
+
+        while True:
+            url = f"{self.base_url}/orgs/OCA/repos"
+            params = {
+                "page": page,
+                "per_page": per_page,
+                "type": "public",
+                "sort": "updated"
+            }
+
+            response = requests.get(url, headers=self.headers, params=params)
+            response.raise_for_status()
+
+            repos = response.json()
+
+            # Si no hay más repos, terminar
+            if not repos:
+                break
+
+            # Filtrar repos
+            for repo in repos:
+                # Skip archivados, forks, y repos de infraestructura
+                if repo.get("archived", False):
+                    continue
+                if repo.get("fork", False):
+                    continue
+
+                # Filtrar por estrellas mínimas
+                stars = repo.get("stargazers_count", 0)
+                if stars < min_stars:
+                    continue
+
+                # Filtrar repos de infraestructura (no contienen módulos)
+                repo_name = repo["name"]
+                infrastructure_repos = [
+                    "maintainer-tools", "maintainer-quality-tools",
+                    "odoo-pre-commit-hooks", "pylint-odoo",
+                    "github-organization-project", "oca-custom",
+                    "OpenUpgrade", "runbot-addons",
+                    "odoo-community.org", "OCB"
+                ]
+
+                if repo_name in infrastructure_repos:
+                    continue
+
+                all_repos.append(repo_name)
+
+            print(f"   Página {page}: {len(repos)} repos ({len(all_repos)} válidos acumulados)")
+            page += 1
+
+            # Protección: máximo 500 repos
+            if len(all_repos) >= 500:
+                print("   ⚠️  Alcanzado límite de 500 repos")
+                break
+
+        print(f"✅ Encontrados {len(all_repos)} repositorios activos de OCA\n")
+        return all_repos
+
     def find_manifests(self, repo_name: str, version: str) -> List[str]:
         """
         Encontrar todos los __manifest__.py en un repo/versión.

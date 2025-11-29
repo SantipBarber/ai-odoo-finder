@@ -6,6 +6,7 @@ on:
 jobs:
   etl:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Máximo 30 min (normalmente ~3 min)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

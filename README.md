@@ -200,6 +200,40 @@ Simplemente pregunta en lenguaje natural:
 
 El asistente buscará automáticamente y te dará recomendaciones personalizadas.
 
+### Claude Desktop (MCP)
+
+Para usar AI-OdooFinder directamente en Claude Desktop:
+
+1. **Configura** `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "/Users/TU_USUARIO/.local/bin/uv",
+      "args": [
+        "--directory",
+        "/ruta/a/ai-odoo-finder/mcp-server",
+        "run",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "http://localhost:8989"
+      }
+    }
+  }
+}
+```
+
+2. **Reinicia** Claude Desktop (`Cmd+Q`)
+3. **Pregunta** sobre módulos de Odoo:
+
+```text
+"Busco un módulo de facturación electrónica Facturae para España en Odoo 16"
+```
+
+Ver [mcp-server/README.md](mcp-server/README.md) para instrucciones detalladas.
+
 ---
 
 ## 📚 Documentación
@@ -213,6 +247,8 @@ El asistente buscará automáticamente y te dará recomendaciones personalizadas
 ### 🔧 Setup y Configuración
 - **[Configuración Neon](docs/NEON_SETUP.md)** - Setup de base de datos PostgreSQL
 - **[Claude Skill](claude-skill/ai-odoofinder-skill/Skill.md)** - Configurar el asistente conversacional
+- **[Claude Desktop MCP](mcp-server/README.md)** - Configurar MCP para Claude Desktop
+- **[Changelog](docs/CHANGELOG.md)** - Historial de cambios del proyecto
 
 ### 🎨 Diseño y Branding
 - **[Branding](docs/BRANDING.md)** - Paleta de colores, logos y guía de estilo
@@ -231,23 +267,30 @@ El asistente buscará automáticamente y te dará recomendaciones personalizadas
 
 ## 🗺️ Roadmap
 
-### ✅ Fase Actual: MVP
-- [x] Búsqueda básica en repositorios OCA
-- [x] Filtrado por versión
+### ✅ Completado
+- [x] Búsqueda semántica en repositorios OCA (15,881 módulos)
+- [x] Filtrado por versión (12.0 - 19.0)
 - [x] API REST funcional
-- [x] Claude Skill básica
+- [x] MCP Server para Claude Web/Desktop
+- [x] ETL automatizado (GitHub Actions, diario)
+- [x] Hybrid Search (BM25 + Vector + RRF)
+- [x] **Fase 3: Data Enrichment** - 15,881 módulos enriquecidos (100%)
+  - AI descriptions en inglés
+  - Functional tags (sales, accounting, inventory...)
+  - Keywords para búsqueda
+  - Full-text search actualizado con campos enrichment
 
-### 🚧 En Desarrollo
-- [ ] Sistema de scoring avanzado
-- [ ] Análisis de dependencias
-- [ ] Expansión a más repositorios
-- [ ] Interfaz web
+### 🚧 En Desarrollo (Fase 5)
+- [ ] Test suite completo
+- [ ] Benchmarking de calidad de búsqueda
+- [ ] Performance optimization
 
 ### 🔮 Futuro
+- [ ] Fase 4: LLM Reranking (requiere modelo local en servidor)
+- [ ] Fase 6: MCP Inteligente
 - [ ] Integración con Odoo App Store
-- [ ] Reviews y ratings comunitarios
+- [ ] Interfaz web
 - [ ] CLI para terminal
-- [ ] Recomendaciones inteligentes
 
 ---
 
@@ -286,10 +329,11 @@ Lee nuestra [Guía de Contribución](docs/CONTRIBUTING.md) para más detalles.
 
 | Métrica | Valor |
 |---------|-------|
-| 📦 Módulos Indexados | **2,508** |
+| 📦 Módulos Indexados | **15,881** |
 | 🎯 Versiones de Odoo | 8 (v12.0 - v19.0) |
-| 📝 Con README completo | **1,515** (60%) |
-| 🏢 Repositorios | OCA (5 principales) |
+| 📝 Con README completo | **14,869** (93.6%) |
+| 🧠 Con AI Enrichment | **15,881** (100%) |
+| 🏢 Repositorios OCA | **176** (todos los que tienen módulos) |
 | ⚡ Tiempo respuesta | < 500ms |
 | 🔄 Actualización | Diaria (GitHub Actions) |
 
@@ -301,16 +345,16 @@ Lee nuestra [Guía de Contribución](docs/CONTRIBUTING.md) para más detalles.
 
 | Versión | Módulos | Estado |
 |---------|---------|--------|
-| 12.0 | 353 | ✅ Activo |
-| 13.0 | 336 | ✅ Activo |
-| 14.0 | 454 | ✅ Activo |
-| 15.0 | 364 | ✅ Activo |
-| 16.0 (LTS) | 421 | ✅ Activo |
-| 17.0 | 264 | ✅ Activo |
-| 18.0 | 307 | ✅ Activo |
-| 19.0 | 9 | 🔄 En crecimiento |
+| 12.0 | 2,215 | ✅ Activo |
+| 13.0 | 1,990 | ✅ Activo |
+| 14.0 | 2,886 | ✅ Activo |
+| 15.0 | 2,074 | ✅ Activo |
+| 16.0 (LTS) | 2,886 | ✅ Activo |
+| 17.0 | 1,699 | ✅ Activo |
+| 18.0 | 2,018 | ✅ Activo |
+| 19.0 | 112 | 🔄 En crecimiento |
 
-**Total:** 2,508 módulos indexados
+**Total:** 15,880 módulos indexados de 176 repositorios OCA
 
 </div>
 

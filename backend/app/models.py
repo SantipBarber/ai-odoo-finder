@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import ARRAY, Column, DateTime, Integer, String, Text
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -39,11 +40,19 @@ class OdooModule(Base):
     # Embedding (vector de 2560 dimensiones para Qwen3-Embedding 4B)
     embedding = Column(Vector(2560))
 
+    # Full-text search
+    searchable_text = Column(TSVECTOR)
+
+    # Enrichment fields (Phase 3)
+    ai_description = Column(Text)  # AI-generated description in English
+    functional_tags = Column(ARRAY(String))  # Functional category tags
+    keywords = Column(ARRAY(String))  # Extracted search keywords
+    enriched_at = Column(DateTime)  # When module was enriched
+    enrichment_version = Column(String(20))  # Version of enrichment process
+
     # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return f"<OdooModule {self.technical_name} v{self.version}>"
-
-

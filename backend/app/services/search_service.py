@@ -13,6 +13,18 @@ from .hybrid_search_service import HybridSearchService
 logger = get_logger(__name__)
 embedding_service = get_embedding_service()
 
+# Lazy load reranking service (heavy model)
+_reranking_service = None
+
+
+def _get_reranking_service():
+    """Lazy load reranking service to avoid loading model at import time."""
+    global _reranking_service
+    if _reranking_service is None:
+        from .reranking_service import get_reranking_service
+        _reranking_service = get_reranking_service()
+    return _reranking_service
+
 # Type alias for search modes
 SearchMode = Literal["vector", "bm25", "hybrid"]
 
@@ -31,6 +43,7 @@ class SearchService:
         limit: int = 10,
         min_score: int = 0,
         search_mode: SearchMode = "hybrid",
+        use_reranking: bool = False,
     ) -> List[Dict]:
         """
         Búsqueda multi-modal: Vector, BM25, o Híbrida.
@@ -45,6 +58,7 @@ class SearchService:
                 - "vector": Solo búsqueda semántica (legacy)
                 - "bm25": Solo full-text search
                 - "hybrid": Vector + BM25 con RRF (default, recomendado)
+            use_reranking: Si True, aplica reranking con Qwen3-Reranker-4B
 
         Returns:
             Lista de módulos rankeados con score y metadata
@@ -61,21 +75,28 @@ class SearchService:
         query = query.strip()
         dependencies = dependencies or []
 
+        rerank_suffix = " +rerank" if use_reranking else ""
         logger.info(
-            f"Búsqueda [{search_mode}]: query='{query[:50]}...', version={version}, "
+            f"Búsqueda [{search_mode}{rerank_suffix}]: query='{query[:50]}...', version={version}, "
             f"dependencies={dependencies}, limit={limit}"
         )
 
         try:
             # Route to appropriate search method
             if search_mode == "hybrid":
-                return self._search_hybrid(query, version, dependencies, limit, min_score)
+                results = self._search_hybrid(query, version, dependencies, limit, min_score)
             elif search_mode == "bm25":
-                return self._search_bm25(query, version, dependencies, limit, min_score)
+                results = self._search_bm25(query, version, dependencies, limit, min_score)
             elif search_mode == "vector":
-                return self._search_vector(query, version, dependencies, limit, min_score)
+                results = self._search_vector(query, version, dependencies, limit, min_score)
             else:
                 raise ValueError(f"Invalid search_mode: {search_mode}")
+
+            # Apply reranking if enabled
+            if use_reranking and results:
+                results = self._apply_reranking(query, results, limit)
+
+            return results
 
         except Exception as e:
             logger.error(f"Error en búsqueda [{search_mode}]: {e}", exc_info=True)
@@ -85,6 +106,55 @@ class SearchService:
             except Exception:
                 pass
             return []
+
+    def _apply_reranking(
+        self,
+        query: str,
+        candidates: List[Dict],
+        limit: int
+    ) -> List[Dict]:
+        """
+        Apply reranking to search results using Qwen3-Reranker-4B.
+
+        Args:
+            query: Original search query
+            candidates: List of search results to rerank
+            limit: Number of results to return
+
+        Returns:
+            Reranked list of results
+        """
+        try:
+            reranking_service = _get_reranking_service()
+
+            # Enrich candidates with ai_description and keywords for better reranking
+            enriched_candidates = []
+            for candidate in candidates:
+                module = self.db.query(OdooModule).filter(
+                    OdooModule.id == candidate['id']
+                ).first()
+
+                if module:
+                    enriched = candidate.copy()
+                    enriched['ai_description'] = module.ai_description or ""
+                    enriched['keywords'] = module.keywords or []
+                    enriched_candidates.append(enriched)
+                else:
+                    enriched_candidates.append(candidate)
+
+            # Rerank
+            reranked = reranking_service.rerank(
+                query=query,
+                candidates=enriched_candidates,
+                top_k=limit
+            )
+
+            logger.info(f"Reranking complete: {len(reranked)} results")
+            return reranked
+
+        except Exception as e:
+            logger.error(f"Reranking failed, returning original order: {e}")
+            return candidates[:limit]
 
     def _search_hybrid(
         self,

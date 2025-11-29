@@ -1,28 +1,35 @@
 # 🚀 Próximos Pasos - AI-OdooFinder
 
-**Última actualización:** 19 Noviembre 2025 - 23:30 UTC
-**Contexto:** Sprint 1, Sprint 2 (Fases 1-3) y Sprint 3 completados ✅ MCP Server funcionando en producción 🎉
+**Última actualización:** 25 Noviembre 2025
+**Contexto:** ETL completo con todos los repos OCA, Hybrid Search implementado, MCP Server funcionando 🎉
 
 ---
 
-## ✅ COMPLETADO - ETL Finalizado con Éxito
+## ✅ COMPLETADO - ETL Completo (Todos los repos OCA)
 
 ### Estadísticas Finales
 
-**Total módulos indexados:** 2,508 ✅
-**Módulos con README:** 1,515 (60%) ✅
+**Total módulos indexados:** 15,880 ✅
+**Módulos con README:** 14,869 (93.6%) ✅
+**Repositorios OCA indexados:** 176 de 244 (72% - el resto están vacíos)
 
 **Distribución por versión:**
-- v12.0: 353 módulos
-- v13.0: 336 módulos
-- v14.0: 454 módulos
-- v15.0: 364 módulos
-- v16.0: 421 módulos (LTS)
-- v17.0: 264 módulos
-- v18.0: 307 módulos
-- v19.0: 9 módulos (nueva)
+- v12.0: 2,215 módulos
+- v13.0: 1,990 módulos
+- v14.0: 2,886 módulos
+- v15.0: 2,074 módulos
+- v16.0: 2,886 módulos (LTS)
+- v17.0: 1,699 módulos
+- v18.0: 2,018 módulos
+- v19.0: 112 módulos (nueva)
 
-**Resultado:** Superamos las expectativas (~2,000-2,500 esperados) 🎉
+**Resultado:** Indexación completa de OCA - 6x más módulos que el MVP inicial 🎉
+
+### ETL Optimizado
+- ✅ Salta repos ya indexados (consulta BD al inicio)
+- ✅ Ejecución en ~2-3 minutos (antes horas)
+- ✅ GitHub Actions cron diario a las 3 AM UTC
+- ✅ Timeout de 30 minutos como medida de seguridad
 
 ---
 
@@ -359,28 +366,33 @@ async def search_odoo_modules(
 
 ---
 
-## 📅 Timeline Sugerido
+## 📅 Timeline
 
 ### ✅ Semana 16-22 Nov (COMPLETADA)
-- ✅ Verificar ETL completado
-- ✅ Actualizar documentación (README, API, Skill)
 - ✅ Sprint 1: Limpieza de docs
-- ✅ Sprint 2 Fase 1: Investigación MCP
-- ✅ Sprint 2 Fase 2: Implementación Core MCP
-- ✅ Sprint 2 Fase 3: Testing end-to-end
+- ✅ Sprint 2 Fases 1-3: MCP Server en producción
 - ✅ Modernización: Python 3.14 + uv
 - ✅ Bug fixes: Validación de versiones API
 
-### Próxima Semana (23-29 Nov)
-- Sprint 2 Fase 4: Documentación de usuario
-- Tests unitarios para MCP
-- Mejorar coverage de tests
-- Explorar mejoras de performance
+### ✅ Semana 23-25 Nov (COMPLETADA)
+- ✅ Fase 2 Hybrid Search: Implementación completa
+- ✅ ETL expandido: 15,880 módulos de 176 repos OCA
+- ✅ ETL optimizado: Salta repos ya indexados (~2-3 min)
+- ✅ Supervisor mejorado: Termina cuando completa, no reinicia innecesariamente
 
-### Diciembre
-- Sprint 4: Odoo App Store (si hay tiempo/necesidad)
-- Sprint 5: Módulos custom (si es necesario)
-- Mejoras de UX y optimización
+### 🚧 En Progreso: Fase 3 - Data Enrichment
+- [x] Migration BD con campos de enrichment
+- [x] Scripts de export/import (`get_modules_for_enrichment.py`, `save_module_enrichment.py`)
+- [x] Slash command `/enrich` para Claude Max
+- [x] Documentación ([docs/ENRICHMENT_GUIDE.md](docs/ENRICHMENT_GUIDE.md))
+- [ ] Enriquecer ~15,880 módulos (en progreso via Claude Max)
+- [ ] Regenerar embeddings con datos enriquecidos
+
+### 📋 Después: Fases 4-5
+- [ ] LLM Reranking (Claude Haiku)
+- [ ] Test suite completo
+- [ ] Performance & cost analysis
+- [ ] Production deployment guide
 
 ---
 
@@ -453,6 +465,10 @@ Antes de empezar un nuevo hilo, asegúrate de:
 
 ---
 
-**Última actualización:** 19 Nov 2025, 23:30 UTC
-**Próxima tarea:** Sprint 2 Fase 4 - Documentación MCP (1-2 días)
-**Estado actual:** MCP Server funcionando en producción ✅
+**Última actualización:** 25 Nov 2025
+**Próxima tarea:** Fase 3 - Data Enrichment (AI descriptions, tags, keywords)
+**Estado actual:**
+- ✅ 15,880 módulos indexados (176 repos OCA)
+- ✅ Hybrid Search funcionando (BM25 + Vector + RRF)
+- ✅ MCP Server en producción
+- ✅ ETL optimizado (~2-3 min/día)

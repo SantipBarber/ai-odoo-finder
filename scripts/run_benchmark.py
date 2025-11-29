@@ -24,19 +24,21 @@ from backend.app.metrics.benchmark_metrics import MetricsCalculator, ReportAggre
 class BenchmarkRunner:
     """Ejecuta benchmark de búsqueda y genera reporte."""
 
-    def __init__(self, db_session, search_mode: str = "hybrid"):
+    def __init__(self, db_session, search_mode: str = "hybrid", use_reranking: bool = False):
         """
         Inicializa el runner.
 
         Args:
             db_session: Sesión de base de datos
             search_mode: Modo de búsqueda ("vector", "bm25", "hybrid")
+            use_reranking: Si True, aplica reranking con Qwen3-Reranker-4B
         """
         self.db = db_session
         self.search_service = SearchService(db_session)
         self.metrics_calculator = MetricsCalculator()
         self.report_aggregator = ReportAggregator()
         self.search_mode = search_mode
+        self.use_reranking = use_reranking
 
     def run(
         self,
@@ -103,7 +105,7 @@ class BenchmarkRunner:
 
         return report
 
-    def _load_queries(self, filepath: str = "tests/benchmark_queries.json") -> List[Dict]:
+    def _load_queries(self, filepath: str = "specs/phase-5-testing/benchmark_queries_validated.json") -> List[Dict]:
         """
         Carga queries desde JSON.
 
@@ -144,7 +146,8 @@ class BenchmarkRunner:
                 query=query_data['query'],
                 version=query_data['version'],
                 limit=limit,
-                search_mode=self.search_mode
+                search_mode=self.search_mode,
+                use_reranking=self.use_reranking
             )
 
             # Extract module technical names
@@ -331,13 +334,19 @@ def main():
         default='hybrid',
         help='Search mode to benchmark (default: hybrid)'
     )
+    parser.add_argument(
+        '--reranking',
+        action='store_true',
+        help='Enable reranking with Qwen3-Reranker-4B'
+    )
     args = parser.parse_args()
 
-    print(f"\n🚀 Starting benchmark with search_mode={args.search_mode}...\n")
+    rerank_str = " +reranking" if args.reranking else ""
+    print(f"\n🚀 Starting benchmark with search_mode={args.search_mode}{rerank_str}...\n")
 
     db = SessionLocal()
     try:
-        runner = BenchmarkRunner(db, search_mode=args.search_mode)
+        runner = BenchmarkRunner(db, search_mode=args.search_mode, use_reranking=args.reranking)
         report = runner.run(verbose=True)
 
         # Return exit code based on success
