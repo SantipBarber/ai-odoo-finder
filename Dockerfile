@@ -24,7 +24,8 @@ RUN pip install --no-cache-dir \
     pydantic-settings==2.6.1 \
     httpx==0.28.1 \
     python-dotenv==1.0.1 \
-    requests==2.32.3
+    requests==2.32.3 \
+    fastmcp==2.0.0
 
 # Copy application code
 COPY backend/ ./backend/
