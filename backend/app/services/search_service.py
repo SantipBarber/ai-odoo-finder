@@ -1,29 +1,17 @@
 import logging
-from typing import List, Dict, Optional, Literal
+from typing import Dict, List, Literal, Optional
 
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, func, String, cast
+from sqlalchemy import String, and_, cast, func
 from sqlalchemy.dialects.postgresql import ARRAY, array
+from sqlalchemy.orm import Session
 
-from ..models import OdooModule
 from ..core.logging import get_logger
+from ..models import OdooModule
 from .embedding_service import get_embedding_service
 from .hybrid_search_service import HybridSearchService
 
 logger = get_logger(__name__)
 embedding_service = get_embedding_service()
-
-# Lazy load reranking service (heavy model)
-_reranking_service = None
-
-
-def _get_reranking_service():
-    """Lazy load reranking service to avoid loading model at import time."""
-    global _reranking_service
-    if _reranking_service is None:
-        from .reranking_service import get_reranking_service
-        _reranking_service = get_reranking_service()
-    return _reranking_service
 
 # Type alias for search modes
 SearchMode = Literal["vector", "bm25", "hybrid"]
@@ -43,7 +31,6 @@ class SearchService:
         limit: int = 10,
         min_score: int = 0,
         search_mode: SearchMode = "hybrid",
-        use_reranking: bool = False,
     ) -> List[Dict]:
         """
         Búsqueda multi-modal: Vector, BM25, o Híbrida.
@@ -58,7 +45,6 @@ class SearchService:
                 - "vector": Solo búsqueda semántica (legacy)
                 - "bm25": Solo full-text search
                 - "hybrid": Vector + BM25 con RRF (default, recomendado)
-            use_reranking: Si True, aplica reranking con Qwen3-Reranker-4B
 
         Returns:
             Lista de módulos rankeados con score y metadata
@@ -75,9 +61,8 @@ class SearchService:
         query = query.strip()
         dependencies = dependencies or []
 
-        rerank_suffix = " +rerank" if use_reranking else ""
         logger.info(
-            f"Búsqueda [{search_mode}{rerank_suffix}]: query='{query[:50]}...', version={version}, "
+            f"Búsqueda [{search_mode}]: query='{query[:50]}...', version={version}, "
             f"dependencies={dependencies}, limit={limit}"
         )
 
@@ -107,12 +92,7 @@ class SearchService:
                 pass
             return []
 
-    def _apply_reranking(
-        self,
-        query: str,
-        candidates: List[Dict],
-        limit: int
-    ) -> List[Dict]:
+    def _apply_reranking(self, query: str, candidates: List[Dict], limit: int) -> List[Dict]:
         """
         Apply reranking to search results using Qwen3-Reranker-4B.
 
@@ -130,23 +110,19 @@ class SearchService:
             # Enrich candidates with ai_description and keywords for better reranking
             enriched_candidates = []
             for candidate in candidates:
-                module = self.db.query(OdooModule).filter(
-                    OdooModule.id == candidate['id']
-                ).first()
+                module = self.db.query(OdooModule).filter(OdooModule.id == candidate["id"]).first()
 
                 if module:
                     enriched = candidate.copy()
-                    enriched['ai_description'] = module.ai_description or ""
-                    enriched['keywords'] = module.keywords or []
+                    enriched["ai_description"] = module.ai_description or ""
+                    enriched["keywords"] = module.keywords or []
                     enriched_candidates.append(enriched)
                 else:
                     enriched_candidates.append(candidate)
 
             # Rerank
             reranked = reranking_service.rerank(
-                query=query,
-                candidates=enriched_candidates,
-                top_k=limit
+                query=query, candidates=enriched_candidates, top_k=limit
             )
 
             logger.info(f"Reranking complete: {len(reranked)} results")
@@ -181,7 +157,7 @@ class SearchService:
             dependencies=dependencies,
             limit=limit,
             k=60,
-            top_candidates=50
+            top_candidates=50,
         )
 
         # Convert SearchResult to dict format
@@ -219,9 +195,7 @@ class SearchService:
                     "github_stars": module.github_stars or 0,
                     "github_issues_open": module.github_issues_open or 0,
                     "last_commit_date": (
-                        module.last_commit_date.isoformat()
-                        if module.last_commit_date
-                        else None
+                        module.last_commit_date.isoformat() if module.last_commit_date else None
                     ),
                     "score": score,
                     "rrf_score": result.rrf_score,
@@ -244,10 +218,7 @@ class SearchService:
         """Búsqueda BM25 full-text pura."""
 
         results = self.hybrid_search_service._fulltext_search(
-            query=query,
-            version=version,
-            dependencies=dependencies,
-            limit=limit
+            query=query, version=version, dependencies=dependencies, limit=limit
         )
 
         # Convert to dict format
@@ -284,9 +255,7 @@ class SearchService:
                     "github_stars": module.github_stars or 0,
                     "github_issues_open": module.github_issues_open or 0,
                     "last_commit_date": (
-                        module.last_commit_date.isoformat()
-                        if module.last_commit_date
-                        else None
+                        module.last_commit_date.isoformat() if module.last_commit_date else None
                     ),
                     "score": score,
                     "bm25_score": result.bm25_score,
@@ -367,9 +336,7 @@ class SearchService:
                     "github_stars": module.github_stars or 0,
                     "github_issues_open": module.github_issues_open or 0,
                     "last_commit_date": (
-                        module.last_commit_date.isoformat()
-                        if module.last_commit_date
-                        else None
+                        module.last_commit_date.isoformat() if module.last_commit_date else None
                     ),
                     "score": score,
                     "distance": round(float(distance), 4),

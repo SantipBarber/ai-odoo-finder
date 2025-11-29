@@ -23,7 +23,8 @@ RUN pip install --no-cache-dir \
     psycopg[binary]==3.2.3 \
     pydantic-settings==2.6.1 \
     httpx==0.28.1 \
-    python-dotenv==1.0.1
+    python-dotenv==1.0.1 \
+    requests==2.32.3
 
 # Copy application code
 COPY backend/ ./backend/
