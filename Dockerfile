@@ -1,5 +1,5 @@
 # AI-OdooFinder Docker Image
-# Using pip for maximum compatibility with ARM64
+# Production build - minimal dependencies
 
 FROM python:3.12-slim
 
@@ -11,21 +11,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for caching
-COPY pyproject.toml ./
-
-# Install Python dependencies with pip (most compatible)
+# Install Python dependencies with pip
+# Note: These are production-only deps (no torch/transformers needed)
 RUN pip install --no-cache-dir \
     fastapi==0.115.6 \
     uvicorn[standard]==0.32.1 \
     sqlalchemy==2.0.36 \
     pgvector==0.3.6 \
     psycopg[binary]==3.2.3 \
+    pydantic==2.10.3 \
     pydantic-settings==2.6.1 \
     httpx==0.28.1 \
     python-dotenv==1.0.1 \
     requests==2.32.3 \
-    fastmcp==2.0.0
+    fastmcp==2.3.3
 
 # Copy application code
 COPY backend/ ./backend/
