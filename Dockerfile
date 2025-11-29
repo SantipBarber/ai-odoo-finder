@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir \
     pydantic==2.10.3 \
     pydantic-settings==2.6.1 \
     httpx==0.28.1 \
-    python-dotenv==1.0.1 \
+    python-dotenv==1.1.0 \
     requests==2.32.3 \
     fastmcp==2.3.3
 
