@@ -1,0 +1,167 @@
+{
+  "benchmark_queries": [
+    {
+      "id": 1,
+      "query": "modelo 303 IVA trimestral AEAT España",
+      "version": "16.0",
+      "expected_modules": [
+        "l10n_es_aeat_mod303",
+        "l10n_es_aeat_mod303_oss",
+        "l10n_es_aeat_mod303_vat_prorate",
+        "l10n_es_aeat_mod390",
+        "l10n_es_aeat_mod369",
+        "l10n_es_aeat"
+      ],
+      "category": "localization_spain",
+      "difficulty": "easy"
+    },
+    {
+      "id": 2,
+      "query": "libro registro IVA España",
+      "version": "16.0",
+      "expected_modules": [
+        "l10n_es_vat_book",
+        "l10n_es_aeat",
+        "l10n_es_aeat_mod303",
+        "l10n_es_aeat_mod390"
+      ],
+      "category": "localization_spain",
+      "difficulty": "easy"
+    },
+    {
+      "id": 3,
+      "query": "factura electrónica facturae España",
+      "version": "16.0",
+      "expected_modules": [
+        "l10n_es_facturae",
+        "l10n_es_facturae_face",
+        "l10n_es_facturae_igic"
+      ],
+      "category": "localization_spain",
+      "difficulty": "medium"
+    },
+    {
+      "id": 4,
+      "query": "informes financieros balance pérdidas ganancias",
+      "version": "16.0",
+      "expected_modules": [
+        "account_financial_report",
+        "account_financial_report_sale",
+        "mis_builder",
+        "mis_template_financial_report",
+        "l10n_us_mis_financial_report"
+      ],
+      "category": "accounting",
+      "difficulty": "medium"
+    },
+    {
+      "id": 5,
+      "query": "conciliación bancaria widget extracto",
+      "version": "14.0",
+      "expected_modules": [
+        "account_reconciliation_widget",
+        "account_reconcile_oca",
+        "account_statement_import"
+      ],
+      "category": "accounting",
+      "difficulty": "easy"
+    },
+    {
+      "id": 6,
+      "query": "consolidación contable multi empresa",
+      "version": "12.0",
+      "expected_modules": ["account_consolidation"],
+      "category": "accounting",
+      "difficulty": "hard"
+    },
+    {
+      "id": 7,
+      "query": "pack productos kit compuesto ventas",
+      "version": "16.0",
+      "expected_modules": [
+        "product_pack",
+        "sale_product_set",
+        "sale_product_pack",
+        "product_set"
+      ],
+      "category": "sales",
+      "difficulty": "medium"
+    },
+    {
+      "id": 8,
+      "query": "sistema gestión documental DMS archivos",
+      "version": "16.0",
+      "expected_modules": [
+        "dms",
+        "dms_field",
+        "dms_auto_classification",
+        "dms_storage",
+        "dms_attachment_link",
+        "document_knowledge"
+      ],
+      "category": "document_management",
+      "difficulty": "easy"
+    },
+    {
+      "id": 9,
+      "query": "control calidad inspección productos",
+      "version": "16.0",
+      "expected_modules": [
+        "quality_control_oca",
+        "quality_control_stock_oca",
+        "quality_control_mrp_oca",
+        "mgmtsystem_quality",
+        "mgmtsystem_nonconformity_quality_control_oca"
+      ],
+      "category": "manufacturing",
+      "difficulty": "medium"
+    },
+    {
+      "id": 10,
+      "query": "gastos empleados viaje factura",
+      "version": "16.0",
+      "expected_modules": [
+        "hr_expense_invoice",
+        "hr_expense_advance_clearing",
+        "hr_expense_payment",
+        "hr_expense_cancel",
+        "hr_expense_sequence"
+      ],
+      "category": "hr",
+      "difficulty": "medium"
+    },
+    {
+      "id": 11,
+      "query": "subcontratación fabricación MRP",
+      "version": "12.0",
+      "expected_modules": [
+        "mrp_subcontracting",
+        "mrp_subcontracting_purchase_link",
+        "subcontracted_service"
+      ],
+      "category": "manufacturing",
+      "difficulty": "medium"
+    },
+    {
+      "id": 12,
+      "query": "KPI indicadores gestión reporting",
+      "version": "16.0",
+      "expected_modules": [
+        "mis_builder",
+        "mis_template_financial_report",
+        "kpi_dashboard",
+        "mis_builder_budget",
+        "mis_builder_demo"
+      ],
+      "category": "accounting",
+      "difficulty": "medium"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-11-26",
+    "updated_at": "2025-11-29",
+    "total_queries": 12,
+    "validated": true,
+    "notes": "Queries validadas contra base de datos OCA real. Actualizado con módulos alternativos válidos después de mejorar embeddings con descripciones limpias."
+  }
+}

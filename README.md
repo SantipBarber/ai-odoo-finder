@@ -71,13 +71,14 @@ Pregunta como hablarías con un colega: "Necesito algo para gestionar inventario
 ## 🛠️ Stack Tecnológico
 
 ### Backend & Datos
-- **Base de Datos:** [Neon](https://neon.com) - PostgreSQL Serverless con pgVector
-  - Scale-to-zero para costos óptimos
-  - Provisioning en ~300ms
-  - Branching como Git
-- **API:** FastAPI (Python 3.14+) en [Render.com](https://render.com)
-- **ORM:** SQLAlchemy + Alembic
+- **Base de Datos:** PostgreSQL 16 con pgVector
+  - **Producción:** Docker container (self-hosted) o [Neon](https://neon.com) (serverless)
+  - Búsqueda vectorial con HNSW index
+  - Full-text search con tsvector
+- **API:** FastAPI (Python 3.12+)
+- **ORM:** SQLAlchemy 2.0
 - **Gestión de dependencias:** [uv](https://docs.astral.sh/uv/) - Extremadamente rápido (10-100x vs pip)
+- **Containerización:** Docker + Docker Compose
 
 ### IA & Embeddings
 - **Modelo:** Qwen3-Embedding-4B (open source)
@@ -132,24 +133,29 @@ Pregunta como hablarías con un colega: "Necesito algo para gestionar inventario
 
 ## 🚀 Instalación Rápida
 
-### Opción 1: Docker (Recomendado)
+### Opción 1: Docker (Recomendado para Producción)
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/tu-usuario/ai-odoofinder.git
-cd ai-odoofinder
+git clone https://github.com/SantipBarber/ai-odoo-finder.git
+cd ai-odoo-finder
 
 # Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus claves de API
+cp .env.docker.example .env
+nano .env  # Añadir POSTGRES_PASSWORD y OPENROUTER_API_KEY
 
-# Levantar servicios
+# Levantar servicios (PostgreSQL + API)
 docker-compose up -d
 
-# La API estará disponible en http://localhost:8000
+# Verificar
+curl http://localhost:8989/
+
+# La API estará disponible en http://localhost:8989
 ```
 
-### Opción 2: Instalación Local
+Ver [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) para guía completa de despliegue en servidor.
+
+### Opción 2: Instalación Local (Desarrollo)
 
 ```bash
 # Instalar uv (gestor de dependencias moderno)
@@ -245,8 +251,8 @@ Ver [mcp-server/README.md](mcp-server/README.md) para instrucciones detalladas.
 - **[Roadmap](docs/ROADMAP.md)** - Plan de desarrollo y futuro del proyecto
 
 ### 🔧 Setup y Configuración
-- **[Configuración Neon](docs/NEON_SETUP.md)** - Setup de base de datos PostgreSQL
-- **[Claude Skill](claude-skill/ai-odoofinder-skill/Skill.md)** - Configurar el asistente conversacional
+- **[Guía de Despliegue](docs/DEPLOYMENT.md)** - Desplegar en servidor con Docker
+- **[Configuración Neon](docs/NEON_SETUP.md)** - Setup de base de datos PostgreSQL (alternativa cloud)
 - **[Claude Desktop MCP](mcp-server/README.md)** - Configurar MCP para Claude Desktop
 - **[Changelog](docs/CHANGELOG.md)** - Historial de cambios del proyecto
 

@@ -182,9 +182,9 @@ cython_debug/
 .abstra/
 
 # Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore
 #  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#  and can be added to the global gitignore or merged into this file. However, if you prefer,
 #  you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
@@ -213,3 +213,45 @@ __marimo__/
 logs/
 .DS_Store
 .cursorignore
+
+# ============================================
+# AI-OdooFinder Project Specific
+# ============================================
+
+# Environment files (NEVER commit secrets!)
+.env
+.env.*
+!.env.example
+
+# Checkpoints and temporary files
+scripts/.embedding_*.json
+scripts/.enriched_*.json
+scripts/.reenrich_*.json
+scripts/.etl_completed_*
+scripts/*.log
+
+# Local data
+data/
+*.sqlite3
+
+# Supervisor logs
+supervisor*.log
+
+# Test results (keep structure, ignore actual results)
+tests/results/*.json
+
+# Docker volumes (if running locally)
+postgres_data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# MCP server local venv
+mcp-server/.venv/

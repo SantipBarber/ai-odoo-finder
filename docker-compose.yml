@@ -1,12 +1,72 @@
-version: "3.9"
+# AI-OdooFinder Docker Compose
+# Stack: PostgreSQL (pgVector) + FastAPI Backend
+#
+# Usage:
+#   docker-compose up -d          # Start services
+#   docker-compose logs -f api    # View API logs
+#   docker-compose down           # Stop services
+#   docker-compose down -v        # Stop and remove volumes (CAUTION: deletes data)
+
 services:
-  api:
-    build: .
-    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
-    ports:
-      - "8000:8000"
+  # ============================================
+  # PostgreSQL with pgVector
+  # ============================================
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: odoofinder-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ai_odoofinder}
+      POSTGRES_USER: ${POSTGRES_USER:-odoofinder}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password required}
     volumes:
-      - .:/app
-    working_dir: /app
+      - postgres_data:/var/lib/postgresql/data
+      # Init scripts (create extensions, etc.)
+      - ./backend/migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-odoofinder} -d ${POSTGRES_DB:-ai_odoofinder}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - odoofinder-network
 
+  # ============================================
+  # FastAPI Backend
+  # ============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: odoofinder-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Database connection (internal Docker network)
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-odoofinder}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-ai_odoofinder}
+      # External APIs
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?OpenRouter API key required}
+      GH_TOKEN: ${GH_TOKEN:-}
+      # App config
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+    ports:
+      - "8989:8989"
+    networks:
+      - odoofinder-network
 
+networks:
+  odoofinder-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
