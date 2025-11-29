@@ -1,49 +1,42 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+import logging
+from contextlib import asynccontextmanager
+from typing import List, Optional
+
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from contextlib import asynccontextmanager
-import logging
 
 from .database import get_db, init_db
-from .services.search_service import get_search_service
 from .models import OdooModule
-from .mcp_tools import mcp
+from .services.search_service import get_search_service
 
 # Configurar logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-# Crear MCP app primero (necesitamos su lifespan)
-mcp_app = mcp.http_app(path="/")  # path="/" porque montaremos en /mcp
 
-# Crear lifespan combinado (app + MCP)
+# Lifespan para inicializar la base de datos
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    logger.info("🚀 Iniciando AI-OdooFinder API...")
+    logger.info("Iniciando AI-OdooFinder API...")
     init_db()
-    logger.info("✅ Base de datos inicializada")
+    logger.info("Base de datos inicializada")
+    yield
+    # Shutdown
+    logger.info("Apagando servidor...")
 
-    # Inicializar MCP lifespan
-    async with mcp_app.lifespan(app):
-        logger.info("✅ MCP server initialized")
-        yield
 
-    # Shutdown (si necesitamos algo)
-    logger.info("👋 Apagando servidor...")
-
-# Crear app con lifespan combinado
+# Crear app
 app = FastAPI(
     title="AI-OdooFinder API",
     description="Búsqueda inteligente de módulos de Odoo usando RAG híbrido",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    lifespan=lifespan  # ← IMPORTANTE: Lifespan combinado
+    lifespan=lifespan,
 )
 
 # CORS (permitir requests desde cualquier origen)
@@ -55,9 +48,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Montar servidor MCP en /mcp
-app.mount("/mcp", mcp_app)
-logger.info("✅ MCP server mounted at /mcp")
 
 @app.get("/")
 async def root():
@@ -74,10 +64,11 @@ async def root():
             "description": "Model Context Protocol server for Claude and other AI assistants",
             "claude_config": {
                 "url": "https://ai-odoo-finder.onrender.com/mcp/",
-                "note": "IMPORTANT: Use this URL with trailing slash in Claude Web → Settings → Integrations → MCP"
-            }
-        }
+                "note": "IMPORTANT: Use this URL with trailing slash in Claude Web → Settings → Integrations → MCP",
+            },
+        },
     }
+
 
 @app.get("/health")
 async def health_check(db: Session = Depends(get_db)):
@@ -86,14 +77,11 @@ async def health_check(db: Session = Depends(get_db)):
         # Contar módulos en DB
         total_modules = db.query(OdooModule).count()
 
-        return {
-            "status": "healthy",
-            "database": "connected",
-            "total_modules": total_modules
-        }
+        return {"status": "healthy", "database": "connected", "total_modules": total_modules}
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(status_code=503, detail="Service unavailable")
+
 
 @app.get("/search")
 @app.post("/search")
@@ -103,7 +91,7 @@ async def search_modules(
     dependencies: Optional[List[str]] = Query(None, description="Dependencias requeridas"),
     limit: int = Query(10, ge=1, le=50, description="Número máximo de resultados"),
     min_score: int = Query(0, ge=0, le=100, description="Score mínimo (0-100)"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """
     Búsqueda híbrida de módulos de Odoo.
@@ -141,7 +129,7 @@ async def search_modules(
         if version not in ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]:
             raise HTTPException(
                 status_code=400,
-                detail=f"Versión inválida. Use: 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 o 19.0"
+                detail=f"Versión inválida. Use: 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 o 19.0",
             )
 
         # Buscar
@@ -151,7 +139,7 @@ async def search_modules(
             version=version,
             dependencies=dependencies,
             limit=limit,
-            min_score=min_score
+            min_score=min_score,
         )
 
         logger.info(f"Retornando {len(results)} resultados")
@@ -161,7 +149,7 @@ async def search_modules(
             "version": version,
             "dependencies": dependencies,
             "total_results": len(results),
-            "results": results
+            "results": results,
         }
 
     except HTTPException:
@@ -170,11 +158,9 @@ async def search_modules(
         logger.error(f"Error en búsqueda: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/modules/{module_id}")
-async def get_module_detail(
-    module_id: int,
-    db: Session = Depends(get_db)
-):
+async def get_module_detail(module_id: int, db: Session = Depends(get_db)):
     """
     Obtener detalle completo de un módulo por ID.
 
@@ -204,9 +190,11 @@ async def get_module_detail(
             "module_path": module.module_path,
             "github_stars": module.github_stars,
             "github_issues_open": module.github_issues_open,
-            "last_commit_date": module.last_commit_date.isoformat() if module.last_commit_date else None,
+            "last_commit_date": module.last_commit_date.isoformat()
+            if module.last_commit_date
+            else None,
             "created_at": module.created_at.isoformat(),
-            "updated_at": module.updated_at.isoformat()
+            "updated_at": module.updated_at.isoformat(),
         }
 
     except HTTPException:
@@ -214,6 +202,7 @@ async def get_module_detail(
     except Exception as e:
         logger.error(f"Error obteniendo módulo {module_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/stats")
 async def get_stats(db: Session = Depends(get_db)):
@@ -237,24 +226,27 @@ async def get_stats(db: Session = Depends(get_db)):
 
         # Por repositorio (top 10)
         from sqlalchemy import func
-        by_repo = db.query(
-            OdooModule.repo_name,
-            func.count(OdooModule.id).label('count')
-        ).group_by(OdooModule.repo_name).order_by(func.count(OdooModule.id).desc()).limit(10).all()
+
+        by_repo = (
+            db.query(OdooModule.repo_name, func.count(OdooModule.id).label("count"))
+            .group_by(OdooModule.repo_name)
+            .order_by(func.count(OdooModule.id).desc())
+            .limit(10)
+            .all()
+        )
 
         return {
             "total_modules": total,
             "by_version": by_version,
-            "top_repositories": [
-                {"name": repo, "modules": count}
-                for repo, count in by_repo
-            ]
+            "top_repositories": [{"name": repo, "modules": count} for repo, count in by_repo],
         }
 
     except Exception as e:
         logger.error(f"Error obteniendo estadísticas: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8989)
