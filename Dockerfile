@@ -1,24 +1,34 @@
 # AI-OdooFinder Docker Image
-# Single-stage build for simplicity and ARM64 compatibility
+# Using pip for maximum compatibility with ARM64
 
 FROM python:3.12-slim
 
-# Install uv for fast dependency management
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
-
 WORKDIR /app
 
-# Copy dependency files first (better caching)
-COPY pyproject.toml uv.lock ./
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for caching
+COPY pyproject.toml ./
+
+# Install Python dependencies with pip (most compatible)
+RUN pip install --no-cache-dir \
+    fastapi==0.115.6 \
+    uvicorn[standard]==0.32.1 \
+    sqlalchemy==2.0.36 \
+    pgvector==0.3.6 \
+    psycopg[binary]==3.2.3 \
+    pydantic-settings==2.6.1 \
+    httpx==0.28.1 \
+    python-dotenv==1.0.1
 
 # Copy application code
 COPY backend/ ./backend/
 
-# Install dependencies using system Python
-RUN uv sync --frozen --no-dev
-
 # Set environment variables
-ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH="/app"
 ENV PYTHONUNBUFFERED=1
 
