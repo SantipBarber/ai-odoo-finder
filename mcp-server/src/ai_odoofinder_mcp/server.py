@@ -30,58 +30,57 @@ API_TIMEOUT = int(os.getenv("AI_ODOOFINDER_API_TIMEOUT", "60"))
 mcp = FastMCP("AI-OdooFinder")
 
 
-# Tool parameter descriptions (kept in Spanish for Spanish-speaking users)
 QUERY_DESCRIPTION = """
-Query de búsqueda para módulos Odoo OCA.
+Search query for Odoo OCA modules.
 
-⚠️ IMPORTANTE - FLUJO DE BÚSQUEDA INTELIGENTE:
-
-═══════════════════════════════════════════════════════════════
-PASO 1: ¿NECESITAS CLARIFICACIÓN?
-═══════════════════════════════════════════════════════════════
-
-PIDE ACLARACIONES si la query es:
-• Genérica: "facturación", "inventario", "CRM"
-  → Pregunta: ¿País? ¿Funcionalidad específica? ¿Versión Odoo?
-• Ambigua: "gestión de documentos"
-  → Pregunta: ¿DMS completo? ¿Solo adjuntos? ¿Con OCR?
-• Sin versión clara
-  → Pregunta: ¿Qué versión de Odoo usas?
-• Localización sin país: "factura electrónica", "impuestos"
-  → Pregunta: ¿Para qué país?
-
-NO PIDAS aclaraciones si:
-• Query específica: "modelo 303 AEAT España 16.0"
-• Nombre técnico: "l10n_es_facturae"
-• Contexto completo: "DMS para gestionar PDFs en Odoo 17"
+⚠️ IMPORTANT - INTELLIGENT SEARCH FLOW:
 
 ═══════════════════════════════════════════════════════════════
-PASO 2: CONSTRUYE LA QUERY
+STEP 1: DO YOU NEED CLARIFICATION?
 ═══════════════════════════════════════════════════════════════
 
-🚨 REGLA CRÍTICA PARA LOCALIZACIONES:
-Si el usuario busca funcionalidad para un PAÍS ESPECÍFICO,
-USA UNA QUERY CORTA con el prefijo l10n_XX_ como término principal.
+ASK FOR CLARIFICATION if the query is:
+• Generic: "invoicing", "inventory", "CRM"
+  → Ask: Country? Specific functionality? Odoo version?
+• Ambiguous: "document management"
+  → Ask: Full DMS? Just attachments? With OCR?
+• No clear version
+  → Ask: What Odoo version do you use?
+• Localization without country: "electronic invoice", "taxes"
+  → Ask: For which country?
 
-EJEMPLOS DE QUERIES PARA LOCALIZACIONES:
-• España + factura electrónica → "l10n_es_facturae facturae"
-• España + impuestos AEAT     → "l10n_es_aeat modelo"
-• España + TicketBAI          → "l10n_es_ticketbai"
-• México + factura CFDI       → "l10n_mx_edi cfdi"
-• Argentina + factura AFIP    → "l10n_ar_afipws factura"
-• Colombia + factura DIAN     → "l10n_co_edi dian"
-• Chile + factura SII         → "l10n_cl_dte sii"
-• Francia + Chorus            → "l10n_fr_chorus facturx"
-• Italia + fattura            → "l10n_it_fatturapa sdi"
-
-⚠️ Para localizaciones: query de 2-4 palabras máximo
-⚠️ El prefijo l10n_XX_ es MÁS IMPORTANTE que los sinónimos
+DO NOT ASK for clarification if:
+• Specific query: "AEAT model 303 Spain 16.0"
+• Technical name: "l10n_es_facturae"
+• Complete context: "DMS to manage PDFs in Odoo 17"
 
 ═══════════════════════════════════════════════════════════════
-PARA BÚSQUEDAS NO DE LOCALIZACIÓN:
+STEP 2: BUILD THE QUERY
 ═══════════════════════════════════════════════════════════════
 
-Añade sinónimos español/inglés (máximo 15-20 palabras):
+🚨 CRITICAL RULE FOR LOCALIZATIONS:
+If the user searches for functionality for a SPECIFIC COUNTRY,
+USE A SHORT QUERY with the l10n_XX_ prefix as the main term.
+
+LOCALIZATION QUERY EXAMPLES:
+• Spain + electronic invoice → "l10n_es_facturae facturae"
+• Spain + AEAT taxes        → "l10n_es_aeat modelo"
+• Spain + TicketBAI         → "l10n_es_ticketbai"
+• Mexico + CFDI invoice     → "l10n_mx_edi cfdi"
+• Argentina + AFIP invoice  → "l10n_ar_afipws factura"
+• Colombia + DIAN invoice   → "l10n_co_edi dian"
+• Chile + SII invoice       → "l10n_cl_dte sii"
+• France + Chorus           → "l10n_fr_chorus facturx"
+• Italy + fattura           → "l10n_it_fatturapa sdi"
+
+⚠️ For localizations: query of 2-4 words maximum
+⚠️ The l10n_XX_ prefix is MORE IMPORTANT than synonyms
+
+═══════════════════════════════════════════════════════════════
+FOR NON-LOCALIZATION SEARCHES:
+═══════════════════════════════════════════════════════════════
+
+Add English/Spanish synonyms (maximum 15-20 words):
 • "inventario" → "inventory stock warehouse management"
 • "ventas" → "sale sales quotation order"
 • "compras" → "purchase procurement vendor"
@@ -90,48 +89,48 @@ Añade sinónimos español/inglés (máximo 15-20 palabras):
 • "documentos" → "document dms attachment file"
 
 ═══════════════════════════════════════════════════════════════
-EJEMPLOS COMPLETOS:
+COMPLETE EXAMPLES:
 ═══════════════════════════════════════════════════════════════
 
-Usuario: "facturación electrónica para España"
-✅ CORRECTO: "l10n_es_facturae facturae FACE"
-❌ INCORRECTO: "factura electrónica e-invoice XML firma digital Spain..."
+User: "electronic invoicing for Spain"
+✅ CORRECT: "l10n_es_facturae facturae FACE"
+❌ INCORRECT: "electronic invoice e-invoice XML digital signature Spain..."
 
-Usuario: "modelo 303 para España"
-✅ CORRECTO: "l10n_es_aeat_mod303 modelo 303"
+User: "model 303 for Spain"
+✅ CORRECT: "l10n_es_aeat_mod303 modelo 303"
 
-Usuario: "gestión de inventario con códigos de barras"
-✅ CORRECTO: "inventory stock barcode scanning warehouse"
+User: "inventory management with barcodes"
+✅ CORRECT: "inventory stock barcode scanning warehouse"
 
-Usuario: "suscripciones y contratos recurrentes"
-✅ CORRECTO: "subscription contract recurring billing"
+User: "subscriptions and recurring contracts"
+✅ CORRECT: "subscription contract recurring billing"
 """
 
 VERSION_DESCRIPTION = """
-Versión de Odoo (12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, o 19.0).
+Odoo version (12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, or 19.0).
 
-• Si el usuario NO especifica versión → PREGUNTA antes de buscar
-• Si el usuario dice "última" o "actual" → usa 17.0 o 18.0
-• Si el contexto sugiere una versión antigua → confirma con el usuario
+• If user does NOT specify version → ASK before searching
+• If user says "latest" or "current" → use 17.0 or 18.0
+• If context suggests an old version → confirm with user
 """
 
 DEPENDENCIES_DESCRIPTION = """
-Lista opcional de dependencias requeridas.
-Útil para filtrar módulos que extiendan módulos específicos.
+Optional list of required dependencies.
+Useful to filter modules that extend specific modules.
 
-Ejemplos:
-• dependencies=["account"] → módulos de contabilidad
-• dependencies=["stock"] → módulos de inventario
-• dependencies=["sale", "purchase"] → módulos de ventas+compras
+Examples:
+• dependencies=["account"] → accounting modules
+• dependencies=["stock"] → inventory modules
+• dependencies=["sale", "purchase"] → sales+purchase modules
 """
 
 LIMIT_DESCRIPTION = """
-Número máximo de resultados (default: 5, max: 20).
+Maximum number of results (default: 5, max: 20).
 
-Guía:
-• 5 resultados → búsquedas específicas
-• 10 resultados → búsquedas exploratorias
-• 15-20 resultados → cuando el usuario quiere ver todas las opciones
+Guide:
+• 5 results → specific searches
+• 10 results → exploratory searches
+• 15-20 results → when user wants to see all options
 """
 
 
