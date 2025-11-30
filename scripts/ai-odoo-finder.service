@@ -1,0 +1,29 @@
+[Unit]
+Description=AI-OdooFinder - Odoo Module Search Engine
+Documentation=https://github.com/SantipBarber/ai-odoo-finder
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/ai-odoo-finder
+ExecStart=/opt/ai-odoo-finder/scripts/start_system.sh
+ExecStop=/opt/ai-odoo-finder/scripts/stop_system.sh
+ExecReload=/opt/ai-odoo-finder/scripts/stop_system.sh && /opt/ai-odoo-finder/scripts/start_system.sh
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ai-odoo-finder
+
+# Restart policy
+Restart=on-failure
+RestartSec=30
+
+# Environment
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[Install]
+WantedBy=multi-user.target
