@@ -2,7 +2,7 @@ import json
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -195,7 +195,7 @@ def save_checkpoint(
             pass
 
     checkpoint = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "last_repo": repo_name,
         "last_repo_idx": repo_idx,  # Guardar índice en lugar de solo nombre
         "last_version": version,
@@ -435,7 +435,7 @@ def process_module(
         ai_description=enrichment_data.get("ai_description"),
         functional_tags=enrichment_data.get("functional_tags", []),
         keywords=enrichment_data.get("keywords", []),
-        enriched_at=datetime.utcnow() if enrichment_data.get("ai_description") else None,
+        enriched_at=datetime.now(timezone.utc) if enrichment_data.get("ai_description") else None,
         enrichment_version="v2.0-grok4fast" if enrichment_data.get("ai_description") else None,
     )
 
