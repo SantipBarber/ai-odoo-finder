@@ -34,7 +34,7 @@ MIN_STARS = 0  # Mínimo de estrellas en GitHub
 
 # Lista manual (solo si AUTO_DISCOVER_REPOS=False)
 TARGET_REPOS: List[str] = [
-    "l10n-canada",  # TEMP: Repo NO indexado para probar enrichment
+    "l10n-romania",  # TEMP: 34 módulos en 18.0, NO indexado
 ]
 
 # Versiones de Odoo a procesar
