@@ -1,5 +1,7 @@
 # AI-OdooFinder - Deployment & Operations Guide
 
+**Language**: [English](../en/DEPLOYMENT_OPERATIONS.md) | [Español](../es/DEPLOYMENT_OPERATIONS.md)
+
 ## Architecture Overview
 
 Self-hosted solution on Hetzner VPS with Docker. Previously used Neon (PostgreSQL) and Render (API hosting), now consolidated to a single server for cost efficiency and simplicity.

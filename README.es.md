@@ -201,7 +201,7 @@ https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
 
 ### Desplegar tu propia instancia
 
-Ver [docs/DEPLOYMENT_OPERATIONS.md](docs/DEPLOYMENT_OPERATIONS.md) para instrucciones de despliegue con Docker.
+Ver [docs/es/DEPLOYMENT_OPERATIONS.md](docs/es/DEPLOYMENT_OPERATIONS.md) para instrucciones de despliegue con Docker.
 
 ---
 
@@ -249,9 +249,9 @@ curl https://strategy-orchestrator-prod.tailf7d690.ts.net/stats
 
 ## Documentacion
 
-- [Deployment & Operations](docs/DEPLOYMENT_OPERATIONS.md) - Guia de despliegue y operaciones
-- [Project History](docs/PROJECT_HISTORY.md) - Evolucion de la arquitectura del proyecto
-- [Changelog](docs/CHANGELOG.md) - Historial de cambios
+- [Deployment & Operations](docs/es/DEPLOYMENT_OPERATIONS.md) - Guia de despliegue y operaciones
+- [Project History](docs/es/PROJECT_HISTORY.md) - Evolucion de la arquitectura del proyecto
+- [Changelog](docs/es/CHANGELOG.md) - Historial de cambios
 - [MCP Server README](mcp-server/README.md) - Instalacion y configuracion del servidor MCP
 
 ---

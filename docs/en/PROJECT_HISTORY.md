@@ -1,5 +1,7 @@
 # AI-OdooFinder - Project History
 
+**Language**: [English](../en/PROJECT_HISTORY.md) | [Español](../es/PROJECT_HISTORY.md)
+
 This document describes the evolution of the project from its initial conception to the current architecture.
 
 ## Context

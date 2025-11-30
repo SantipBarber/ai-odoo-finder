@@ -1,5 +1,7 @@
 # AI-OdooFinder MCP Server
 
+**Language**: [English](README.md) | [Español](README.es.md)
+
 MCP (Model Context Protocol) server for semantic search of Odoo modules in the OCA ecosystem.
 
 ## Requirements
@@ -196,7 +198,7 @@ This server implements the **Intelligent Search Flow** according to SPEC-602:
 - [SPEC-602: Intelligent Flow](../specs/phase-6-intelligent-mcp/SPEC-602-intelligent-mcp-flow.md)
 - [Implementation Summary](../specs/phase-6-intelligent-mcp/IMPLEMENTATION_SUMMARY.md)
 - [Quick Reference](../specs/phase-6-intelligent-mcp/QUICK_REFERENCE.md)
-- [CHANGELOG](../docs/CHANGELOG.md)
+- [CHANGELOG](../docs/en/CHANGELOG.md)
 
 ### Key Changes
 
