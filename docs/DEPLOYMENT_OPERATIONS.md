@@ -60,6 +60,54 @@ GET /search?query=<text>&version=<version>&limit=<n>&dependencies=<dep1,dep2>
 | 18.0 | 2,022 |
 | 19.0 | 112 |
 
+## Systemd Service (Auto-start)
+
+The system is configured as a systemd service that starts automatically on boot.
+
+### Service Commands
+
+```bash
+# Check status
+systemctl status ai-odoo-finder
+
+# Start services
+systemctl start ai-odoo-finder
+
+# Stop services
+systemctl stop ai-odoo-finder
+
+# Restart services
+systemctl restart ai-odoo-finder
+
+# View logs
+journalctl -u ai-odoo-finder
+
+# Follow logs in real-time
+journalctl -u ai-odoo-finder -f
+
+# View last 50 lines
+journalctl -u ai-odoo-finder -n 50
+```
+
+### Helper Scripts
+
+Located in `/opt/ai-odoo-finder/scripts/`:
+
+| Script | Description |
+|--------|-------------|
+| `start_system.sh` | Start all Docker services with health check |
+| `stop_system.sh` | Stop all Docker services and cleanup |
+| `status_system.sh` | Show detailed system status |
+| `install_service.sh` | Install/reinstall systemd service |
+
+### Manual Status Check
+
+```bash
+/opt/ai-odoo-finder/scripts/status_system.sh
+```
+
+This shows: Docker containers, API health, database stats, disk usage.
+
 ## Common Operations
 
 ### SSH Access
@@ -283,6 +331,7 @@ Configure in Claude Desktop (`~/.config/claude/claude_desktop_config.json`):
 | 2025-11-29 | Initial deployment | Migrated from Neon to self-hosted |
 | 2025-11-29 | PostgreSQL 16 -> 17 | Upgraded for dump compatibility |
 | 2025-11-29 | Data migration | 15,884 modules with embeddings |
+| 2025-11-30 | Systemd service | Added auto-start on boot |
 
 ## Costs Saved
 
