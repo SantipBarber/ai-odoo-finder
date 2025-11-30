@@ -19,13 +19,9 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Pull latest changes (optional, comment out if not desired)
-# echo "Pulling latest code..."
-# git pull
-
-# Start Docker services
+# Start Docker services (start existing or create if needed)
 echo "Starting Docker services..."
-docker compose up -d
+docker compose start 2>/dev/null || docker compose up -d
 
 # Wait for services to be healthy
 echo "Waiting for services to be ready..."

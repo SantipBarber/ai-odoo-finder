@@ -1,6 +1,6 @@
 #!/bin/bash
 # AI-OdooFinder - Stop System
-# This script stops all Docker services and cleans up
+# This script stops all Docker services
 
 set -e
 
@@ -13,12 +13,8 @@ echo "Timestamp: $(date)"
 
 cd "$PROJECT_DIR"
 
-# Stop Docker services
+# Stop Docker services (just stop, don't remove)
 echo "Stopping Docker services..."
-docker compose down
-
-# Optional: Clean up dangling images/containers
-echo "Cleaning up orphaned containers..."
-docker container prune -f 2>/dev/null || true
+docker compose stop
 
 echo "=== System stopped successfully ==="
