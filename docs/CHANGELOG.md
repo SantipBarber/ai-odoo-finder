@@ -1,92 +1,126 @@
 # Changelog
 
-Todos los cambios notables en AI-OdooFinder serán documentados en este archivo.
+All notable changes to AI-OdooFinder will be documented in this file.
 
-El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/),
-y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.2.0] - 2025-11-30
+
+### Remote MCP Server Support
+
+This version adds support for remote MCP clients (Claude.ai Web, Zed, Cursor).
+
+### Added
+
+#### HTTP Transport for Remote MCP
+- **HTTP transport mode** with `--http` flag in `mcp-server/src/ai_odoofinder_mcp/server.py`
+- **Dockerfile** for MCP server containerization
+- **docker-compose.yml** updated with MCP service on port 8080
+- **Tailscale Funnel** integration for HTTPS exposure
+
+#### Multi-language Documentation
+- **README.md** rewritten in English (default)
+- **README.es.md** created for Spanish documentation
+- Language selector badges for easy switching
+
+### Changed
+
+- All code comments translated to English
+- All tool descriptions translated to English
+- Removed hardcoded server details from documentation
+
+### Deployment
+
+MCP Server now accessible at:
+- **Claude.ai Web**: Add as remote MCP server
+- **Claude Desktop**: Local STDIO or remote HTTP
+- **Zed/Cursor**: Remote HTTP connection
 
 ---
 
 ## [1.1.0] - 2025-01-XX
 
-### 🚀 Fase 6: MCP Inteligente (SPEC-602)
+### Phase 6: Intelligent MCP (SPEC-602)
 
-Esta versión implementa el flujo inteligente de búsqueda MCP según SPEC-602.
+This version implements the intelligent search flow for MCP according to SPEC-602.
 
 ### Added
 
-#### Servidor MCP Local para Claude Desktop
-- **Nuevo directorio `mcp-server/`** con servidor MCP standalone
-  - `mcp-server/src/ai_odoofinder_mcp/server.py` - Servidor principal
-  - `mcp-server/pyproject.toml` - Configuración del paquete
-  - `mcp-server/README.md` - Instrucciones de instalación
+#### Local MCP Server for Claude Desktop
+- **New `mcp-server/` directory** with standalone MCP server
+  - `mcp-server/src/ai_odoofinder_mcp/server.py` - Main server
+  - `mcp-server/pyproject.toml` - Package configuration
+  - `mcp-server/README.md` - Installation instructions
 
-#### Tool Description Enriquecido
-- **Instrucciones de clarificación inteligente** en el parámetro `query`:
-  - Cuándo pedir aclaraciones (queries genéricas, ambiguas, sin versión)
-  - Cuándo NO pedir aclaraciones (queries específicas, nombres técnicos)
+#### Enriched Tool Description
+- **Smart clarification instructions** in the `query` parameter:
+  - When to ask for clarifications (generic queries, ambiguous, no version)
+  - When NOT to ask for clarifications (specific queries, technical names)
   
-- **Instrucciones de construcción de query**:
-  - Regla crítica para localizaciones: usar prefijo `l10n_XX_` como término principal
-  - Ejemplos específicos para España, México, Argentina, Francia, Italia, etc.
-  - Guía de sinónimos ES/EN para búsquedas no localizadas
+- **Query construction instructions**:
+  - Critical rule for localizations: use `l10n_XX_` prefix as main term
+  - Specific examples for Spain, Mexico, Argentina, France, Italy, etc.
+  - ES/EN synonym guide for non-localized searches
 
-#### Formato de Respuesta Estructurada
-- **Niveles de confianza**: 🟢 ALTA (≥80), 🟡 MEDIA (50-79), 🟠 BAJA (<50), 🔴 NINGUNA
-- **Secciones diferenciadas**:
-  - ✅ RECOMENDADO: Módulos con score ≥80, formato detallado
-  - 📋 ALTERNATIVAS: Módulos con score <80, formato resumido
-- **Guía contextual** según nivel de confianza
-- **Instrucciones para el LLM** sobre cómo presentar resultados
+#### Structured Response Format
+- **Confidence levels**: HIGH (>=80), MEDIUM (50-79), LOW (<50), NONE
+- **Differentiated sections**:
+  - RECOMMENDED: Modules with score >=80, detailed format
+  - ALTERNATIVES: Modules with score <80, summary format
+- **Contextual guidance** based on confidence level
+- **LLM instructions** on how to present results
 
-#### Migración de Base de Datos
+#### Database Migration
 - **`backend/migrations/005_add_repo_name_to_searchable_text.sql`**
-  - Añade `repo_name` al campo `searchable_text` (tsvector)
-  - Mejora búsqueda de localizaciones por nombre de país
-  - Ejemplo: buscar "Spain" ahora encuentra módulos de `l10n-spain`
+  - Adds `repo_name` to `searchable_text` field (tsvector)
+  - Improves localization search by country name
+  - Example: searching "Spain" now finds modules from `l10n-spain`
 
 ### Changed
 
 - **`backend/app/mcp_tools.py`**: 
-  - Actualizado `QUERY_DESCRIPTION` con instrucciones inteligentes
-  - Nueva función `_format_results_intelligent()` con niveles de confianza
-  - Nueva función `_calculate_confidence()` 
-  - Nueva función `_format_module_detailed()` para recomendados
-  - Nueva función `_format_module_summary()` para alternativas
-  - Nueva función `_get_confidence_guidance()` con guías contextuales
-  - Nueva función `_get_llm_instructions()` con instrucciones para el LLM
-  - Nueva función `_format_no_results()` para casos sin resultados
+  - Updated `QUERY_DESCRIPTION` with intelligent instructions
+  - New function `_format_results_intelligent()` with confidence levels
+  - New function `_calculate_confidence()` 
+  - New function `_format_module_detailed()` for recommended modules
+  - New function `_format_module_summary()` for alternatives
+  - New function `_get_confidence_guidance()` with contextual guides
+  - New function `_get_llm_instructions()` with LLM instructions
+  - New function `_format_no_results()` for no-results cases
 
 ### Fixed
 
-- **Búsqueda de localizaciones**: Antes, buscar "facturae Spain" no encontraba `l10n_es_facturae` porque:
-  - La descripción del módulo está en español
-  - El campo `repo_name` (l10n-spain) no estaba indexado en BM25
-  - Ahora `repo_name` se incluye en `searchable_text` con peso B
+- **Localization search**: Previously, searching "facturae Spain" didn't find `l10n_es_facturae` because:
+  - Module description was in Spanish
+  - The `repo_name` field (l10n-spain) wasn't indexed in BM25
+  - Now `repo_name` is included in `searchable_text` with weight B
 
 ### Metrics
 
-Resultados del testing con Claude Desktop:
+Testing results with Claude Desktop:
 
-| Consulta | Resultado | Módulos encontrados correctamente |
-|----------|-----------|-----------------------------------|
-| Facturae España (Odoo 16) | ✅ | `l10n_es_facturae_face`, `l10n_es_facturae_igic` |
-| CFDI México (Odoo 17) | ✅ | `l10n_mx_cfdi`, `l10n_mx_cfdi_account` |
-| Suscripciones (Odoo 16) | ✅ | `contract`, `subscription_oca` |
-| DMS + OCR (Odoo 17) | ✅ | `dms`, `dms_storage` |
-| AEAT mod303 (Odoo 16) | ✅ | `l10n_es_aeat_mod303` |
-| Delivery carriers (Odoo 17) | ✅ | `delivery_price_method`, `product_packaging_dimension` |
+| Query | Result | Modules found correctly |
+|-------|--------|-------------------------|
+| Facturae Spain (Odoo 16) | Success | `l10n_es_facturae_face`, `l10n_es_facturae_igic` |
+| CFDI Mexico (Odoo 17) | Success | `l10n_mx_cfdi`, `l10n_mx_cfdi_account` |
+| Subscriptions (Odoo 16) | Success | `contract`, `subscription_oca` |
+| DMS + OCR (Odoo 17) | Success | `dms`, `dms_storage` |
+| AEAT mod303 (Odoo 16) | Success | `l10n_es_aeat_mod303` |
+| Delivery carriers (Odoo 17) | Success | `delivery_price_method`, `product_packaging_dimension` |
 
 ---
 
 ## [1.0.0] - 2025-11-XX
 
-### Fase 5: Search Quality & Testing
+### Phase 5: Search Quality & Testing
 
 #### Added
-- Benchmark suite para evaluar calidad de búsqueda
-- Scripts de comparación de benchmarks
-- Casos de prueba para localizaciones
+- Benchmark suite for search quality evaluation
+- Benchmark comparison scripts
+- Test cases for localizations
 
 #### Metrics
 - Precision@3: 41.7%
@@ -97,60 +131,60 @@ Resultados del testing con Claude Desktop:
 
 ## [0.9.0] - 2025-11-XX
 
-### Fase 4: Data Enrichment
+### Phase 4: Data Enrichment
 
 #### Added
-- Campo `ai_description` con descripciones generadas por IA
-- Campo `keywords` con palabras clave extraídas
-- Campo `functional_tags` con categorías funcionales
-- Migración 004: Full-text search con campos de enrichment
+- `ai_description` field with AI-generated descriptions
+- `keywords` field with extracted keywords
+- `functional_tags` field with functional categories
+- Migration 004: Full-text search with enrichment fields
 
 #### Metrics
-- 15,881 módulos enriquecidos (100%)
+- 15,881 modules enriched (100%)
 
 ---
 
 ## [0.8.0] - 2025-11-XX
 
-### Fase 3: Hybrid Search
+### Phase 3: Hybrid Search
 
 #### Added
-- Búsqueda híbrida (Vector + BM25)
+- Hybrid search (Vector + BM25)
 - Reciprocal Rank Fusion (RRF)
-- Campo `searchable_text` (tsvector)
-- Índice GIN para full-text search
+- `searchable_text` field (tsvector)
+- GIN index for full-text search
 
 ---
 
 ## [0.7.0] - 2025-11-XX
 
-### Fase 2: Vector Search
+### Phase 2: Vector Search
 
 #### Added
-- Embeddings con Qwen3-Embedding-4B
-- Índice HNSW para búsqueda vectorial
+- Embeddings with Qwen3-Embedding-4B
+- HNSW index for vector search
 - pgVector integration
 
 ---
 
 ## [0.6.0] - 2025-11-XX
 
-### Fase 1: ETL & Data Ingestion
+### Phase 1: ETL & Data Ingestion
 
 #### Added
-- ETL pipeline para módulos OCA
-- Integración con GitHub API
-- 15,881 módulos indexados de 176 repositorios
-- Soporte para versiones 12.0 a 19.0
+- ETL pipeline for OCA modules
+- GitHub API integration
+- 15,881 modules indexed from 176 repositories
+- Support for versions 12.0 to 19.0
 
 ---
 
-## Cómo Usar Este Changelog
+## How to Use This Changelog
 
-- **Added**: Nuevas funcionalidades
-- **Changed**: Cambios en funcionalidades existentes
-- **Deprecated**: Funcionalidades que serán eliminadas
-- **Removed**: Funcionalidades eliminadas
-- **Fixed**: Corrección de bugs
-- **Security**: Vulnerabilidades corregidas
-- **Metrics**: Métricas de rendimiento/calidad
+- **Added**: New features
+- **Changed**: Changes to existing features
+- **Deprecated**: Features that will be removed
+- **Removed**: Removed features
+- **Fixed**: Bug fixes
+- **Security**: Security vulnerabilities fixed
+- **Metrics**: Performance/quality metrics

@@ -1,35 +1,35 @@
-# 🔍 AI-OdooFinder MCP Server
+# AI-OdooFinder MCP Server
 
-Servidor MCP (Model Context Protocol) para búsqueda semántica de módulos Odoo en el ecosistema OCA.
+MCP (Model Context Protocol) server for semantic search of Odoo modules in the OCA ecosystem.
 
-## 📋 Requisitos
+## Requirements
 
 - Python 3.11+
-- [uv](https://docs.astral.sh/uv/) (gestor de paquetes recomendado)
-- Claude Desktop instalado
+- [uv](https://docs.astral.sh/uv/) (recommended package manager)
+- Claude Desktop installed (for local usage)
 
-## 🚀 Instalación
+## Installation
 
-### Paso 1: Verificar que `uv` está instalado
+### Step 1: Verify that `uv` is installed
 
 ```bash
-# Instalar uv si no lo tienes
+# Install uv if you don't have it
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Verificar instalación
+# Verify installation
 uv --version
 ```
 
-### Paso 2: Instalar dependencias del servidor MCP
+### Step 2: Install MCP server dependencies
 
 ```bash
-cd /Users/spbarber/Desarrollo/ai-odoo-finder/mcp-server
+cd <your-path>/ai-odoo-finder/mcp-server
 uv sync
 ```
 
-### Paso 3: Configurar Claude Desktop
+### Step 3: Configure Claude Desktop
 
-Abre el archivo de configuración de Claude Desktop:
+Open the Claude Desktop configuration file:
 
 **macOS:**
 ```bash
@@ -41,11 +41,11 @@ open ~/Library/Application\ Support/Claude/claude_desktop_config.json
 %APPDATA%\Claude\claude_desktop_config.json
 ```
 
-Si el archivo no existe, créalo.
+If the file doesn't exist, create it.
 
-### Paso 4: Añadir la configuración del servidor MCP
+### Step 4: Add the MCP server configuration
 
-Añade (o modifica) el contenido del archivo `claude_desktop_config.json`:
+Add (or modify) the content of `claude_desktop_config.json`:
 
 ```json
 {
@@ -54,7 +54,7 @@ Añade (o modifica) el contenido del archivo `claude_desktop_config.json`:
       "command": "uv",
       "args": [
         "--directory",
-        "/Users/spbarber/Desarrollo/ai-odoo-finder/mcp-server",
+        "<your-path>/ai-odoo-finder/mcp-server",
         "run",
         "ai-odoofinder-mcp"
       ],
@@ -66,13 +66,13 @@ Añade (o modifica) el contenido del archivo `claude_desktop_config.json`:
 }
 ```
 
-> ⚠️ **IMPORTANTE:** Usa la **ruta absoluta** a tu directorio `mcp-server`.
+> **IMPORTANT:** Use the **absolute path** to your `mcp-server` directory.
 
-### Paso 5: Configurar la URL de la API (opcional)
+### Step 5: Configure the API URL (optional)
 
-Por defecto, el servidor MCP se conecta a `http://localhost:8989`.
+By default, the MCP server connects to `http://localhost:8989`.
 
-Si tu API está en otro lugar (ej: Render), modifica la variable de entorno:
+If your API is elsewhere (e.g., remote server), modify the environment variable:
 
 ```json
 {
@@ -81,146 +81,144 @@ Si tu API está en otro lugar (ej: Render), modifica la variable de entorno:
       "command": "uv",
       "args": [
         "--directory",
-        "/Users/spbarber/Desarrollo/ai-odoo-finder/mcp-server",
+        "<your-path>/ai-odoo-finder/mcp-server",
         "run",
         "ai-odoofinder-mcp"
       ],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://tu-api.onrender.com"
+        "AI_ODOOFINDER_API_URL": "https://<your-server>.ts.net"
       }
     }
   }
 }
 ```
 
-### Paso 6: Reiniciar Claude Desktop
+### Step 6: Restart Claude Desktop
 
-**IMPORTANTE:** Debes cerrar Claude Desktop completamente y volver a abrirlo.
+**IMPORTANT:** You must close Claude Desktop completely and reopen it.
 
-- **macOS:** `Cmd+Q` (no solo cerrar la ventana)
-- **Windows:** Cerrar desde la bandeja del sistema
+- **macOS:** `Cmd+Q` (not just close the window)
+- **Windows:** Close from the system tray
 
-### Paso 7: Verificar la instalación
+### Step 7: Verify the installation
 
-1. Abre Claude Desktop
-2. Busca el ícono de herramientas (🔧) en la esquina inferior derecha
-3. Deberías ver **"ai-odoofinder"** con la herramienta `search_odoo_modules`
+1. Open Claude Desktop
+2. Look for the tools icon in the bottom right corner
+3. You should see **"ai-odoofinder"** with the `search_odoo_modules` tool
 
-## 🧪 Probar el servidor
+## Testing the server
 
-### Test básico en Claude Desktop
+### Basic test in Claude Desktop
 
-Escribe en Claude:
+Type in Claude:
 
 ```
-¿Hay módulos de facturación electrónica para España en Odoo 16?
+Are there electronic invoicing modules for Spain in Odoo 16?
 ```
 
-Claude debería automáticamente usar la herramienta `search_odoo_modules`.
+Claude should automatically use the `search_odoo_modules` tool.
 
-### Test manual (sin Claude)
+### Manual test (without Claude)
 
 ```bash
-cd /Users/spbarber/Desarrollo/ai-odoo-finder/mcp-server
+cd <your-path>/ai-odoo-finder/mcp-server
 uv run ai-odoofinder-mcp
 ```
 
-El servidor arrancará y esperará conexiones JSON-RPC por stdin/stdout.
+The server will start and wait for JSON-RPC connections via stdin/stdout.
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
-### El servidor no aparece en Claude Desktop
+### The server doesn't appear in Claude Desktop
 
-1. **Verifica la ruta:** Debe ser absoluta (empieza con `/`)
-2. **Verifica que `uv` está en PATH:**
+1. **Verify the path:** Must be absolute (starts with `/` on macOS/Linux or drive letter on Windows)
+2. **Verify that `uv` is in PATH:**
    ```bash
    which uv
    ```
-3. **Revisa los logs de Claude:**
+3. **Check Claude logs:**
    ```bash
    tail -f ~/Library/Logs/Claude/mcp*.log
    ```
-4. **Reinicia completamente Claude** (Cmd+Q, no solo cerrar ventana)
+4. **Restart Claude completely** (Cmd+Q, not just close window)
 
-### Error "Connection refused" o timeout
+### "Connection refused" or timeout error
 
-1. **Verifica que la API está corriendo:**
+1. **Verify the API is running:**
    ```bash
    curl http://localhost:8989/api/v1/search \
      -H "Content-Type: application/json" \
      -d '{"query": "test", "version": "16.0"}'
    ```
 
-2. **Si usas Render:** La primera petición puede tardar ~30s si el servidor está en sleep
+2. **Increase timeout:** Modify `AI_ODOOFINDER_API_TIMEOUT` in environment variables
 
-3. **Aumenta el timeout:** Modifica `AI_ODOOFINDER_API_TIMEOUT` en las variables de entorno
+### "corrupted JSON-RPC" error
 
-### Error "corrupted JSON-RPC"
+This occurs if there's `print()` in the code that writes to stdout.
+The MCP server must use only `logging` (which writes to stderr).
 
-Esto ocurre si hay `print()` en el código que escribe a stdout. 
-El servidor MCP debe usar solo `logging` (que escribe a stderr).
-
-## 📁 Estructura del proyecto
+## Project Structure
 
 ```
 mcp-server/
-├── pyproject.toml           # Configuración del paquete
-├── README.md                # Este archivo
+├── pyproject.toml           # Package configuration
+├── README.md                # This file
 └── src/
     └── ai_odoofinder_mcp/
         ├── __init__.py
-        └── server.py        # Servidor MCP principal
+        └── server.py        # Main MCP server
 ```
 
-## 🌐 Variables de Entorno
+## Environment Variables
 
-| Variable | Default | Descripción |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `AI_ODOOFINDER_API_URL` | `http://localhost:8989` | URL de la API backend |
-| `AI_ODOOFINDER_API_TIMEOUT` | `60` | Timeout en segundos para la API |
+| `AI_ODOOFINDER_API_URL` | `http://localhost:8989` | Backend API URL |
+| `AI_ODOOFINDER_API_TIMEOUT` | `60` | API timeout in seconds |
 
-## 📚 Flujo Inteligente de Búsqueda
+## Intelligent Search Flow
 
-El servidor implementa el flujo inteligente según SPEC-602:
+The server implements the intelligent flow according to SPEC-602:
 
-1. **Clarificación:** El LLM pide aclaraciones si la query es genérica
-2. **Expansión:** El LLM expande la query con sinónimos ES/EN
-3. **Respuesta estructurada:** Resultados con niveles de confianza (ALTA/MEDIA/BAJA)
-4. **Confirmación:** El LLM confirma con el usuario si encontró lo que buscaba
+1. **Clarification:** The LLM asks for clarifications if the query is generic
+2. **Expansion:** The LLM expands the query with ES/EN synonyms
+3. **Structured response:** Results with confidence levels (HIGH/MEDIUM/LOW)
+4. **Confirmation:** The LLM confirms with the user if it found what they were looking for
 
-## 📖 Documentación Técnica
+## Technical Documentation
 
-### Implementación SPEC-602
+### SPEC-602 Implementation
 
-Este servidor implementa el **Flujo Inteligente de Búsqueda** según SPEC-602:
+This server implements the **Intelligent Search Flow** according to SPEC-602:
 
-**Documentos de referencia:**
-- [SPEC-602: Flujo Inteligente](../specs/phase-6-intelligent-mcp/SPEC-602-intelligent-mcp-flow.md)
-- [Resumen de Implementación](../specs/phase-6-intelligent-mcp/IMPLEMENTATION_SUMMARY.md)
-- [Guía Rápida](../specs/phase-6-intelligent-mcp/QUICK_REFERENCE.md)
+**Reference documents:**
+- [SPEC-602: Intelligent Flow](../specs/phase-6-intelligent-mcp/SPEC-602-intelligent-mcp-flow.md)
+- [Implementation Summary](../specs/phase-6-intelligent-mcp/IMPLEMENTATION_SUMMARY.md)
+- [Quick Reference](../specs/phase-6-intelligent-mcp/QUICK_REFERENCE.md)
 - [CHANGELOG](../docs/CHANGELOG.md)
 
-### Cambios Clave
+### Key Changes
 
-| Componente | Cambio | Impacto |
-|------------|--------|---------|
-| **Tool Description** | Instrucciones para localizaciones | Claude construye queries óptimas |
-| **Formato Respuesta** | Niveles de confianza (ALTA/MEDIA/BAJA) | Mejor presentación al usuario |
-| **Migración 005** | `repo_name` en `searchable_text` | 449 módulos encontrables por país |
+| Component | Change | Impact |
+|-----------|--------|--------|
+| **Tool Description** | Instructions for localizations | Claude builds optimal queries |
+| **Response Format** | Confidence levels (HIGH/MEDIUM/LOW) | Better presentation to user |
+| **Migration 005** | `repo_name` in `searchable_text` | 449 modules findable by country |
 
 ### Testing
 
-✅ 6 casos de prueba con 100% de éxito:
-- Facturae España → `l10n_es_facturae_face`
-- CFDI México → `l10n_mx_cfdi`
-- Suscripciones → `contract`
-- DMS + OCR → `dms`
-- AEAT 303 → `l10n_es_aeat_mod303`
-- Delivery carriers → `delivery_price_method`
+6 test cases with 100% success:
+- Facturae Spain -> `l10n_es_facturae_face`
+- CFDI Mexico -> `l10n_mx_cfdi`
+- Subscriptions -> `contract`
+- DMS + OCR -> `dms`
+- AEAT 303 -> `l10n_es_aeat_mod303`
+- Delivery carriers -> `delivery_price_method`
 
-## 🔗 Links útiles
+## Useful Links
 
-- [Documentación MCP](https://modelcontextprotocol.io/)
+- [MCP Documentation](https://modelcontextprotocol.io/)
 - [FastMCP](https://github.com/jlowin/fastmcp)
 - [AI-OdooFinder](https://github.com/SantipBarber/ai-odoo-finder)
-- [SPEC-602 Completo](../specs/phase-6-intelligent-mcp/SPEC-602-intelligent-mcp-flow.md)
+- [Full SPEC-602](../specs/phase-6-intelligent-mcp/SPEC-602-intelligent-mcp-flow.md)
