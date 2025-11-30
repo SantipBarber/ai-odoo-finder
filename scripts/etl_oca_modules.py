@@ -27,18 +27,22 @@ enrichment = get_enrichment_service()
 # ============================================================================
 
 # AUTO-DESCUBRIMIENTO: Si True, ignora TARGET_REPOS y obtiene TODOS los repos de OCA
-AUTO_DISCOVER_REPOS = False  # TEMP: False para prueba
+AUTO_DISCOVER_REPOS = True
 
 # Filtro de calidad (solo si AUTO_DISCOVER_REPOS=True)
 MIN_STARS = 0  # Mínimo de estrellas en GitHub
 
 # Lista manual (solo si AUTO_DISCOVER_REPOS=False)
 TARGET_REPOS: List[str] = [
-    "l10n-romania",  # TEMP: 34 módulos en 18.0, NO indexado
+    "web",
+    "server-tools",
+    "account-financial-tools",
+    "sale-workflow",
+    "purchase-workflow",
 ]
 
 # Versiones de Odoo a procesar
-ODOO_VERSIONS: List[str] = ["18.0"]  # TEMP: Solo 18.0 para prueba
+ODOO_VERSIONS: List[str] = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
 
 # Sistema de checkpoints
 CHECKPOINT_FILE = Path(__file__).parent / "etl_checkpoint.json"
@@ -531,7 +535,7 @@ def main() -> None:
         # OPTIMIZACIÓN: Obtener repos ya indexados para saltarlos
         # NOTA: Esta optimización salta repos completos, pero no detecta módulos individuales faltantes
         # Para re-procesar módulos borrados, usar SKIP_INDEXED_REPOS = False
-        SKIP_INDEXED_REPOS = False  # TEMP: Deshabilitado para prueba de enrichment
+        SKIP_INDEXED_REPOS = True  # Optimización: salta repos ya indexados completamente
 
         if SKIP_INDEXED_REPOS:
             indexed_repos = get_fully_indexed_repos(db)
