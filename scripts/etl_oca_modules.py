@@ -529,18 +529,26 @@ def main() -> None:
         sys.stdout.flush()
 
         # OPTIMIZACIÓN: Obtener repos ya indexados para saltarlos
-        indexed_repos = get_fully_indexed_repos(db)
-        repos_to_skip = len([r for r in repos_to_process if r in indexed_repos])
-        repos_new = len(repos_to_process) - repos_to_skip
-        print(f"⏭️  Repos a saltar (ya indexados): {repos_to_skip}")
-        print(f"🆕 Repos nuevos a procesar: {repos_new}")
+        # NOTA: Esta optimización salta repos completos, pero no detecta módulos individuales faltantes
+        # Para re-procesar módulos borrados, usar SKIP_INDEXED_REPOS = False
+        SKIP_INDEXED_REPOS = False  # TEMP: Deshabilitado para prueba de enrichment
+
+        if SKIP_INDEXED_REPOS:
+            indexed_repos = get_fully_indexed_repos(db)
+            repos_to_skip = len([r for r in repos_to_process if r in indexed_repos])
+            repos_new = len(repos_to_process) - repos_to_skip
+            print(f"⏭️  Repos a saltar (ya indexados): {repos_to_skip}")
+            print(f"🆕 Repos nuevos a procesar: {repos_new}")
+        else:
+            indexed_repos = set()  # No saltar ninguno
+            print("⚠️  Optimización de repos deshabilitada - verificará módulos individuales")
         print("=" * 80)
         sys.stdout.flush()
 
         # Procesar cada repositorio
         for repo_idx, repo_name in enumerate(repos_to_process, 1):
             # OPTIMIZACIÓN: Saltar repos completamente indexados
-            if repo_name in indexed_repos:
+            if SKIP_INDEXED_REPOS and repo_name in indexed_repos:
                 print(
                     f"\n⏭️  [{repo_idx}/{len(repos_to_process)}] {repo_name} - Ya indexado, saltando..."
                 )
