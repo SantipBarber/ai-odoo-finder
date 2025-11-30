@@ -188,39 +188,9 @@ El servidor implementa el flujo inteligente según SPEC-602:
 3. **Respuesta estructurada:** Resultados con niveles de confianza (HIGH/MEDIUM/LOW)
 4. **Confirmación:** El LLM confirma con el usuario si encontró lo que buscaba
 
-## Documentación técnica
-
-### Implementación de SPEC-602
-
-Este servidor implementa el **Flujo de búsqueda inteligente** según SPEC-602:
-
-**Documentos de referencia:**
-- [SPEC-602: Flujo inteligente](../specs/phase-6-intelligent-mcp/SPEC-602-intelligent-mcp-flow.md)
-- [Resumen de implementación](../specs/phase-6-intelligent-mcp/IMPLEMENTATION_SUMMARY.md)
-- [Referencia rápida](../specs/phase-6-intelligent-mcp/QUICK_REFERENCE.md)
-- [CHANGELOG](../docs/es/CHANGELOG.md)
-
-### Cambios clave
-
-| Componente | Cambio | Impacto |
-|------------|--------|---------|
-| **Descripción de herramienta** | Instrucciones para localizaciones | Claude construye consultas óptimas |
-| **Formato de respuesta** | Niveles de confianza (HIGH/MEDIUM/LOW) | Mejor presentación al usuario |
-| **Migración 005** | `repo_name` en `searchable_text` | 449 módulos encontrables por país |
-
-### Pruebas
-
-6 casos de prueba con 100% de éxito:
-- Facturae Spain -> `l10n_es_facturae_face`
-- CFDI Mexico -> `l10n_mx_cfdi`
-- Subscriptions -> `contract`
-- DMS + OCR -> `dms`
-- AEAT 303 -> `l10n_es_aeat_mod303`
-- Delivery carriers -> `delivery_price_method`
-
 ## Enlaces útiles
 
 - [Documentación MCP](https://modelcontextprotocol.io/)
 - [FastMCP](https://github.com/jlowin/fastmcp)
 - [AI-OdooFinder](https://github.com/SantipBarber/ai-odoo-finder)
-- [SPEC-602 completa](../specs/phase-6-intelligent-mcp/SPEC-602-intelligent-mcp-flow.md)
+- [CHANGELOG](../docs/es/CHANGELOG.md)
