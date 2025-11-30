@@ -9,37 +9,36 @@ from typing import Dict, List, Optional
 # Añadir backend al path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from sqlalchemy.exc import OperationalError, DBAPIError
+from sqlalchemy.exc import DBAPIError, OperationalError
+
 from backend.app.database import SessionLocal
 from backend.app.models import OdooModule
 from backend.app.services.embedding_service import get_embedding_service
+from backend.app.services.enrichment_service import get_enrichment_service
 from backend.app.services.github_service import get_github_service
 
 # Servicios
 github = get_github_service()
 embedding = get_embedding_service()
+enrichment = get_enrichment_service()
 
 # ============================================================================
 # CONFIGURACIÓN
 # ============================================================================
 
 # AUTO-DESCUBRIMIENTO: Si True, ignora TARGET_REPOS y obtiene TODOS los repos de OCA
-AUTO_DISCOVER_REPOS = True
+AUTO_DISCOVER_REPOS = False  # TEMP: False para prueba
 
 # Filtro de calidad (solo si AUTO_DISCOVER_REPOS=True)
 MIN_STARS = 0  # Mínimo de estrellas en GitHub
 
 # Lista manual (solo si AUTO_DISCOVER_REPOS=False)
 TARGET_REPOS: List[str] = [
-    "web",
-    "server-tools",
-    "account-financial-tools",
-    "sale-workflow",
-    "purchase-workflow",
+    "server-tools",  # Repo con módulos variados para probar
 ]
 
 # Versiones de Odoo a procesar
-ODOO_VERSIONS: List[str] = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+ODOO_VERSIONS: List[str] = ["18.0"]  # TEMP: Solo 18.0 para prueba
 
 # Sistema de checkpoints
 CHECKPOINT_FILE = Path(__file__).parent / "etl_checkpoint.json"
@@ -47,6 +46,9 @@ ENABLE_CHECKPOINTS = True
 
 # Rate limiting (segundos entre requests a GitHub)
 RATE_LIMIT_DELAY = 0.5
+
+# Enrichment con IA
+ENABLE_ENRICHMENT = True  # Si False, solo usa fallback heurístico
 
 # Reintentos para errores de BD
 MAX_DB_RETRIES = 3
@@ -156,10 +158,11 @@ def get_fully_indexed_repos(db) -> set:
 def repo_version_has_modules(db, repo_name: str, version: str) -> bool:
     """Verificar si un repo+versión específico ya tiene módulos en BD"""
     try:
-        count = db.query(OdooModule).filter(
-            OdooModule.repo_name == repo_name,
-            OdooModule.version == version
-        ).count()
+        count = (
+            db.query(OdooModule)
+            .filter(OdooModule.repo_name == repo_name, OdooModule.version == version)
+            .count()
+        )
         return count > 0
     except Exception:
         return False
@@ -170,7 +173,13 @@ def repo_version_has_modules(db, repo_name: str, version: str) -> bool:
 # ============================================================================
 
 
-def save_checkpoint(repo_name: str, version: str, modules_processed: int, repo_idx: int = 0, repos_list: List[str] = None) -> None:
+def save_checkpoint(
+    repo_name: str,
+    version: str,
+    modules_processed: int,
+    repo_idx: int = 0,
+    repos_list: List[str] = None,
+) -> None:
     """Guardar progreso del ETL"""
     if not ENABLE_CHECKPOINTS:
         return
@@ -191,7 +200,9 @@ def save_checkpoint(repo_name: str, version: str, modules_processed: int, repo_i
         "last_repo_idx": repo_idx,  # Guardar índice en lugar de solo nombre
         "last_version": version,
         "modules_processed": modules_processed,
-        "repos_list": repos_list if repos_list is not None else existing_repos_list  # Preservar lista de repos
+        "repos_list": repos_list
+        if repos_list is not None
+        else existing_repos_list,  # Preservar lista de repos
     }
 
     with open(CHECKPOINT_FILE, "w") as f:
@@ -287,11 +298,15 @@ def process_module(
             db = reconnect_db(db)
             # Intentar verificar existencia nuevamente
             try:
-                existing = db.query(OdooModule).filter(
-                    OdooModule.technical_name == technical_name,
-                    OdooModule.version == version,
-                    OdooModule.repo_name == repo_name,
-                ).first()
+                existing = (
+                    db.query(OdooModule)
+                    .filter(
+                        OdooModule.technical_name == technical_name,
+                        OdooModule.version == version,
+                        OdooModule.repo_name == repo_name,
+                    )
+                    .first()
+                )
                 if existing:
                     print(f"    ⏭️  {technical_name} ya existe, saltando...")
                     sys.stdout.flush()
@@ -315,16 +330,54 @@ def process_module(
     # Obtener README (si existe)
     readme_content = github.get_readme_content(repo_name, version, manifest_path)
 
-    # Preparar texto para embedding
+    # Preparar datos del módulo
     name = manifest.get("name", technical_name)
     summary = manifest.get("summary", "")
     description = manifest.get("description", "")
+    depends = manifest.get("depends", [])
 
-    # Combinar textos relevantes (incluyendo README si existe)
+    # =========================================================================
+    # ENRICHMENT: Generar descripción IA, tags y keywords ANTES del embedding
+    # =========================================================================
+    enrichment_data = None
+    if ENABLE_ENRICHMENT:
+        print("🤖", end=" ")
+        sys.stdout.flush()
+        enrichment_data = enrichment.enrich_module(
+            technical_name=technical_name,
+            name=name,
+            summary=summary,
+            description=description,
+            readme=readme_content[:1500] if readme_content else None,
+            depends=depends,
+            repo_name=repo_name,
+        )
+
+    # Fallback si enrichment falló o está deshabilitado
+    if not enrichment_data or not enrichment_data.get("ai_description"):
+        enrichment_data = enrichment.generate_fallback_enrichment(
+            technical_name=technical_name,
+            name=name,
+            summary=summary,
+            depends=depends,
+        )
+
+    # =========================================================================
+    # EMBEDDING: Incluir contenido enriquecido para mejor búsqueda semántica
+    # =========================================================================
     text_parts = [name, summary, description]
+
+    # Añadir descripción IA si existe (mejora significativamente la búsqueda)
+    if enrichment_data.get("ai_description"):
+        text_parts.append(enrichment_data["ai_description"])
+
+    # Añadir keywords
+    if enrichment_data.get("keywords"):
+        text_parts.append(" ".join(enrichment_data["keywords"]))
+
+    # Añadir README preview
     if readme_content:
-        # Limitar README a primeros 2000 caracteres para no saturar el embedding
-        readme_preview = readme_content[:2000]
+        readme_preview = readme_content[:1500]
         text_parts.append(readme_preview)
 
     text_for_embedding = ". ".join(filter(None, text_parts))
@@ -360,12 +413,12 @@ def process_module(
                     sys.stdout.flush()
                     return (False, None)
 
-    # Crear módulo
+    # Crear módulo con todos los campos incluyendo enrichment
     module = OdooModule(
         technical_name=technical_name,
         name=name,
         version=version,
-        depends=manifest.get("depends", []),
+        depends=depends,
         author=manifest.get("author", ""),
         license=manifest.get("license", "AGPL-3"),
         summary=summary,
@@ -377,13 +430,18 @@ def process_module(
         embedding=emb,
         github_stars=repo_metadata["stars"],
         github_issues_open=repo_metadata["open_issues"],
-        last_commit_date=datetime.fromisoformat(
-            repo_metadata["last_push"].replace("Z", "+00:00")
-        ),
+        last_commit_date=datetime.fromisoformat(repo_metadata["last_push"].replace("Z", "+00:00")),
+        # Enrichment fields
+        ai_description=enrichment_data.get("ai_description"),
+        functional_tags=enrichment_data.get("functional_tags", []),
+        keywords=enrichment_data.get("keywords", []),
+        enriched_at=datetime.utcnow() if enrichment_data.get("ai_description") else None,
+        enrichment_version="v2.0-grok4fast" if enrichment_data.get("ai_description") else None,
     )
 
     # Insertar con retry automático
     try:
+
         def insert_module():
             db.add(module)
             db.commit()
@@ -438,7 +496,7 @@ def main() -> None:
         "total_modules_skipped": 0,
         "total_modules_failed": 0,
         "repos_processed": [],
-        "repos_failed": []
+        "repos_failed": [],
     }
 
     try:
@@ -483,22 +541,28 @@ def main() -> None:
         for repo_idx, repo_name in enumerate(repos_to_process, 1):
             # OPTIMIZACIÓN: Saltar repos completamente indexados
             if repo_name in indexed_repos:
-                print(f"\n⏭️  [{repo_idx}/{len(repos_to_process)}] {repo_name} - Ya indexado, saltando...")
+                print(
+                    f"\n⏭️  [{repo_idx}/{len(repos_to_process)}] {repo_name} - Ya indexado, saltando..."
+                )
                 sys.stdout.flush()
                 stats["repos_processed"].append(repo_name)
                 # Guardar checkpoint para no perder progreso
-                save_checkpoint(repo_name, ODOO_VERSIONS[-1], stats["total_modules_processed"], repo_idx, None)
+                save_checkpoint(
+                    repo_name, ODOO_VERSIONS[-1], stats["total_modules_processed"], repo_idx, None
+                )
                 continue
 
-            print(f"\n{'='*80}")
+            print(f"\n{'=' * 80}")
             print(f"📂 [{repo_idx}/{len(repos_to_process)}] Repositorio: {repo_name}")
-            print(f"{'='*80}")
+            print(f"{'=' * 80}")
             sys.stdout.flush()
 
             # Obtener metadata del repo
             try:
                 repo_metadata = github.get_repo_metadata(repo_name)
-                print(f"   ⭐ Stars: {repo_metadata['stars']} | Issues: {repo_metadata['open_issues']}")
+                print(
+                    f"   ⭐ Stars: {repo_metadata['stars']} | Issues: {repo_metadata['open_issues']}"
+                )
                 sys.stdout.flush()
             except Exception as e:
                 print(f"   ❌ Error obteniendo metadata: {e}")
@@ -579,8 +643,18 @@ def main() -> None:
                     # Guardar checkpoint después de cada versión (con retry)
                     try:
                         # Solo pasar repos_list en el primer checkpoint
-                        repos_list_to_save = repos_to_process if repo_idx == 1 and version == ODOO_VERSIONS[0] else None
-                        save_checkpoint(repo_name, version, stats["total_modules_processed"], repo_idx, repos_list_to_save)
+                        repos_list_to_save = (
+                            repos_to_process
+                            if repo_idx == 1 and version == ODOO_VERSIONS[0]
+                            else None
+                        )
+                        save_checkpoint(
+                            repo_name,
+                            version,
+                            stats["total_modules_processed"],
+                            repo_idx,
+                            repos_list_to_save,
+                        )
                     except Exception as e:
                         print(f"      ⚠️  Error guardando checkpoint: {e}")
                         sys.stdout.flush()
@@ -604,7 +678,7 @@ def main() -> None:
 
         # Estadísticas de ejecución
         print("\n📊 ESTADÍSTICAS DE EJECUCIÓN:")
-        print(f"   ⏱️  Tiempo total: {elapsed_time/60:.1f} minutos")
+        print(f"   ⏱️  Tiempo total: {elapsed_time / 60:.1f} minutos")
         print(f"   📂 Repos procesados: {len(stats['repos_processed'])}/{stats['total_repos']}")
         print(f"   📦 Módulos encontrados: {stats['total_modules_processed']}")
         print(f"   ✅ Módulos añadidos: {stats['total_modules_success']}")
@@ -628,6 +702,11 @@ def main() -> None:
         with_readme = db.query(OdooModule).filter(OdooModule.readme.isnot(None)).count()
         readme_percentage = (with_readme / total_db * 100) if total_db > 0 else 0
         print(f"\n   📄 Módulos con README: {with_readme} ({readme_percentage:.1f}%)")
+
+        # Módulos con enrichment IA
+        with_enrichment = db.query(OdooModule).filter(OdooModule.ai_description.isnot(None)).count()
+        enrichment_percentage = (with_enrichment / total_db * 100) if total_db > 0 else 0
+        print(f"   🤖 Módulos con AI enrichment: {with_enrichment} ({enrichment_percentage:.1f}%)")
 
         print("\n🎉 ¡Listo para búsquedas!")
         sys.stdout.flush()

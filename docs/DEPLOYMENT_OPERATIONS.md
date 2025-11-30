@@ -1,5 +1,30 @@
 # AI-OdooFinder - Deployment & Operations Guide
 
+## Architecture Overview
+
+Self-hosted solution on Hetzner VPS with Docker. Previously used Neon (PostgreSQL) and Render (API hosting), now consolidated to a single server for cost efficiency and simplicity.
+
+```
+                    +------------------+
+                    |   Client/Claude  |
+                    +--------+---------+
+                             |
+                             | HTTP :8989
+                             v
++---------------------------------------------------+
+|                 Hetzner VPS (Docker)               |
+|                                                   |
+|  +-------------+          +-------------------+   |
+|  | PostgreSQL  |<-------->|   FastAPI (API)   |   |
+|  | + pgvector  |  :5432   |                   |   |
+|  | (db)        |          | - /search         |   |
+|  +-------------+          | - /stats          |   |
+|                           | - /health         |   |
+|                           +-------------------+   |
+|                                                   |
++---------------------------------------------------+
+```
+
 ## Server Information
 
 | Item | Value |
@@ -145,19 +170,6 @@ docker compose build --no-cache api
 docker compose up -d api
 ```
 
-### Stop/Start Services
-
-```bash
-# Stop all
-docker compose down
-
-# Start all
-docker compose up -d
-
-# Stop and remove volumes (CAUTION: deletes data!)
-docker compose down -v
-```
-
 ### Check Service Status
 
 ```bash
@@ -204,7 +216,8 @@ curl http://localhost:8989/stats
 Located at `/opt/ai-odoo-finder/.env`:
 
 ```env
-# Database (Docker internal)
+# Database
+DATABASE_URL=postgresql://odoofinder:<password>@db:5432/ai_odoofinder
 POSTGRES_DB=ai_odoofinder
 POSTGRES_USER=odoofinder
 POSTGRES_PASSWORD=<password>
@@ -220,34 +233,11 @@ LOG_LEVEL=INFO
 
 **Note**: The `.env` file is in `.gitignore` and should never be committed.
 
-## Architecture
-
-```
-                    +------------------+
-                    |   Client/Claude  |
-                    +--------+---------+
-                             |
-                             | HTTP :8989
-                             v
-+---------------------------------------------------+
-|                    Server (Hetzner)                |
-|                                                   |
-|  +-------------+          +-------------------+   |
-|  | PostgreSQL  |<-------->|   FastAPI (API)   |   |
-|  | + pgvector  |  :5432   |                   |   |
-|  | (db)        |          | - /search         |   |
-|  +-------------+          | - /stats          |   |
-|                           | - /health         |   |
-|                           +-------------------+   |
-|                                                   |
-+---------------------------------------------------+
-```
-
 ## Hybrid Search Algorithm
 
 The search uses **Reciprocal Rank Fusion (RRF)** combining:
 
-1. **Vector Search**: Semantic similarity using embeddings (OpenAI text-embedding-3-small)
+1. **Vector Search**: Semantic similarity using Qwen3-Embedding (2560 dimensions)
 2. **BM25 Full-Text**: Keyword matching on technical_name, name, summary, description
 
 ```
@@ -303,7 +293,7 @@ du -sh /opt/ai-odoo-finder/*
 
 ## MCP Server (Standalone)
 
-The MCP server for Claude integration is located at `mcp-server/` and runs separately:
+The MCP server for Claude integration runs locally and connects to the remote API:
 
 ```bash
 cd mcp-server
@@ -332,13 +322,17 @@ Configure in Claude Desktop (`~/.config/claude/claude_desktop_config.json`):
 | 2025-11-29 | PostgreSQL 16 -> 17 | Upgraded for dump compatibility |
 | 2025-11-29 | Data migration | 15,884 modules with embeddings |
 | 2025-11-30 | Systemd service | Added auto-start on boot |
+| 2025-11-30 | Removed Render | Consolidated to self-hosted Docker |
 
-## Costs Saved
+## Cost Summary
 
-- **Neon PostgreSQL**: $5/month (cancelled)
-- **Render hosting**: Free tier was limited
-- **Now**: Self-hosted on existing Hetzner server (no additional cost)
+| Service | Before | After |
+|---------|--------|-------|
+| Neon PostgreSQL | $5/month | $0 (self-hosted) |
+| Render API | Free tier (limited) | $0 (self-hosted) |
+| Hetzner VPS | Already owned | No additional cost |
+| **Total** | ~$5/month | **$0/month** |
 
 ---
 
-*Last updated: 2025-11-29*
+*Last updated: 2025-11-30*
