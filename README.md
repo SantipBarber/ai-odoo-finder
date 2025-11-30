@@ -42,18 +42,28 @@ Como desarrollador de Odoo:
 ## Arquitectura
 
 ```
-┌─────────────────────┐      ┌──────────────────────────────────┐
-│   Claude Desktop    │      │        Hetzner VPS (Docker)      │
-│   + MCP Server      │─────►│  ┌────────────┐  ┌────────────┐  │
-│   (local)           │ HTTPS│  │  FastAPI   │  │ PostgreSQL │  │
-└─────────────────────┘      │  │  :8989     │◄─│ + pgvector │  │
-                             │  └────────────┘  └────────────┘  │
-                             └──────────────────────────────────┘
+┌─────────────────────┐      ┌──────────────────────────────────────┐
+│  Claude.ai Web      │      │        Hetzner VPS (Docker)          │
+│  Zed / Cursor       │─────►│  ┌─────────────┐  ┌──────────────┐   │
+│  (remote MCP)       │ HTTPS│  │ MCP Server  │  │   FastAPI    │   │
+└─────────────────────┘      │  │  :8080/mcp  │─►│   :8989      │   │
+                             │  └─────────────┘  └──────┬───────┘   │
+┌─────────────────────┐      │                          │           │
+│   Claude Desktop    │      │                   ┌──────▼───────┐   │
+│   + MCP Server      │─────►│                   │  PostgreSQL  │   │
+│   (local, STDIO)    │ HTTPS│                   │  + pgvector  │   │
+└─────────────────────┘      │                   └──────────────┘   │
+                             └──────────────────────────────────────┘
 ```
 
+**Modos de uso:**
+- **Remote MCP** (Claude.ai Web, Zed, Cursor): Conectan al MCP Server remoto via HTTP
+- **Local MCP** (Claude Desktop): MCP Server corre localmente via STDIO
+- **API REST directa**: Para integraciones custom
+
 **Componentes:**
-- **MCP Server** (local): Corre en tu maquina, se comunica con Claude
-- **FastAPI Backend** (remoto): API REST con busqueda hibrida
+- **MCP Server HTTP** (remoto, :8080): Servidor MCP para clientes remotos
+- **FastAPI Backend** (remoto, :8989): API REST con busqueda hibrida
 - **PostgreSQL + pgvector** (remoto): 16,494 modulos con embeddings
 
 ---
@@ -87,23 +97,38 @@ Como desarrollador de Odoo:
 
 ## Instalacion
 
-### Usar el MCP Server (Recomendado)
+AI-OdooFinder soporta multiples plataformas. Elige la que uses:
 
-El servidor MCP permite usar AI-OdooFinder directamente desde Claude Desktop.
+### Claude.ai Web (Remote MCP)
 
-1. **Configura** `~/Library/Application Support/Claude/claude_desktop_config.json`:
+Conecta directamente desde Claude.ai sin instalar nada:
+
+1. Ve a **Claude.ai** > **Settings** > **Conectores**
+2. Click en **"Anadir conector personalizado"**
+3. Introduce la URL del servidor MCP:
+   ```
+   https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
+   ```
+4. Guarda y empieza a buscar modulos
+
+> **Nota**: El servidor es publico y no requiere autenticacion.
+
+---
+
+### Claude Desktop (Local MCP)
+
+Para usar con Claude Desktop en tu maquina:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+**Linux**: `~/.config/claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
-      "command": "/Users/TU_USUARIO/.local/bin/uv",
-      "args": [
-        "--directory",
-        "/ruta/a/ai-odoo-finder/mcp-server",
-        "run",
-        "ai-odoofinder-mcp"
-      ],
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -112,12 +137,65 @@ El servidor MCP permite usar AI-OdooFinder directamente desde Claude Desktop.
 }
 ```
 
-2. **Reinicia** Claude Desktop
-3. **Pregunta** sobre modulos de Odoo:
+Reinicia Claude Desktop y pregunta sobre modulos de Odoo.
 
+---
+
+### Zed Editor
+
+Configura en `~/.config/zed/settings.json`:
+
+```json
+{
+  "context_servers": {
+    "ai-odoofinder": {
+      "command": {
+        "path": "uvx",
+        "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+        "env": {
+          "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+        }
+      }
+    }
+  }
+}
 ```
-"Busco un modulo de facturacion electronica para Espana en Odoo 16"
+
+---
+
+### Cursor
+
+Configura en `.cursor/mcp.json` (proyecto) o `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
 ```
+
+---
+
+### Otros Clientes MCP (Remote HTTP)
+
+Para cualquier cliente que soporte MCP remoto via HTTP/SSE:
+
+**URL del servidor MCP:**
+```
+https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
+```
+
+**Protocolo**: Streamable HTTP (MCP spec 2024-11-05)
+**Autenticacion**: Ninguna (servidor publico)
+
+---
 
 ### Desplegar tu propia instancia
 

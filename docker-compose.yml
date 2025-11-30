@@ -63,6 +63,38 @@ services:
     networks:
       - odoofinder-network
 
+  # ============================================
+  # MCP Server (Remote HTTP)
+  # For Claude.ai Web, Zed, Cursor, etc.
+  # ============================================
+  mcp:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: odoofinder-mcp
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      # Connect to API via internal Docker network
+      AI_ODOOFINDER_API_URL: http://api:8989
+      AI_ODOOFINDER_API_TIMEOUT: "60"
+      # MCP Server config
+      MCP_TRANSPORT: http
+      MCP_HOST: "0.0.0.0"
+      MCP_PORT: "8080"
+      MCP_PATH: /mcp
+    ports:
+      - "8080:8080"
+    networks:
+      - odoofinder-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
 networks:
   odoofinder-network:
     driver: bridge

@@ -536,11 +536,67 @@ No se encontraron módulos OCA que coincidan con tu búsqueda.
 # ENTRY POINT
 # ============================================================================
 
+# Configuración del servidor HTTP
+MCP_HOST = os.getenv("MCP_HOST", "0.0.0.0")
+MCP_PORT = int(os.getenv("MCP_PORT", "8080"))
+MCP_PATH = os.getenv("MCP_PATH", "/mcp")
+
 
 def main():
-    """Punto de entrada para el servidor MCP."""
-    logger.info(f"Starting AI-OdooFinder MCP Server (API: {API_BASE_URL})")
-    mcp.run()
+    """
+    Punto de entrada para el servidor MCP.
+
+    Modos de ejecución:
+    - STDIO (default): Para Claude Desktop local
+      $ ai-odoofinder-mcp
+
+    - HTTP: Para Claude Web, Zed, Cursor, y otros clientes remotos
+      $ ai-odoofinder-mcp --http
+      $ MCP_TRANSPORT=http ai-odoofinder-mcp
+
+    Variables de entorno:
+    - MCP_TRANSPORT: "stdio" (default) o "http"
+    - MCP_HOST: Host para HTTP (default: 0.0.0.0)
+    - MCP_PORT: Puerto para HTTP (default: 8080)
+    - MCP_PATH: Path del endpoint MCP (default: /mcp)
+    - AI_ODOOFINDER_API_URL: URL del backend API
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(description="AI-OdooFinder MCP Server")
+    parser.add_argument(
+        "--http",
+        action="store_true",
+        help="Run in HTTP mode (for remote clients like Claude Web, Zed, Cursor)",
+    )
+    parser.add_argument("--host", default=MCP_HOST, help=f"Host to bind (default: {MCP_HOST})")
+    parser.add_argument(
+        "--port", type=int, default=MCP_PORT, help=f"Port to bind (default: {MCP_PORT})"
+    )
+
+    args = parser.parse_args()
+
+    # Determinar modo de transporte
+    transport = os.getenv("MCP_TRANSPORT", "stdio")
+    if args.http:
+        transport = "http"
+
+    if transport == "http":
+        logger.info(
+            f"Starting AI-OdooFinder MCP Server in HTTP mode "
+            f"(host={args.host}, port={args.port}, path={MCP_PATH})"
+        )
+        logger.info(f"Backend API: {API_BASE_URL}")
+        logger.info(f"MCP endpoint will be available at: http://{args.host}:{args.port}{MCP_PATH}")
+        mcp.run(
+            transport="http",
+            host=args.host,
+            port=args.port,
+            path=MCP_PATH,
+        )
+    else:
+        logger.info(f"Starting AI-OdooFinder MCP Server in STDIO mode (API: {API_BASE_URL})")
+        mcp.run()
 
 
 if __name__ == "__main__":

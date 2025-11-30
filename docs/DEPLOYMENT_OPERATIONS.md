@@ -29,8 +29,8 @@ Self-hosted solution on Hetzner VPS with Docker. Previously used Neon (PostgreSQ
 
 | Item | Value |
 |------|-------|
-| **Server IP** | 157.180.41.130 |
-| **Provider** | Hetzner |
+| **Public URL** | `https://strategy-orchestrator-prod.tailf7d690.ts.net` |
+| **Provider** | Hetzner (exposed via Tailscale Funnel) |
 | **Architecture** | ARM64 (aarch64) |
 | **OS** | Ubuntu 22.04.5 LTS |
 | **Resources** | 2 vCPU, 3.7GB RAM, 38GB disk |
@@ -44,8 +44,9 @@ Self-hosted solution on Hetzner VPS with Docker. Previously used Neon (PostgreSQ
 |-----------|-------|------|---------|
 | `odoofinder-postgres` | pgvector/pgvector:pg17 | 5432 | PostgreSQL 17 + pgvector |
 | `odoofinder-api` | custom build | 8989 | FastAPI Backend |
+| `odoofinder-mcp` | custom build | 8080 | MCP Server (Remote HTTP) |
 
-### API Endpoints
+### API Endpoints (FastAPI - :8989)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -55,6 +56,13 @@ Self-hosted solution on Hetzner VPS with Docker. Previously used Neon (PostgreSQ
 | `/modules/{id}` | GET | Get module by ID |
 | `/stats` | GET | Database statistics |
 | `/docs` | GET | Swagger UI documentation |
+
+### MCP Endpoints (MCP Server - :8080)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/mcp` | POST | MCP JSON-RPC endpoint (Streamable HTTP) |
+| `/mcp` | GET | MCP SSE endpoint (legacy) |
 
 ### Search Parameters
 
@@ -138,7 +146,12 @@ This shows: Docker containers, API health, database stats, disk usage.
 ### SSH Access
 
 ```bash
-ssh root@157.180.41.130
+# Via Tailscale (recommended)
+ssh root@strategy-orchestrator-prod
+
+# Or via Tailscale IP
+ssh root@100.113.121.87
+
 cd /opt/ai-odoo-finder
 ```
 
@@ -291,24 +304,60 @@ docker system prune -a
 du -sh /opt/ai-odoo-finder/*
 ```
 
-## MCP Server (Standalone)
+## MCP Server
 
-The MCP server for Claude integration runs locally and connects to the remote API:
+The MCP Server supports two modes of operation:
+
+### Remote Mode (Docker - for Claude.ai Web, Zed, Cursor)
+
+The MCP server runs as a Docker container alongside the API:
+
+```bash
+# Deploy MCP server (without affecting other services)
+docker compose build mcp
+docker compose up -d mcp
+
+# Check MCP server status
+docker compose logs mcp --tail 20
+
+# Test MCP endpoint
+curl -X POST "http://localhost:8080/mcp" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+```
+
+**Tailscale Funnel Setup** (expose MCP on port 8080):
+
+```bash
+# Add port 8080 to Tailscale Funnel
+tailscale funnel 8080
+```
+
+### Local Mode (STDIO - for Claude Desktop)
+
+For Claude Desktop, run the MCP server locally:
 
 ```bash
 cd mcp-server
-uv run python -m mcp_odoofinder
+uv run ai-odoofinder-mcp
 ```
 
-Configure in Claude Desktop (`~/.config/claude/claude_desktop_config.json`):
+Configure in Claude Desktop:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+**Linux**: `~/.config/claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
-    "odoofinder": {
-      "command": "uv",
-      "args": ["run", "python", "-m", "mcp_odoofinder"],
-      "cwd": "/path/to/ai-odoo-finder/mcp-server"
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
     }
   }
 }
