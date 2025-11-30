@@ -13,7 +13,6 @@ from .hybrid_search_service import HybridSearchService
 logger = get_logger(__name__)
 embedding_service = get_embedding_service()
 
-# Type alias for search modes
 SearchMode = Literal["vector", "bm25", "hybrid"]
 
 
@@ -33,21 +32,12 @@ class SearchService:
         search_mode: SearchMode = "hybrid",
     ) -> List[Dict]:
         """
-        Búsqueda multi-modal: Vector, BM25, o Híbrida.
+        Multi-modal search: Vector, BM25, or Hybrid.
 
-        Args:
-            query: Consulta en lenguaje natural
-            version: Versión de Odoo (ej: "17.0")
-            dependencies: Lista de dependencias requeridas (opcional)
-            limit: Número máximo de resultados
-            min_score: Score mínimo (0-100) para filtrar resultados
-            search_mode: Modo de búsqueda:
-                - "vector": Solo búsqueda semántica (legacy)
-                - "bm25": Solo full-text search
-                - "hybrid": Vector + BM25 con RRF (default, recomendado)
-
-        Returns:
-            Lista de módulos rankeados con score y metadata
+        Search modes:
+        - "vector": Semantic search only (legacy)
+        - "bm25": Full-text search only
+        - "hybrid": Vector + BM25 with RRF (default, recommended)
         """
         # Validaciones
         if not query or not query.strip():
@@ -67,7 +57,6 @@ class SearchService:
         )
 
         try:
-            # Route to appropriate search method
             if search_mode == "hybrid":
                 results = self._search_hybrid(query, version, dependencies, limit, min_score)
             elif search_mode == "bm25":
@@ -80,8 +69,7 @@ class SearchService:
             return results
 
         except Exception as e:
-            logger.error(f"Error en búsqueda [{search_mode}]: {e}", exc_info=True)
-            # Hacer rollback para evitar que la transacción quede abortada
+            logger.error(f"Error in search [{search_mode}]: {e}", exc_info=True)
             try:
                 self.db.rollback()
             except Exception:
@@ -96,16 +84,13 @@ class SearchService:
         limit: int,
         min_score: int,
     ) -> List[Dict]:
-        """Búsqueda híbrida usando HybridSearchService."""
-
-        # Generate embedding
+        """Hybrid search using HybridSearchService."""
         try:
             query_embedding = self.embedding_service.get_embedding(query)
         except Exception as e:
-            logger.error(f"Error generando embedding: {e}")
+            logger.error(f"Error generating embedding: {e}")
             return []
 
-        # Execute hybrid search
         results = self.hybrid_search_service.search(
             query=query,
             query_embedding=query_embedding,
@@ -116,16 +101,13 @@ class SearchService:
             top_candidates=50,
         )
 
-        # Convert SearchResult to dict format
         output = []
         for result in results:
-            # Calculate score 0-100 from RRF score
-            score = int(min(100, result.rrf_score * 100 * 60))  # Approximate normalization
+            score = int(min(100, result.rrf_score * 100 * 60))
 
             if score < min_score:
                 continue
 
-            # Fetch full module data for metadata
             module = self.db.query(OdooModule).filter(OdooModule.id == result.id).first()
             if not module:
                 continue
@@ -171,16 +153,13 @@ class SearchService:
         limit: int,
         min_score: int,
     ) -> List[Dict]:
-        """Búsqueda BM25 full-text pura."""
-
+        """Pure BM25 full-text search."""
         results = self.hybrid_search_service._fulltext_search(
             query=query, version=version, dependencies=dependencies, limit=limit
         )
 
-        # Convert to dict format
         output = []
         for result in results:
-            # Normalize BM25 score to 0-100 range (approximate)
             score = int(min(100, result.bm25_score * 10))
 
             if score < min_score:
@@ -229,23 +208,19 @@ class SearchService:
         limit: int,
         min_score: int,
     ) -> List[Dict]:
-        """Búsqueda vectorial pura (legacy mode)."""
-
-        # Generate embedding
+        """Pure vector search (legacy mode)."""
         try:
             query_embedding = self.embedding_service.get_embedding(query)
         except Exception as e:
-            logger.error(f"Error generando embedding: {e}")
+            logger.error(f"Error generating embedding: {e}")
             return []
 
-        # Build filters
         filters = [OdooModule.version == version]
 
         if dependencies:
             dep_array = cast(array(dependencies), ARRAY(String))
             filters.append(OdooModule.depends.op("@>")(dep_array))
 
-        # Vector search using cosine distance
         results = (
             self.db.query(
                 OdooModule,
@@ -258,13 +233,11 @@ class SearchService:
         )
 
         if not results:
-            logger.info("No se encontraron resultados")
+            logger.info("No results found")
             return []
 
-        # Format results
         output = []
         for module, distance in results:
-            # Convert distance to score (0-100)
             similarity = max(0.0, 1.0 - (float(distance) / 2.0))
             score = int(similarity * 100)
 
@@ -299,13 +272,12 @@ class SearchService:
                 }
             )
 
-        # Limit final results
         output = output[:limit]
 
-        logger.info(f"Vector search retornando {len(output)} resultados")
+        logger.info(f"Vector search returning {len(output)} results")
         return output
 
 
 def get_search_service(db: Session) -> SearchService:
-    """Factory function para crear instancia de SearchService"""
+    """Factory function to create SearchService instance."""
     return SearchService(db)

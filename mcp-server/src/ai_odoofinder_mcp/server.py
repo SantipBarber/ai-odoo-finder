@@ -1,16 +1,8 @@
 """
 AI-OdooFinder MCP Server
 
-Servidor MCP (Model Context Protocol) para búsqueda semántica
-de módulos Odoo en el ecosistema OCA.
-
-Implementa el flujo inteligente de búsqueda según SPEC-602:
-- Fase 1: Clarificación inteligente (instrucciones en tool description)
-- Fase 2: Expansión de query (instrucciones en tool description)
-- Fase 3: Respuesta estructurada con niveles de confianza
-- Fase 4: Confirmación y bucle iterativo (instrucciones en tool description)
-
-Este servidor se comunica con la API REST del backend (local o remoto).
+MCP (Model Context Protocol) server for semantic search of Odoo modules
+in the OCA ecosystem. Supports both STDIO (local) and HTTP (remote) transport.
 """
 
 import logging
@@ -22,10 +14,9 @@ import httpx
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 
-# Cargar variables de entorno
 load_dotenv()
 
-# Configurar logging a stderr (IMPORTANTE: stdout es para JSON-RPC)
+# Log to stderr (stdout is for JSON-RPC)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -33,18 +24,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ai-odoofinder-mcp")
 
-# URL de la API (configurable via env)
 API_BASE_URL = os.getenv("AI_ODOOFINDER_API_URL", "http://localhost:8989")
 API_TIMEOUT = int(os.getenv("AI_ODOOFINDER_API_TIMEOUT", "60"))
 
-# Crear instancia de FastMCP
-mcp = FastMCP("AI-OdooFinder 🔍")
+mcp = FastMCP("AI-OdooFinder")
 
 
-# ============================================================================
-# TOOL DESCRIPTION ENRIQUECIDO (SPEC-602 Fase 1 y 2)
-# ============================================================================
-
+# Tool parameter descriptions (kept in Spanish for Spanish-speaking users)
 QUERY_DESCRIPTION = """
 Query de búsqueda para módulos Odoo OCA.
 
@@ -149,23 +135,13 @@ Guía:
 """
 
 
-# ============================================================================
-# HTTP CLIENT
-# ============================================================================
-
-
 async def get_http_client() -> httpx.AsyncClient:
-    """Crea un cliente HTTP con timeout configurado."""
+    """Create HTTP client with configured timeout."""
     return httpx.AsyncClient(
         base_url=API_BASE_URL,
         timeout=httpx.Timeout(API_TIMEOUT),
         headers={"Content-Type": "application/json"},
     )
-
-
-# ============================================================================
-# MCP TOOL
-# ============================================================================
 
 
 @mcp.tool()
@@ -176,54 +152,26 @@ async def search_odoo_modules(
     limit: Annotated[int, LIMIT_DESCRIPTION] = 5,
 ) -> str:
     """
-    Busca módulos de Odoo en el ecosistema OCA (15,000+ módulos).
+    Search Odoo modules in the OCA ecosystem (16,000+ modules).
 
-    ═══════════════════════════════════════════════════════════════
-    FLUJO COMPLETO DE BÚSQUEDA INTELIGENTE
-    ═══════════════════════════════════════════════════════════════
+    Intelligent search flow:
+    1. CLARIFY if needed (country, version, specific functionality)
+    2. EXPAND query with synonyms ES/EN
+    3. INTERPRET results by confidence level (HIGH/MEDIUM/LOW)
+    4. CONFIRM with user and iterate if needed
 
-    1️⃣ CLARIFICA si es necesario
-       Pide al usuario: país, versión, funcionalidad específica
-       (Ver instrucciones en parámetro 'query')
-
-    2️⃣ EXPANDE la query
-       Añade sinónimos ES/EN, términos técnicos, contexto localización
-       (Ver instrucciones en parámetro 'query')
-
-    3️⃣ INTERPRETA los resultados según nivel de confianza:
-       • ALTA (score ≥ 80): Recomienda directamente
-       • MEDIA (score 50-79): Presenta opciones, pide confirmación
-       • BAJA (score < 50): Menciona limitaciones, ofrece alternativas
-
-    4️⃣ CONFIRMA con el usuario
-       "¿Este módulo cubre tu necesidad?"
-       • Si dice "sí" → proporciona instrucciones de instalación
-       • Si dice "no" → vuelve al paso 1 con más contexto
-       • Si dice "casi" → sugiere módulos complementarios o extensiones
-
-    5️⃣ Si NO HAY buenos resultados:
-       • Sugiere módulos parciales que cubran parte del requisito
-       • Indica si la funcionalidad existe en Odoo Enterprise
-       • Ofrece guía para desarrollo de módulo custom
-
-    ═══════════════════════════════════════════════════════════════
-    REGLAS IMPORTANTES
-    ═══════════════════════════════════════════════════════════════
-
-    ⛔ NUNCA inventes módulos que no existen en los resultados
-    ⛔ NUNCA asumas la versión de Odoo sin preguntar
-    ⛔ NUNCA ignores cuando el usuario dice "no es lo que busco"
-    ✅ SIEMPRE usa los links de GitHub proporcionados en los resultados
-    ✅ SIEMPRE menciona las dependencias importantes
-    ✅ SIEMPRE ofrece alternativas cuando la confianza es media/baja
+    Rules:
+    - NEVER invent modules not in results
+    - NEVER assume Odoo version without asking
+    - ALWAYS use GitHub links from results
+    - ALWAYS offer alternatives when confidence is medium/low
     """
-    # Validaciones
     if not query or not query.strip():
-        return "❌ Error: La query no puede estar vacía"
+        return "❌ Error: Query cannot be empty"
 
     valid_versions = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
     if version not in valid_versions:
-        return f"❌ Error: Versión '{version}' inválida. Usa: {', '.join(valid_versions)}"
+        return f"❌ Error: Invalid version '{version}'. Use: {', '.join(valid_versions)}"
 
     if limit < 1 or limit > 20:
         limit = min(max(1, limit), 20)
@@ -232,12 +180,7 @@ async def search_odoo_modules(
 
     try:
         async with await get_http_client() as client:
-            # Llamar a la API (GET con query params)
-            params = {
-                "query": query,
-                "version": version,
-                "limit": limit,
-            }
+            params = {"query": query, "version": version, "limit": limit}
             if dependencies:
                 params["dependencies"] = ",".join(dependencies)
 
@@ -246,7 +189,7 @@ async def search_odoo_modules(
             if response.status_code != 200:
                 error_detail = response.text[:200] if response.text else "Unknown error"
                 logger.error(f"API error {response.status_code}: {error_detail}")
-                return f"❌ Error de API ({response.status_code}): {error_detail}"
+                return f"❌ API Error ({response.status_code}): {error_detail}"
 
             data = response.json()
             results = data.get("results", [])
@@ -254,114 +197,92 @@ async def search_odoo_modules(
             if not results:
                 return _format_no_results(query, version)
 
-            # Formatear resultados con estructura inteligente
             return _format_results_intelligent(results, query, version)
 
     except httpx.TimeoutException:
         logger.error(f"API timeout after {API_TIMEOUT}s")
-        return f"❌ Timeout: La API no respondió en {API_TIMEOUT} segundos. Intenta de nuevo."
+        return f"❌ Timeout: API did not respond in {API_TIMEOUT} seconds. Try again."
 
     except httpx.ConnectError as e:
         logger.error(f"Connection error: {e}")
-        return (
-            f"❌ Error de conexión: No se pudo conectar a {API_BASE_URL}. ¿Está el servidor activo?"
-        )
+        return f"❌ Connection error: Could not connect to {API_BASE_URL}. Is the server running?"
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}", exc_info=True)
-        return f"❌ Error inesperado: {str(e)}"
-
-
-# ============================================================================
-# FORMATO DE RESPUESTA ESTRUCTURADA (SPEC-602 Fase 3)
-# ============================================================================
+        return f"❌ Unexpected error: {str(e)}"
 
 
 def _calculate_confidence(results: list[dict]) -> str:
-    """Calcula el nivel de confianza basado en los scores de los resultados."""
+    """Calculate confidence level based on top result score."""
     if not results:
-        return "NINGUNA"
-
+        return "NONE"
     top_score = results[0].get("score", 0)
-
     if top_score >= 80:
-        return "ALTA"
+        return "HIGH"
     elif top_score >= 50:
-        return "MEDIA"
-    else:
-        return "BAJA"
+        return "MEDIUM"
+    return "LOW"
 
 
 def _get_confidence_emoji(confidence: str) -> str:
-    """Devuelve emoji según nivel de confianza."""
-    return {"ALTA": "🟢", "MEDIA": "🟡", "BAJA": "🟠", "NINGUNA": "🔴"}.get(confidence, "⚪")
+    """Get emoji for confidence level."""
+    return {"HIGH": "🟢", "MEDIUM": "🟡", "LOW": "🟠", "NONE": "🔴"}.get(confidence, "⚪")
 
 
 def _format_results_intelligent(results: list[dict], query: str, version: str) -> str:
-    """
-    Formatea los resultados de búsqueda con estructura inteligente según SPEC-602.
-    """
+    """Format search results with intelligent structure."""
     output = []
     confidence = _calculate_confidence(results)
     confidence_emoji = _get_confidence_emoji(confidence)
 
-    # Header con nivel de confianza
-    output.append("# 🎯 Resultados de Búsqueda")
+    output.append("# 🎯 Search Results")
     output.append(f"**Query:** {query[:100]}{'...' if len(query) > 100 else ''}")
-    output.append(f"**Versión Odoo:** {version}")
-    output.append(f"**Resultados encontrados:** {len(results)}")
-    output.append(f"\n## {confidence_emoji} Confianza: {confidence}\n")
+    output.append(f"**Odoo Version:** {version}")
+    output.append(f"**Results found:** {len(results)}")
+    output.append(f"\n## {confidence_emoji} Confidence: {confidence}\n")
 
-    # Separar en recomendados y alternativas
     recommended = [r for r in results if r.get("score", 0) >= 80]
     alternatives = [r for r in results if r.get("score", 0) < 80]
 
-    # Sección RECOMENDADO
     if recommended:
-        output.append("### ✅ RECOMENDADO\n")
+        output.append("### ✅ RECOMMENDED\n")
         for module in recommended:
             output.append(_format_module_detailed(module, version))
 
-    # Sección ALTERNATIVAS
     if alternatives:
-        output.append("### 📋 ALTERNATIVAS\n")
+        output.append("### 📋 ALTERNATIVES\n")
         for i, module in enumerate(alternatives, 1):
             output.append(_format_module_summary(module, index=i, version=version))
 
-    # Guía según nivel de confianza
     output.append("\n---\n")
     output.append(_get_confidence_guidance(confidence))
-
-    # Instrucciones para el LLM
     output.append("\n---\n")
-    output.append("### 🤖 Instrucciones para el Asistente\n")
+    output.append("### 🤖 Assistant Instructions\n")
     output.append(_get_llm_instructions(confidence))
 
     return "\n".join(output)
 
 
 def _format_module_detailed(module: dict, version: str) -> str:
-    """Formatea un módulo con todos los detalles (para recomendados)."""
+    """Format module with full details (for recommended)."""
     score = module.get("score", 0)
-
     lines = []
-    lines.append(f"**Módulo:** `{module.get('technical_name', 'unknown')}`")
-    lines.append(f"**Nombre:** {module.get('name', 'Unknown')}")
+    lines.append(f"**Module:** `{module.get('technical_name', 'unknown')}`")
+    lines.append(f"**Name:** {module.get('name', 'Unknown')}")
     lines.append(f"**Score:** {score}/100")
 
     if module.get("summary"):
-        lines.append(f"**Resumen:** {module['summary']}")
+        lines.append(f"**Summary:** {module['summary']}")
 
     if module.get("description"):
         desc = module["description"]
         if len(desc) > 300:
             desc = desc[:300] + "..."
-        lines.append(f"**Descripción:** {desc}")
+        lines.append(f"**Description:** {desc}")
 
     repo_name = module.get("repo_name", "unknown")
-    lines.append(f"**Repositorio:** {repo_name}")
+    lines.append(f"**Repository:** {repo_name}")
 
-    # GitHub link
     repo_url = module.get("repo_url", f"https://github.com/OCA/{repo_name}")
     module_path = module.get("module_path", "").replace("/__manifest__.py", "")
     github_link = f"{repo_url}/tree/{version}/{module_path}"
@@ -371,24 +292,24 @@ def _format_module_detailed(module: dict, version: str) -> str:
         deps = module["depends"][:7]
         deps_str = ", ".join(f"`{d}`" for d in deps)
         if len(module["depends"]) > 7:
-            deps_str += f" (+{len(module['depends']) - 7} más)"
-        lines.append(f"**Dependencias:** {deps_str}")
+            deps_str += f" (+{len(module['depends']) - 7} more)"
+        lines.append(f"**Dependencies:** {deps_str}")
 
-    lines.append(f"**Autor:** {module.get('author', 'OCA')}")
-    lines.append(f"**Licencia:** {module.get('license', 'AGPL-3')}")
+    lines.append(f"**Author:** {module.get('author', 'OCA')}")
+    lines.append(f"**License:** {module.get('license', 'AGPL-3')}")
 
     if module.get("github_stars"):
         lines.append(f"**GitHub Stars:** ⭐ {module['github_stars']}")
 
     if module.get("last_commit_date"):
-        lines.append(f"**Última actualización:** {module['last_commit_date'][:10]}")
+        lines.append(f"**Last updated:** {module['last_commit_date'][:10]}")
 
-    lines.append("")  # Línea en blanco
+    lines.append("")
     return "\n".join(lines)
 
 
 def _format_module_summary(module: dict, index: int, version: str) -> str:
-    """Formatea un módulo de forma resumida (para alternativas)."""
+    """Format module summary (for alternatives)."""
     score = module.get("score", 0)
     summary = module.get("summary", module.get("description", ""))[:100]
     if len(summary) == 100:
@@ -398,168 +319,149 @@ def _format_module_summary(module: dict, index: int, version: str) -> str:
     repo_url = module.get("repo_url", f"https://github.com/OCA/{repo_name}")
     module_path = module.get("module_path", "").replace("/__manifest__.py", "")
     github_link = f"{repo_url}/tree/{version}/{module_path}"
-
     tech_name = module.get("technical_name", "unknown")
 
-    lines = [
-        f"{index}. **`{tech_name}`** (Score: {score}/100)",
-        f"   {summary}",
-        f"   📦 Repo: {repo_name} | [Ver en GitHub]({github_link})",
-        "",
-    ]
-    return "\n".join(lines)
+    return f"""{index}. **`{tech_name}`** (Score: {score}/100)
+   {summary}
+   📦 Repo: {repo_name} | [View on GitHub]({github_link})
+"""
 
 
 def _get_confidence_guidance(confidence: str) -> str:
-    """Genera guía contextual según el nivel de confianza."""
+    """Generate contextual guidance based on confidence level."""
+    if confidence == "HIGH":
+        return """### 💡 Additional Information
 
-    if confidence == "ALTA":
-        return """### 💡 Información Adicional
+The recommended modules are highly relevant to your search.
 
-Los módulos recomendados tienen alta relevancia para tu búsqueda.
+**To install an OCA module:**
+1. Clone the repository: `git clone https://github.com/OCA/<repo> -b <version>`
+2. Add the path to Odoo's `addons_path`
+3. Update the app list in Odoo
+4. Search and install the module
 
-**Para instalar un módulo OCA:**
-1. Clona el repositorio: `git clone https://github.com/OCA/<repo> -b <version>`
-2. Añade la ruta al `addons_path` de Odoo
-3. Actualiza la lista de aplicaciones en Odoo
-4. Busca e instala el módulo
-
-**O vía pip (si está disponible):**
+**Or via pip (if available):**
 ```
-pip install odoo-addon-<nombre_tecnico>
+pip install odoo-addon-<technical_name>
 ```
 """
+    elif confidence == "MEDIUM":
+        return """### 💡 Additional Information
 
-    elif confidence == "MEDIA":
-        return """### 💡 Información Adicional
+Results have moderate relevance. This may mean:
+- No module exactly covers your need
+- You may need to combine several modules
+- Consider adjusting your search with more context
 
-Los resultados tienen relevancia moderada. Puede que:
-- Ningún módulo cubra exactamente tu necesidad
-- Necesites combinar varios módulos
-- Debas ajustar tu búsqueda con más contexto
-
-**Recomendaciones:**
-- Revisa los módulos listados para ver cuál se ajusta mejor
-- Considera si necesitas funcionalidad adicional
-- Pregunta al usuario si alguno de estos módulos cubre su caso
+**Recommendations:**
+- Review listed modules to find the best fit
+- Consider if you need additional functionality
+- Ask the user if any of these modules cover their case
 """
+    else:
+        return """### 💡 Additional Information
 
-    else:  # BAJA o NINGUNA
-        return """### 💡 Información Adicional
+Results have low relevance. This may mean:
 
-Los resultados tienen baja relevancia. Esto puede significar:
+1. **No specific OCA module exists** for this functionality
+   → Consider developing a custom module
 
-1. **No existe módulo OCA específico** para esta funcionalidad
-   → Considera desarrollar un módulo custom
+2. **The functionality is in Odoo Enterprise**
+   → Some advanced features are only in the paid version
 
-2. **La funcionalidad está en Odoo Enterprise**
-   → Algunas features avanzadas solo están en la versión de pago
+3. **Different search terms**
+   → The functionality may exist under another name
 
-3. **Términos de búsqueda diferentes**
-   → La funcionalidad puede existir con otro nombre
-
-4. **Buscar en otros repositorios:**
+4. **Search in other repositories:**
    - [Odoo Apps Store](https://apps.odoo.com)
-   - GitHub búsqueda general de "odoo <funcionalidad>"
+   - GitHub general search for "odoo <functionality>"
 """
 
 
 def _get_llm_instructions(confidence: str) -> str:
-    """Genera instrucciones específicas para el LLM según la confianza."""
-
-    if confidence == "ALTA":
-        return """- **Recomienda** el módulo con mayor score directamente
-- **Explica** por qué es la mejor opción para el usuario
-- **Pregunta**: "¿Este módulo cubre lo que necesitas?"
-- Si el usuario confirma, ofrece ayuda con la instalación/configuración"""
-
-    elif confidence == "MEDIA":
-        return """- **Presenta** las opciones disponibles de forma clara
-- **Explica** las diferencias entre los módulos encontrados
-- **Pregunta**: "¿Cuál de estos módulos se ajusta mejor a tu caso?"
-- Si ninguno convence al usuario, **pide más detalles** sobre su necesidad"""
-
-    else:  # BAJA
-        return """- **Sé honesto**: menciona que no encontraste un resultado ideal
-- **Ofrece** los módulos encontrados como opciones parciales
-- **Pregunta**: "¿Podrías darme más detalles sobre lo que necesitas?"
-- **Sugiere** alternativas: desarrollo custom, Odoo Enterprise, otros repos"""
+    """Generate specific instructions for the LLM based on confidence."""
+    if confidence == "HIGH":
+        return """- **Recommend** the highest-scoring module directly
+- **Explain** why it's the best option for the user
+- **Ask**: "Does this module cover what you need?"
+- If user confirms, offer help with installation/configuration"""
+    elif confidence == "MEDIUM":
+        return """- **Present** available options clearly
+- **Explain** differences between found modules
+- **Ask**: "Which of these modules best fits your case?"
+- If none convinces the user, **ask for more details** about their need"""
+    else:
+        return """- **Be honest**: mention you didn't find an ideal result
+- **Offer** found modules as partial options
+- **Ask**: "Could you give me more details about what you need?"
+- **Suggest** alternatives: custom development, Odoo Enterprise, other repos"""
 
 
 def _format_no_results(query: str, version: str) -> str:
-    """Formatea respuesta cuando no hay resultados."""
-
-    return f"""# 🔍 Sin Resultados
+    """Format response when no results found."""
+    return f"""# 🔍 No Results
 
 **Query:** {query}
-**Versión Odoo:** {version}
+**Odoo Version:** {version}
 
-## 🔴 Confianza: NINGUNA
+## 🔴 Confidence: NONE
 
-No se encontraron módulos OCA que coincidan con tu búsqueda.
+No OCA modules found matching your search.
 
-### Esto puede significar:
+### This may mean:
 
-1. **No existe módulo OCA** para esta funcionalidad específica
-   - Considera desarrollar un módulo custom
-   - Busca en [Odoo Apps Store](https://apps.odoo.com)
+1. **No OCA module exists** for this specific functionality
+   - Consider developing a custom module
+   - Search on [Odoo Apps Store](https://apps.odoo.com)
 
-2. **Términos de búsqueda muy específicos o diferentes**
-   - Intenta con sinónimos o términos más generales
-   - Usa términos en inglés además de español
+2. **Search terms too specific or different**
+   - Try synonyms or more general terms
+   - Use English terms in addition to Spanish
 
-3. **La funcionalidad está en Odoo Enterprise**
-   - Algunas características solo están en la versión de pago
+3. **Functionality is in Odoo Enterprise**
+   - Some features are only in the paid version
 
-4. **Versión de Odoo sin soporte**
-   - Algunos módulos no están disponibles para todas las versiones
-   - Prueba con una versión diferente (16.0 o 17.0 tienen más módulos)
+4. **Odoo version not supported**
+   - Some modules aren't available for all versions
+   - Try a different version (16.0 or 17.0 have more modules)
 
-### Sugerencias:
+### Suggestions:
 
-- Prueba una búsqueda más amplia
-- Especifica mejor el dominio funcional
-- Revisa si hay un módulo base que puedas extender
+- Try a broader search
+- Better specify the functional domain
+- Check if there's a base module you can extend
 
 ---
 
-### 🤖 Instrucciones para el Asistente
+### 🤖 Assistant Instructions
 
-- **Pregunta** al usuario por más contexto sobre su necesidad
-- **Sugiere** búsquedas alternativas basadas en lo que entendiste
-- **Ofrece** ayuda para diseñar un módulo custom si es necesario
-- **NO inventes** módulos que no existen
+- **Ask** the user for more context about their need
+- **Suggest** alternative searches based on what you understood
+- **Offer** help designing a custom module if needed
+- **DO NOT invent** modules that don't exist
 """
 
 
-# ============================================================================
-# ENTRY POINT
-# ============================================================================
-
-# Configuración del servidor HTTP
+# HTTP server configuration
 MCP_HOST = os.getenv("MCP_HOST", "0.0.0.0")
 MCP_PORT = int(os.getenv("MCP_PORT", "8080"))
-MCP_PATH = os.getenv("MCP_PATH", "/mcp")
+MCP_PATH = os.getenv("MCP_PATH", "/")
 
 
 def main():
     """
-    Punto de entrada para el servidor MCP.
+    Entry point for MCP server.
 
-    Modos de ejecución:
-    - STDIO (default): Para Claude Desktop local
-      $ ai-odoofinder-mcp
+    Modes:
+    - STDIO (default): For Claude Desktop local
+    - HTTP (--http flag): For Claude Web, Zed, Cursor, and other remote clients
 
-    - HTTP: Para Claude Web, Zed, Cursor, y otros clientes remotos
-      $ ai-odoofinder-mcp --http
-      $ MCP_TRANSPORT=http ai-odoofinder-mcp
-
-    Variables de entorno:
-    - MCP_TRANSPORT: "stdio" (default) o "http"
-    - MCP_HOST: Host para HTTP (default: 0.0.0.0)
-    - MCP_PORT: Puerto para HTTP (default: 8080)
-    - MCP_PATH: Path del endpoint MCP (default: /mcp)
-    - AI_ODOOFINDER_API_URL: URL del backend API
+    Environment variables:
+    - MCP_TRANSPORT: "stdio" (default) or "http"
+    - MCP_HOST: Host for HTTP (default: 0.0.0.0)
+    - MCP_PORT: Port for HTTP (default: 8080)
+    - MCP_PATH: MCP endpoint path (default: /)
+    - AI_ODOOFINDER_API_URL: Backend API URL
     """
     import argparse
 
@@ -576,7 +478,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Determinar modo de transporte
     transport = os.getenv("MCP_TRANSPORT", "stdio")
     if args.http:
         transport = "http"
@@ -587,13 +488,8 @@ def main():
             f"(host={args.host}, port={args.port}, path={MCP_PATH})"
         )
         logger.info(f"Backend API: {API_BASE_URL}")
-        logger.info(f"MCP endpoint will be available at: http://{args.host}:{args.port}{MCP_PATH}")
-        mcp.run(
-            transport="http",
-            host=args.host,
-            port=args.port,
-            path=MCP_PATH,
-        )
+        logger.info(f"MCP endpoint: http://{args.host}:{args.port}{MCP_PATH}")
+        mcp.run(transport="http", host=args.host, port=args.port, path=MCP_PATH)
     else:
         logger.info(f"Starting AI-OdooFinder MCP Server in STDIO mode (API: {API_BASE_URL})")
         mcp.run()

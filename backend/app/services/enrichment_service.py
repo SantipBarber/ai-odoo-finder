@@ -1,7 +1,4 @@
-"""
-Enrichment Service - Generate AI descriptions, tags, and keywords for Odoo modules.
-Uses OpenRouter API with Grok-4-fast model.
-"""
+"""Enrichment Service - Generate AI descriptions, tags, and keywords for Odoo modules."""
 
 import json
 import time
@@ -13,7 +10,6 @@ from ..config import get_settings
 
 settings = get_settings()
 
-# Functional tags available for categorization
 FUNCTIONAL_TAGS = [
     "sales",
     "accounting",
@@ -67,22 +63,7 @@ class EnrichmentService:
         depends: List[str],
         repo_name: str,
     ) -> Optional[Dict]:
-        """
-        Generate AI enrichment for a single module.
-
-        Args:
-            technical_name: Module technical name (e.g., 'sale_order_line_discount')
-            name: Human-readable name
-            summary: Short summary from manifest
-            description: Full description from manifest
-            readme: README content (truncated)
-            depends: List of dependencies
-            repo_name: OCA repository name
-
-        Returns:
-            Dict with ai_description, functional_tags, keywords, or None on error
-        """
-        # Build context for the LLM
+        """Generate AI enrichment for a single module."""
         context_parts = [
             f"Technical name: {technical_name}",
             f"Name: {name}",
@@ -92,11 +73,9 @@ class EnrichmentService:
         if summary:
             context_parts.append(f"Summary: {summary}")
         if description:
-            # Limit description to avoid token overflow
             desc_preview = description[:1500] if len(description) > 1500 else description
             context_parts.append(f"Description: {desc_preview}")
         if readme:
-            # Limit README
             readme_preview = readme[:1000] if len(readme) > 1000 else readme
             context_parts.append(f"README excerpt: {readme_preview}")
         if depends:
@@ -117,7 +96,6 @@ Generate a JSON response with:
 Respond with ONLY valid JSON, no markdown, no explanation:
 {{"ai_description": "...", "functional_tags": ["...", "..."], "keywords": ["...", "..."]}}"""
 
-        # Call the API with retries
         for attempt in range(self.max_retries):
             try:
                 response = requests.post(
@@ -188,34 +166,29 @@ Respond with ONLY valid JSON, no markdown, no explanation:
         """Validate and sanitize enrichment result."""
         validated = {}
 
-        # ai_description
         ai_desc = result.get("ai_description", "")
         if isinstance(ai_desc, str) and len(ai_desc) > 10:
-            validated["ai_description"] = ai_desc[:2000]  # Limit length
+            validated["ai_description"] = ai_desc[:2000]
         else:
             validated["ai_description"] = None
 
-        # functional_tags
         tags = result.get("functional_tags", [])
         if isinstance(tags, list):
-            # Filter to valid tags only
             valid_tags = [
                 t.lower() for t in tags if isinstance(t, str) and t.lower() in FUNCTIONAL_TAGS
             ]
-            validated["functional_tags"] = valid_tags[:5]  # Max 5 tags
+            validated["functional_tags"] = valid_tags[:5]
         else:
             validated["functional_tags"] = []
 
-        # keywords
         keywords = result.get("keywords", [])
         if isinstance(keywords, list):
-            # Sanitize keywords
             valid_keywords = [
-                k.lower().strip()[:50]  # Lowercase, limit length
+                k.lower().strip()[:50]
                 for k in keywords
                 if isinstance(k, str) and len(k.strip()) > 2
             ]
-            validated["keywords"] = valid_keywords[:10]  # Max 10 keywords
+            validated["keywords"] = valid_keywords[:10]
         else:
             validated["keywords"] = []
 
@@ -224,11 +197,7 @@ Respond with ONLY valid JSON, no markdown, no explanation:
     def generate_fallback_enrichment(
         self, technical_name: str, name: str, summary: str, depends: List[str]
     ) -> Dict:
-        """
-        Generate basic enrichment without AI when API fails.
-        Uses heuristics based on module name and dependencies.
-        """
-        # Infer tags from technical name and dependencies
+        """Generate basic enrichment without AI when API fails (uses heuristics)."""
         tags = set()
         text = (technical_name + " " + (summary or "") + " " + " ".join(depends or [])).lower()
 
@@ -259,7 +228,6 @@ Respond with ONLY valid JSON, no markdown, no explanation:
         if not tags:
             tags.add("integration")
 
-        # Generate basic keywords from technical name
         keywords = set()
         for part in technical_name.split("_"):
             if len(part) > 3:
@@ -269,13 +237,12 @@ Respond with ONLY valid JSON, no markdown, no explanation:
                 keywords.add(word.lower())
 
         return {
-            "ai_description": None,  # No AI description in fallback
+            "ai_description": None,
             "functional_tags": list(tags)[:5],
             "keywords": list(keywords)[:10],
         }
 
 
-# Singleton
 _enrichment_service = None
 
 

@@ -10,26 +10,21 @@ from .database import get_db, init_db
 from .models import OdooModule
 from .services.search_service import get_search_service
 
-# Configurar logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
-# Lifespan para inicializar la base de datos
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    logger.info("Iniciando AI-OdooFinder API...")
+    logger.info("Starting AI-OdooFinder API...")
     init_db()
-    logger.info("Base de datos inicializada")
+    logger.info("Database initialized")
     yield
-    # Shutdown
-    logger.info("Apagando servidor...")
+    logger.info("Shutting down server...")
 
 
-# Crear app
 app = FastAPI(
     title="AI-OdooFinder API",
     description="Búsqueda inteligente de módulos de Odoo usando RAG híbrido",
@@ -39,7 +34,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS (permitir requests desde cualquier origen)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -51,7 +45,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    """Endpoint raíz"""
+    """Root endpoint."""
     return {
         "name": "AI-OdooFinder API",
         "version": "1.0.0",
@@ -72,9 +66,8 @@ async def root():
 
 @app.get("/health")
 async def health_check(db: Session = Depends(get_db)):
-    """Health check - verificar que la API y DB funcionan"""
+    """Health check - verify that API and DB are working."""
     try:
-        # Contar módulos en DB
         total_modules = db.query(OdooModule).count()
 
         return {"status": "healthy", "database": "connected", "total_modules": total_modules}
@@ -90,21 +83,21 @@ async def search_modules(
     version: str = Query(..., description="Versión de Odoo (16.0, 17.0, 18.0)"),
     dependencies: Optional[List[str]] = Query(None, description="Dependencias requeridas"),
     limit: int = Query(10, ge=1, le=50, description="Número máximo de resultados"),
-    min_score: int = Query(0, ge=0, le=100, description="Score mínimo (0-100)"),
+    min_score: int = Query(0, ge=0, le=100, description="Minimum score (0-100)"),
     db: Session = Depends(get_db),
 ):
     """
-    Búsqueda híbrida de módulos de Odoo.
+    Hybrid search for Odoo modules.
 
-    Acepta tanto GET como POST requests.
+    Accepts both GET and POST requests.
 
-    **Ejemplo:**
+    **Example:**
     ```
     GET /search?query=sales+subscriptions&version=17.0&limit=5
     POST /search?query=sales+subscriptions&version=17.0&limit=5
     ```
 
-    **Respuesta:**
+    **Response:**
     ```json
     {
       "query": "sales subscriptions",
@@ -123,16 +116,14 @@ async def search_modules(
     ```
     """
     try:
-        logger.info(f"Búsqueda: query='{query[:50]}...', version={version}, limit={limit}")
+        logger.info(f"Search: query='{query[:50]}...', version={version}, limit={limit}")
 
-        # Validar versión
         if version not in ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]:
             raise HTTPException(
                 status_code=400,
-                detail=f"Versión inválida. Use: 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 o 19.0",
+                detail=f"Invalid version. Use: 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 or 19.0",
             )
 
-        # Buscar
         search_service = get_search_service(db)
         results = search_service.search(
             query=query,
@@ -142,7 +133,7 @@ async def search_modules(
             min_score=min_score,
         )
 
-        logger.info(f"Retornando {len(results)} resultados")
+        logger.info(f"Returning {len(results)} results")
 
         return {
             "query": query,
@@ -155,16 +146,16 @@ async def search_modules(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error en búsqueda: {e}")
+        logger.error(f"Search error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/modules/{module_id}")
 async def get_module_detail(module_id: int, db: Session = Depends(get_db)):
     """
-    Obtener detalle completo de un módulo por ID.
+    Get complete module details by ID.
 
-    **Ejemplo:**
+    **Example:**
     ```
     GET /modules/123
     ```
@@ -173,7 +164,7 @@ async def get_module_detail(module_id: int, db: Session = Depends(get_db)):
         module = db.query(OdooModule).filter(OdooModule.id == module_id).first()
 
         if not module:
-            raise HTTPException(status_code=404, detail="Módulo no encontrado")
+            raise HTTPException(status_code=404, detail="Module not found")
 
         return {
             "id": module.id,
@@ -200,16 +191,16 @@ async def get_module_detail(module_id: int, db: Session = Depends(get_db)):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error obteniendo módulo {module_id}: {e}")
+        logger.error(f"Error getting module {module_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/stats")
 async def get_stats(db: Session = Depends(get_db)):
     """
-    Estadísticas generales de la base de datos.
+    General database statistics.
 
-    **Ejemplo:**
+    **Example:**
     ```
     GET /stats
     ```
@@ -217,14 +208,12 @@ async def get_stats(db: Session = Depends(get_db)):
     try:
         total = db.query(OdooModule).count()
 
-        # Por versión
         by_version = {}
         for version in ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]:
             count = db.query(OdooModule).filter(OdooModule.version == version).count()
             if count > 0:
                 by_version[version] = count
 
-        # Por repositorio (top 10)
         from sqlalchemy import func
 
         by_repo = (
@@ -242,7 +231,7 @@ async def get_stats(db: Session = Depends(get_db)):
         }
 
     except Exception as e:
-        logger.error(f"Error obteniendo estadísticas: {e}")
+        logger.error(f"Error getting statistics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

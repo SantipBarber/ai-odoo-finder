@@ -83,7 +83,7 @@ services:
       MCP_TRANSPORT: http
       MCP_HOST: "0.0.0.0"
       MCP_PORT: "8080"
-      MCP_PATH: /mcp
+      MCP_PATH: /
     ports:
       - "8080:8080"
     networks:

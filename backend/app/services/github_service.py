@@ -10,7 +10,7 @@ settings = get_settings()
 
 
 def _safe_ast_eval(node: ast.AST) -> Any:
-    """Evaluar nodos AST permitiendo solo estructuras de datos literales."""
+    """Safely evaluate AST nodes allowing only literal data structures."""
     if isinstance(node, ast.Constant):
         return node.value
     if isinstance(node, ast.List):
@@ -19,8 +19,7 @@ def _safe_ast_eval(node: ast.AST) -> Any:
         return tuple(_safe_ast_eval(elt) for elt in node.elts)
     if isinstance(node, ast.Dict):
         return {
-            _safe_ast_eval(key): _safe_ast_eval(value)
-            for key, value in zip(node.keys, node.values)
+            _safe_ast_eval(key): _safe_ast_eval(value) for key, value in zip(node.keys, node.values)
         }
     if isinstance(node, ast.Set):
         return {_safe_ast_eval(elt) for elt in node.elts}
@@ -29,14 +28,13 @@ def _safe_ast_eval(node: ast.AST) -> Any:
     if isinstance(node, ast.Name):
         if node.id in {"True", "False", "None"}:
             return eval(node.id)  # noqa: PGH001
-        raise ValueError(f"Nombre no permitido en manifest: {node.id}")
+        raise ValueError(f"Name not allowed in manifest: {node.id}")
     if isinstance(node, ast.Call):
-        # Soportar traducciones tipo _("texto")
         if isinstance(node.func, ast.Name) and node.func.id == "_":
             if node.args:
                 return _safe_ast_eval(node.args[0])
-        raise ValueError("Llamadas a funciones no permitidas en manifest")
-    raise ValueError(f"Tipo de nodo no soportado: {type(node).__name__}")
+        raise ValueError("Function calls not allowed in manifest")
+    raise ValueError(f"Unsupported node type: {type(node).__name__}")
 
 
 class GitHubService:
@@ -46,15 +44,7 @@ class GitHubService:
         self.base_url = "https://api.github.com"
 
     def get_repo_metadata(self, repo_name: str) -> Dict:
-        """
-        Obtener metadata de un repositorio.
-
-        Args:
-            repo_name: Nombre del repo (ej: "server-tools")
-
-        Returns:
-            Dict con stars, issues, última actualización
-        """
+        """Get repository metadata (stars, issues, last update)."""
         url = f"{self.base_url}/repos/OCA/{repo_name}"
         response = requests.get(url, headers=self.headers)
         response.raise_for_status()
@@ -65,19 +55,11 @@ class GitHubService:
             "stars": data.get("stargazers_count", 0),
             "open_issues": data.get("open_issues_count", 0),
             "last_push": data.get("pushed_at"),
-            "url": data.get("html_url")
+            "url": data.get("html_url"),
         }
 
     def list_versions(self, repo_name: str) -> List[str]:
-        """
-        Listar versiones de Odoo disponibles (branches).
-
-        Args:
-            repo_name: Nombre del repo
-
-        Returns:
-            Lista de versiones (ej: ["16.0", "17.0", "18.0"])
-        """
+        """List available Odoo versions (branches)."""
         url = f"{self.base_url}/repos/OCA/{repo_name}/branches"
         response = requests.get(url, headers=self.headers)
         response.raise_for_status()
@@ -86,67 +68,53 @@ class GitHubService:
 
         # Filtrar solo versiones de Odoo
         odoo_versions = [
-            b['name'] for b in branches
-            if b['name'] in ['14.0', '15.0', '16.0', '17.0', '18.0']
+            b["name"] for b in branches if b["name"] in ["14.0", "15.0", "16.0", "17.0", "18.0"]
         ]
 
         return sorted(odoo_versions)
 
     def get_all_oca_repos(self, min_stars: int = 0) -> List[str]:
-        """
-        Obtener todos los repositorios activos de la organización OCA.
-
-        Args:
-            min_stars: Mínimo de estrellas para incluir el repo (filtro de calidad)
-
-        Returns:
-            Lista de nombres de repositorios activos
-        """
+        """Get all active repositories from OCA organization."""
         all_repos = []
         page = 1
         per_page = 100
 
-        print("🔍 Descubriendo repositorios de OCA...")
+        print("Discovering OCA repositories...")
 
         while True:
             url = f"{self.base_url}/orgs/OCA/repos"
-            params = {
-                "page": page,
-                "per_page": per_page,
-                "type": "public",
-                "sort": "updated"
-            }
+            params = {"page": page, "per_page": per_page, "type": "public", "sort": "updated"}
 
             response = requests.get(url, headers=self.headers, params=params)
             response.raise_for_status()
 
             repos = response.json()
 
-            # Si no hay más repos, terminar
             if not repos:
                 break
 
-            # Filtrar repos
             for repo in repos:
-                # Skip archivados, forks, y repos de infraestructura
                 if repo.get("archived", False):
                     continue
                 if repo.get("fork", False):
                     continue
 
-                # Filtrar por estrellas mínimas
                 stars = repo.get("stargazers_count", 0)
                 if stars < min_stars:
                     continue
 
-                # Filtrar repos de infraestructura (no contienen módulos)
                 repo_name = repo["name"]
                 infrastructure_repos = [
-                    "maintainer-tools", "maintainer-quality-tools",
-                    "odoo-pre-commit-hooks", "pylint-odoo",
-                    "github-organization-project", "oca-custom",
-                    "OpenUpgrade", "runbot-addons",
-                    "odoo-community.org", "OCB"
+                    "maintainer-tools",
+                    "maintainer-quality-tools",
+                    "odoo-pre-commit-hooks",
+                    "pylint-odoo",
+                    "github-organization-project",
+                    "oca-custom",
+                    "OpenUpgrade",
+                    "runbot-addons",
+                    "odoo-community.org",
+                    "OCB",
                 ]
 
                 if repo_name in infrastructure_repos:
@@ -154,55 +122,34 @@ class GitHubService:
 
                 all_repos.append(repo_name)
 
-            print(f"   Página {page}: {len(repos)} repos ({len(all_repos)} válidos acumulados)")
+            print(f"   Page {page}: {len(repos)} repos ({len(all_repos)} valid accumulated)")
             page += 1
 
-            # Protección: máximo 500 repos
             if len(all_repos) >= 500:
-                print("   ⚠️  Alcanzado límite de 500 repos")
+                print("   Reached 500 repos limit")
                 break
 
-        print(f"✅ Encontrados {len(all_repos)} repositorios activos de OCA\n")
+        print(f"Found {len(all_repos)} active OCA repositories\n")
         return all_repos
 
     def find_manifests(self, repo_name: str, version: str) -> List[str]:
-        """
-        Encontrar todos los __manifest__.py en un repo/versión.
-
-        Args:
-            repo_name: Nombre del repo
-            version: Versión de Odoo (ej: "17.0")
-
-        Returns:
-            Lista de paths a manifests (ej: ["module_name/__manifest__.py"])
-        """
+        """Find all __manifest__.py files in a repo/version."""
         url = f"{self.base_url}/repos/OCA/{repo_name}/git/trees/{version}?recursive=1"
         response = requests.get(url, headers=self.headers)
 
         if response.status_code != 200:
             return []
 
-        tree = response.json().get('tree', [])
+        tree = response.json().get("tree", [])
 
-        manifests = [
-            item['path'] for item in tree
-            if item['path'].endswith('__manifest__.py')
-        ]
+        manifests = [item["path"] for item in tree if item["path"].endswith("__manifest__.py")]
 
         return manifests
 
-    def get_manifest_content(self, repo_name: str, version: str, manifest_path: str) -> Optional[Dict]:
-        """
-        Obtener y parsear el contenido de un __manifest__.py
-
-        Args:
-            repo_name: Nombre del repo
-            version: Versión de Odoo
-            manifest_path: Path al manifest (ej: "module_name/__manifest__.py")
-
-        Returns:
-            Dict con el contenido del manifest parseado
-        """
+    def get_manifest_content(
+        self, repo_name: str, version: str, manifest_path: str
+    ) -> Optional[Dict]:
+        """Get and parse __manifest__.py content."""
         url = f"{self.base_url}/repos/OCA/{repo_name}/contents/{manifest_path}?ref={version}"
         response = requests.get(url, headers=self.headers)
 
@@ -211,10 +158,8 @@ class GitHubService:
 
         data = response.json()
 
-        # Decodificar contenido (está en base64)
-        content = base64.b64decode(data['content']).decode('utf-8')
+        content = base64.b64decode(data["content"]).decode("utf-8")
 
-        # Parsear el manifest (es código Python)
         try:
             tree = ast.parse(content)
 
@@ -225,7 +170,6 @@ class GitHubService:
                     except Exception:
                         continue
 
-            # Fallback: primer dict literal encontrado
             for node in ast.walk(tree):
                 if isinstance(node, ast.Dict):
                     try:
@@ -233,28 +177,20 @@ class GitHubService:
                     except Exception:
                         continue
         except Exception as e:
-            print(f"❌ Error parseando {manifest_path}: {e}")
+            print(f"Error parsing {manifest_path}: {e}")
             return None
 
         return None
 
     def get_readme_content(self, repo_name: str, version: str, module_path: str) -> Optional[str]:
-        """
-        Obtener el contenido del README de un módulo.
+        """Get README content for a module."""
+        module_dir = (
+            module_path.rsplit("/", 1)[0]
+            if "/" in module_path
+            else module_path.replace("__manifest__.py", "")
+        )
 
-        Args:
-            repo_name: Nombre del repo
-            version: Versión de Odoo
-            module_path: Path al módulo (ej: "sale_order_type/__manifest__.py")
-
-        Returns:
-            Contenido del README como string, o None si no existe
-        """
-        # Extraer el directorio del módulo
-        module_dir = module_path.rsplit('/', 1)[0] if '/' in module_path else module_path.replace('__manifest__.py', '')
-
-        # Probar diferentes nombres de README
-        readme_names = ['README.md', 'README.rst', 'README.MD', 'README.RST', 'readme.md']
+        readme_names = ["README.md", "README.rst", "README.MD", "README.RST", "readme.md"]
 
         for readme_name in readme_names:
             readme_path = f"{module_dir}/{readme_name}"
@@ -265,8 +201,7 @@ class GitHubService:
 
                 if response.status_code == 200:
                     data = response.json()
-                    # Decodificar contenido (está en base64)
-                    content = base64.b64decode(data['content']).decode('utf-8', errors='ignore')
+                    content = base64.b64decode(data["content"]).decode("utf-8", errors="ignore")
                     return content
             except Exception:
                 continue
@@ -274,7 +209,6 @@ class GitHubService:
         return None
 
 
-# Singleton
 _github_service = None
 
 
@@ -283,5 +217,3 @@ def get_github_service() -> GitHubService:
     if _github_service is None:
         _github_service = GitHubService()
     return _github_service
-
-

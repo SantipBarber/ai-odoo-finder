@@ -6,35 +6,25 @@ from .models import Base
 
 settings = get_settings()
 
-# Force psycopg3 driver by replacing postgresql:// with postgresql+psycopg://
 database_url = settings.database_url
 if database_url.startswith("postgresql://"):
     database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
-# Crear engine
-engine = create_engine(
-    database_url,
-    pool_pre_ping=True,  # Verificar conexión antes de usar
-    pool_recycle=3600,   # Reciclar conexiones cada hora
-    echo=False           # True para debug SQL
-)
+engine = create_engine(database_url, pool_pre_ping=True, pool_recycle=3600, echo=False)
 
-# Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db():
-    """Crear todas las tablas"""
+    """Create all database tables."""
     Base.metadata.create_all(bind=engine)
-    print("✅ Base de datos inicializada")
+    print("Database initialized")
 
 
 def get_db():
-    """Dependency para obtener sesión de DB"""
+    """Get database session dependency."""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-
-
