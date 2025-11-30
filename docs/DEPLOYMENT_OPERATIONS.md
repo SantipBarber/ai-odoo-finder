@@ -29,11 +29,11 @@ Self-hosted solution on Hetzner VPS with Docker. Previously used Neon (PostgreSQ
 
 | Item | Value |
 |------|-------|
-| **Public URL** | `https://strategy-orchestrator-prod.tailf7d690.ts.net` |
-| **Provider** | Hetzner (exposed via Tailscale Funnel) |
-| **Architecture** | ARM64 (aarch64) |
-| **OS** | Ubuntu 22.04.5 LTS |
-| **Resources** | 2 vCPU, 3.7GB RAM, 38GB disk |
+| **Public URL** | `https://<your-server>.ts.net` |
+| **Provider** | VPS (exposed via Tailscale Funnel) |
+| **Architecture** | ARM64 or x86_64 |
+| **OS** | Ubuntu 22.04+ LTS |
+| **Recommended Resources** | 2 vCPU, 4GB RAM, 40GB disk |
 | **Project Path** | `/opt/ai-odoo-finder` |
 
 ## Services
@@ -147,10 +147,10 @@ This shows: Docker containers, API health, database stats, disk usage.
 
 ```bash
 # Via Tailscale (recommended)
-ssh root@strategy-orchestrator-prod
+ssh user@<your-server-name>
 
 # Or via Tailscale IP
-ssh root@100.113.121.87
+ssh user@<tailscale-ip>
 
 cd /opt/ai-odoo-finder
 ```
@@ -356,7 +356,7 @@ Configure in Claude Desktop:
       "command": "uvx",
       "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+        "AI_ODOOFINDER_API_URL": "https://<your-server>.ts.net"
       }
     }
   }
