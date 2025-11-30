@@ -34,7 +34,7 @@ MIN_STARS = 0  # Mínimo de estrellas en GitHub
 
 # Lista manual (solo si AUTO_DISCOVER_REPOS=False)
 TARGET_REPOS: List[str] = [
-    "server-tools",  # Repo con módulos variados para probar
+    "iot",  # TEMP: Repo pequeño (1 módulo) para probar enrichment
 ]
 
 # Versiones de Odoo a procesar
