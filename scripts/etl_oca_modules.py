@@ -65,6 +65,11 @@ RATE_LIMIT_DELAY = 0.5
 # Enrichment con IA
 ENABLE_ENRICHMENT = True  # Si False, solo usa fallback heurístico
 
+# Optimización de repos
+# True: Salta repos que ya tienen algún módulo (rápido para carga inicial)
+# False: Verifica cada módulo individualmente (detecta módulos nuevos en repos existentes)
+SKIP_INDEXED_REPOS = False  # Recomendado para mantenimiento regular
+
 # Reintentos para errores de BD
 MAX_DB_RETRIES = 3
 DB_RETRY_DELAY = 5  # segundos
@@ -545,8 +550,7 @@ def main() -> None:
 
         # OPTIMIZACIÓN: Obtener repos ya indexados para saltarlos
         # NOTA: Esta optimización salta repos completos, pero no detecta módulos individuales faltantes
-        # Para re-procesar módulos borrados, usar SKIP_INDEXED_REPOS = False
-        SKIP_INDEXED_REPOS = True  # Optimización: salta repos ya indexados completamente
+        # Para añadir versiones nuevas a repos existentes, cambiar SKIP_INDEXED_REPOS = False en config
 
         if SKIP_INDEXED_REPOS:
             indexed_repos = get_fully_indexed_repos(db)
