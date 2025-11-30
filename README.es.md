@@ -2,7 +2,7 @@
 
 > **Encuentra el modulo de Odoo perfecto con IA en segundos.**
 
-Un servidor MCP (Model Context Protocol) que permite a Claude buscar modulos de Odoo en los repositorios de OCA usando busqueda hibrida (semantica + full-text).
+Un servidor MCP (Model Context Protocol) que permite a los LLMs buscar modulos de Odoo en los repositorios de OCA usando busqueda hibrida (semantica + full-text).
 
 <div align="center">
 
@@ -250,8 +250,9 @@ curl https://strategy-orchestrator-prod.tailf7d690.ts.net/stats
 ## Documentacion
 
 - [Deployment & Operations](docs/DEPLOYMENT_OPERATIONS.md) - Guia de despliegue y operaciones
-- [MCP Design](docs/MCP_DESIGN.md) - Diseno del servidor MCP
+- [Project History](docs/PROJECT_HISTORY.md) - Evolucion de la arquitectura del proyecto
 - [Changelog](docs/CHANGELOG.md) - Historial de cambios
+- [MCP Server README](mcp-server/README.md) - Instalacion y configuracion del servidor MCP
 
 ---
 

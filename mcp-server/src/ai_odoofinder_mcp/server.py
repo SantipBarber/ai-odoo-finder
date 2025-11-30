@@ -1,8 +1,9 @@
 """
 AI-OdooFinder MCP Server
 
-MCP (Model Context Protocol) server for semantic search of Odoo modules
-in the OCA ecosystem. Supports both STDIO (local) and HTTP (remote) transport.
+MCP (Model Context Protocol) server that enables LLMs to search Odoo modules
+in the OCA ecosystem using hybrid search (semantic + full-text).
+Supports both STDIO (local) and HTTP (remote) transport.
 """
 
 import logging
