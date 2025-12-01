@@ -99,38 +99,18 @@ Como desarrollador de Odoo:
 
 ## Instalacion
 
-AI-OdooFinder soporta multiples plataformas. Elige la que uses:
-
-### Claude.ai Web (Remote MCP)
-
-Conecta directamente desde Claude.ai sin instalar nada:
-
-1. Ve a **Claude.ai** > **Settings** > **Conectores**
-2. Click en **"Anadir conector personalizado"**
-3. Introduce la URL del servidor MCP:
-   ```
-   https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
-   ```
-4. Guarda y empieza a buscar modulos
-
-> **Nota**: El servidor es publico y no requiere autenticacion.
-
----
-
-### Claude Desktop (Local MCP)
-
-Para usar con Claude Desktop en tu maquina:
-
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-**Linux**: `~/.config/claude/claude_desktop_config.json`
+Añade la siguiente configuración a tu cliente MCP:
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -139,13 +119,63 @@ Para usar con Claude Desktop en tu maquina:
 }
 ```
 
-Reinicia Claude Desktop y pregunta sobre modulos de Odoo.
+> **Nota**: Requiere el gestor de paquetes [uv](https://docs.astral.sh/uv/) instalado.
 
----
+### Configuración por IDE/Cliente
 
-### Zed Editor
+<details>
+<summary><b>Claude Desktop</b></summary>
 
-Configura en `~/.config/zed/settings.json`:
+Añade a `claude_desktop_config.json`:
+
+**Ubicación del archivo:**
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/claude/claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+Reinicia Claude Desktop.
+
+</details>
+
+<details>
+<summary><b>Claude.ai Web (Remoto)</b></summary>
+
+Sin instalación requerida. Conéctate directamente:
+
+1. Ve a **Claude.ai** > **Settings** > **Conectores**
+2. Haz clic en **"Añadir conector personalizado"**
+3. Introduce la URL del servidor MCP:
+   ```
+   https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
+   ```
+4. Guarda y empieza a buscar
+
+> **Protocolo**: Streamable HTTP (especificación MCP 2024-11-05)
+
+</details>
+
+<details>
+<summary><b>Zed</b></summary>
+
+Añade a `~/.config/zed/settings.json`:
 
 ```json
 {
@@ -153,7 +183,11 @@ Configura en `~/.config/zed/settings.json`:
     "ai-odoofinder": {
       "command": {
         "path": "uvx",
-        "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+        "args": [
+          "--from",
+          "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+          "ai-odoofinder-mcp"
+        ],
         "env": {
           "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
         }
@@ -163,18 +197,23 @@ Configura en `~/.config/zed/settings.json`:
 }
 ```
 
----
+</details>
 
-### Cursor
+<details>
+<summary><b>Cursor</b></summary>
 
-Configura en `.cursor/mcp.json` (proyecto) o `~/.cursor/mcp.json` (global):
+Añade a `.cursor/mcp.json` (proyecto) o `~/.cursor/mcp.json` (global):
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -183,19 +222,89 @@ Configura en `.cursor/mcp.json` (proyecto) o `~/.cursor/mcp.json` (global):
 }
 ```
 
----
+</details>
 
-### Otros Clientes MCP (Remote HTTP)
+<details>
+<summary><b>Antigravity</b></summary>
 
-Para cualquier cliente que soporte MCP remoto via HTTP/SSE:
+Añade a tu archivo de configuración MCP de Antigravity:
 
-**URL del servidor MCP:**
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+**Solución de problemas en Windows**: Si no encuentra `uvx`, usa la ruta completa:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "C:\\Users\\TU_USUARIO\\.cargo\\bin\\uvx.exe",
+      "args": [ /* mismo que arriba */ ]
+    }
+  }
+}
+```
+
+> **Nota**: Antigravity usa el protocolo SSE. Las conexiones remotas pueden fallar debido a nuestra implementación de Streamable HTTP. Usa modo local.
+
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Añade a tu configuración MCP de Windsurf:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Otros Clientes MCP</b></summary>
+
+Para cualquier cliente compatible con MCP:
+
+**Modo local (STDIO)**: Usa la configuración mostrada arriba
+
+**Modo remoto (HTTP/SSE)**: Usa la URL del servidor:
 ```
 https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
 ```
 
-**Protocolo**: Streamable HTTP (MCP spec 2024-11-05)
-**Autenticacion**: Ninguna (servidor publico)
+**Protocolo**: Streamable HTTP (especificación MCP 2024-11-05)  
+**Autenticación**: Ninguna (servidor público)
+
+</details>
 
 ---
 
