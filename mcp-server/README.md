@@ -4,161 +4,261 @@
 
 MCP (Model Context Protocol) server for semantic search of Odoo modules in the OCA ecosystem.
 
-## Requirements
+## Getting Started
 
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/) (recommended package manager)
-- Claude Desktop installed (for local usage)
-
-## Installation
-
-### Step 1: Verify that `uv` is installed
-
-```bash
-# Install uv if you don't have it
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Verify installation
-uv --version
-```
-
-### Step 2: Install MCP server dependencies
-
-```bash
-cd <your-path>/ai-odoo-finder/mcp-server
-uv sync
-```
-
-### Step 3: Configure Claude Desktop
-
-Open the Claude Desktop configuration file:
-
-**macOS:**
-```bash
-open ~/Library/Application\ Support/Claude/claude_desktop_config.json
-```
-
-**Windows:**
-```
-%APPDATA%\Claude\claude_desktop_config.json
-```
-
-If the file doesn't exist, create it.
-
-### Step 4: Add the MCP server configuration
-
-Add (or modify) the content of `claude_desktop_config.json`:
+Add the following config to your MCP client:
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "--directory",
-        "<your-path>/ai-odoo-finder/mcp-server",
-        "run",
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
         "ai-odoofinder-mcp"
       ],
       "env": {
-        "AI_ODOOFINDER_API_URL": "http://localhost:8989"
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
     }
   }
 }
 ```
 
-> **IMPORTANT:** Use the **absolute path** to your `mcp-server` directory.
+> **Note**: Requires [uv](https://docs.astral.sh/uv/) package manager installed.
 
-### Step 5: Configure the API URL (optional)
+---
 
-By default, the MCP server connects to `http://localhost:8989`.
+## MCP Client Configuration
 
-If your API is elsewhere (e.g., remote server), modify the environment variable:
+<details>
+<summary><b>Claude Desktop</b></summary>
+
+Add to `claude_desktop_config.json`:
+
+**File locations:**
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "--directory",
-        "<your-path>/ai-odoo-finder/mcp-server",
-        "run",
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
         "ai-odoofinder-mcp"
       ],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://<your-server>.ts.net"
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
     }
   }
 }
 ```
 
-### Step 6: Restart Claude Desktop
+Restart Claude Desktop.
 
-**IMPORTANT:** You must close Claude Desktop completely and reopen it.
+</details>
 
-- **macOS:** `Cmd+Q` (not just close the window)
-- **Windows:** Close from the system tray
+<details>
+<summary><b>Claude.ai Web (Remote)</b></summary>
 
-### Step 7: Verify the installation
+No installation required. Connect directly:
 
-1. Open Claude Desktop
-2. Look for the tools icon in the bottom right corner
-3. You should see **"ai-odoofinder"** with the `search_odoo_modules` tool
+1. Go to **Claude.ai** > **Settings** > **Connectors**
+2. Click **"Add custom connector"**
+3. Enter the MCP server URL:
+   ```
+   https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
+   ```
+4. Save and start searching
 
-## Testing the server
+> **Protocol**: Streamable HTTP (MCP spec 2024-11-05)
 
-### Basic test in Claude Desktop
+</details>
 
-Type in Claude:
+<details>
+<summary><b>Zed</b></summary>
+
+Add to `~/.config/zed/settings.json`:
+
+```json
+{
+  "context_servers": {
+    "ai-odoofinder": {
+      "command": {
+        "path": "uvx",
+        "args": [
+          "--from",
+          "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+          "ai-odoofinder-mcp"
+        ],
+        "env": {
+          "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+        }
+      }
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Antigravity</b></summary>
+
+Add to your Antigravity MCP configuration file:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+**Windows troubleshooting**: If `uvx` is not found, use the full path:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "C:\\Users\\YOUR_USER\\.cargo\\bin\\uvx.exe",
+      "args": [ /* same as above */ ]
+    }
+  }
+}
+```
+
+> **Note**: Antigravity uses SSE protocol. Remote connections may fail due to our Streamable HTTP implementation. Use local mode.
+
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Add to your Windsurf MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Other MCP Clients</b></summary>
+
+For any MCP-compatible client:
+
+**Local mode (STDIO)**: Use the configuration shown in "Getting Started"
+
+**Remote mode (HTTP/SSE)**: Use the server URL:
+```
+https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
+```
+
+**Protocol**: Streamable HTTP (MCP spec 2024-11-05)  
+**Authentication**: None (public server)
+
+</details>
+
+---
+
+## Your First Prompt
+
+Enter the following prompt in your MCP client to check if everything is working:
 
 ```
-Are there electronic invoicing modules for Spain in Odoo 16?
+I need a module for Odoo 17 that handles recurring payments
 ```
 
-Claude should automatically use the `search_odoo_modules` tool.
+The MCP server should search and return relevant modules like `contract` or `subscription_oca`.
 
-### Manual test (without Claude)
+> **Note**: The MCP server connects to the remote API automatically. No additional setup required.
 
-```bash
-cd <your-path>/ai-odoo-finder/mcp-server
-uv run ai-odoofinder-mcp
-```
+---
 
-The server will start and wait for JSON-RPC connections via stdin/stdout.
+## Features
 
-## Troubleshooting
+- **Hybrid Search**: Combines semantic search (embeddings) with BM25 full-text
+- **Version Filtering**: Only shows compatible modules (Odoo 10.0 to 19.0)
+- **AI Enrichment**: Descriptions, tags, and keywords generated by Grok-4-fast
+- **16,494 modules** indexed from OCA repositories
 
-### The server doesn't appear in Claude Desktop
+---
 
-1. **Verify the path:** Must be absolute (starts with `/` on macOS/Linux or drive letter on Windows)
-2. **Verify that `uv` is in PATH:**
-   ```bash
-   which uv
-   ```
-3. **Check Claude logs:**
-   ```bash
-   tail -f ~/Library/Logs/Claude/mcp*.log
-   ```
-4. **Restart Claude completely** (Cmd+Q, not just close window)
+## Intelligent Search Flow
 
-### "Connection refused" or timeout error
+The server implements an intelligent search flow:
 
-1. **Verify the API is running:**
-   ```bash
-   curl http://localhost:8989/api/v1/search \
-     -H "Content-Type: application/json" \
-     -d '{"query": "test", "version": "16.0"}'
-   ```
+1. **Clarification**: The LLM asks for clarifications if the query is generic
+2. **Expansion**: The LLM expands the query with ES/EN synonyms
+3. **Structured response**: Results with confidence levels (HIGH/MEDIUM/LOW)
+4. **Confirmation**: The LLM confirms with the user if it found what they were looking for
 
-2. **Increase timeout:** Modify `AI_ODOOFINDER_API_TIMEOUT` in environment variables
+---
 
-### "corrupted JSON-RPC" error
+## Environment Variables
 
-This occurs if there's `print()` in the code that writes to stdout.
-The MCP server must use only `logging` (which writes to stderr).
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AI_ODOOFINDER_API_URL` | `http://localhost:8989` | Backend API URL |
+| `AI_ODOOFINDER_API_TIMEOUT` | `60` | API timeout in seconds |
+
+---
 
 ## Project Structure
 
@@ -172,25 +272,40 @@ mcp-server/
         └── server.py        # Main MCP server
 ```
 
-## Environment Variables
+---
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `AI_ODOOFINDER_API_URL` | `http://localhost:8989` | Backend API URL |
-| `AI_ODOOFINDER_API_TIMEOUT` | `60` | API timeout in seconds |
+## Troubleshooting
 
-## Intelligent Search Flow
+### The server doesn't appear in the MCP client
 
-The server implements the intelligent flow according to SPEC-602:
+1. **Verify that `uv` is installed:**
+   ```bash
+   uv --version
+   ```
 
-1. **Clarification:** The LLM asks for clarifications if the query is generic
-2. **Expansion:** The LLM expands the query with ES/EN synonyms
-3. **Structured response:** Results with confidence levels (HIGH/MEDIUM/LOW)
-4. **Confirmation:** The LLM confirms with the user if it found what they were looking for
+2. **Check MCP client logs** for error messages
+
+3. **Restart the MCP client completely** (not just close the window)
+
+### "Connection refused" or timeout error
+
+1. **Verify the API is running:**
+   ```bash
+   curl https://strategy-orchestrator-prod.tailf7d690.ts.net/health
+   ```
+
+2. **Increase timeout**: Set `AI_ODOOFINDER_API_TIMEOUT` to a higher value (e.g., `120`)
+
+### "uvx not found" error
+
+- **Make sure `uv` is in PATH**: Run `which uv` (Unix) or `where uv` (Windows)
+- **Use full path**: If `uv` is not in PATH, use the absolute path in the config
+
+---
 
 ## Useful Links
 
-- [MCP Documentation](https://modelcontextprotocol.io/)
-- [FastMCP](https://github.com/jlowin/fastmcp)
-- [AI-OdooFinder](https://github.com/SantipBarber/ai-odoo-finder)
+- [Main Project](https://github.com/SantipBarber/ai-odoo-finder)
 - [CHANGELOG](../docs/en/CHANGELOG.md)
+- [MCP Protocol Documentation](https://modelcontextprotocol.io/)
+- [FastMCP](https://github.com/jlowin/fastmcp)
