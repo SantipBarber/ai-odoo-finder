@@ -12,7 +12,7 @@ Un servidor MCP (Model Context Protocol) que permite a los LLMs buscar modulos d
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![Odoo](https://img.shields.io/badge/Odoo-10.0%20to%2019.0-714B67)](https://www.odoo.com)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io/)
-[![DeepWiki badge](https://deepwiki.com/badge-maker?url=https%3A%2F%2Fdeepwiki.com%2FSantipBarber%2Fai-odoo-finder)](https://deepwiki.com/badge-maker?url=https%3A%2F%2Fdeepwiki.com%2FSantipBarber%2Fai-odoo-finder)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/SantipBarber/ai-odoo-finder)
 
 **Idioma**: [English](README.md) | [Español](README.es.md)
 
