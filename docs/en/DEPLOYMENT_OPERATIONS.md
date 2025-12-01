@@ -365,6 +365,52 @@ Configure in Claude Desktop:
 }
 ```
 
+## Scheduled ETL
+
+The ETL process runs automatically via cron job on the server to keep the module index updated.
+
+### Cron Configuration
+
+The ETL runs daily at 3 AM UTC. To configure:
+
+```bash
+# Edit crontab
+crontab -e
+
+# Add this line:
+0 3 * * * /opt/ai-odoo-finder/scripts/cron_etl.sh >> /var/log/ai-odoofinder-etl.log 2>&1
+```
+
+### Manual Execution
+
+```bash
+# Run ETL manually
+/opt/ai-odoo-finder/scripts/cron_etl.sh
+
+# Or directly with uv
+cd /opt/ai-odoo-finder
+uv run python scripts/etl_oca_modules.py
+```
+
+### ETL Logs
+
+```bash
+# View ETL logs
+tail -f /var/log/ai-odoofinder-etl.log
+
+# View last 100 lines
+tail -100 /var/log/ai-odoofinder-etl.log
+```
+
+### ETL Features
+
+- **Incremental updates**: Only processes new/changed modules
+- **Checkpoints**: Can be interrupted and resumed
+- **AI Enrichment**: Generates descriptions, tags, and keywords with Grok-4-fast
+- **Embeddings**: Creates vectors with Qwen3-Embedding-4B
+
+---
+
 ## Migration History
 
 | Date | Action | Details |
