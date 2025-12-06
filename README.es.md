@@ -157,6 +157,51 @@ Reinicia Claude Desktop.
 </details>
 
 <details>
+<summary><b>Claude Code CLI</b></summary>
+
+**¡NUEVO!** Usa Claude directamente desde tu terminal.
+
+Instala Claude Code:
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Añade el servidor MCP:
+```bash
+# Configuración interactiva
+claude mcp add
+
+# O edita ~/.claude.json directamente
+```
+
+Configuración (`~/.claude.json`):
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+Uso:
+```bash
+claude
+> Necesito un módulo de Odoo 17 para suscripciones
+```
+
+</details>
+
+<details>
 <summary><b>Claude.ai Web (Remoto)</b></summary>
 
 Sin instalación requerida. Conéctate directamente:
@@ -170,6 +215,103 @@ Sin instalación requerida. Conéctate directamente:
 4. Guarda y empieza a buscar
 
 > **Protocolo**: Streamable HTTP (especificación MCP 2024-11-05)
+
+</details>
+
+<details>
+<summary><b>ChatGPT Developer Mode</b></summary>
+
+**¡NUEVO!** OpenAI añadió soporte completo MCP en septiembre de 2025.
+
+**Requisitos:**
+- Suscripción a ChatGPT Plus/Pro/Team
+- Developer Mode habilitado (beta)
+
+**Configuración:**
+1. Ve a **ChatGPT Settings** > **Beta Features**
+2. Habilita **"Developer Mode"**
+3. Navega a **Integrations** > **MCP Servers**
+4. Añade el servidor:
+   - **Remoto (más fácil)**: `https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp`
+   - **Local**: Usa la configuración con uvx (ver documentación completa)
+
+**Uso:**
+```
+Usa ai-odoofinder para buscar módulos de Odoo 17 para inventario
+```
+
+> **Nota**: Soporta operaciones de lectura y escritura (no solo lectura).
+
+</details>
+
+<details>
+<summary><b>VSCode Copilot</b></summary>
+
+**¡NUEVO!** GitHub Copilot soporta MCP (GA desde julio de 2025).
+
+**Requisitos:**
+- VSCode 1.102+
+- Suscripción a GitHub Copilot
+- Política MCP habilitada (solo Business/Enterprise)
+
+**Configuración:**
+
+Crea `.vscode/mcp.json` (proyecto) o `~/.config/Code/User/mcp.json` (global):
+
+```json
+{
+  "servers": {
+    "ai-odoofinder": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+Recarga VSCode (`Ctrl/Cmd + Shift + P` → "Reload Window").
+
+**Uso:**
+```
+@workspace Encuentra un módulo de Odoo para contabilidad
+```
+
+> **Para Business/Enterprise**: El administrador debe habilitar la política "MCP servers in Copilot".
+
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+Añade a `.cursor/mcp.json` (proyecto) o `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+Reinicia Cursor.
 
 </details>
 
@@ -198,70 +340,7 @@ Añade a `~/.config/zed/settings.json`:
 }
 ```
 
-</details>
-
-<details>
-<summary><b>Cursor</b></summary>
-
-Añade a `.cursor/mcp.json` (proyecto) o `~/.cursor/mcp.json` (global):
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><b>Antigravity</b></summary>
-
-Añade a tu archivo de configuración MCP de Antigravity:
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
-```
-
-**Solución de problemas en Windows**: Si no encuentra `uvx`, usa la ruta completa:
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "C:\\Users\\TU_USUARIO\\.cargo\\bin\\uvx.exe",
-      "args": [ /* mismo que arriba */ ]
-    }
-  }
-}
-```
-
-> **Nota**: Antigravity usa el protocolo SSE. Las conexiones remotas pueden fallar debido a nuestra implementación de Streamable HTTP. Usa modo local.
+Reinicia Zed.
 
 </details>
 
@@ -288,6 +367,67 @@ Añade a tu configuración MCP de Windsurf:
 }
 ```
 
+Reinicia Windsurf.
+
+</details>
+
+<details>
+<summary><b>Antigravity</b></summary>
+
+⚠️ **Problemas Conocidos**: Antigravity tiene problemas de compatibilidad con `uvx` y conexiones MCP remotas.
+
+**Solución 1: Usar npx (Recomendado)**
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@SantipBarber/ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+**Solución 2: Usar ruta completa a uvx (Windows)**
+
+Encuentra la ruta de uvx:
+```bash
+where uvx  # Windows
+which uvx  # macOS/Linux
+```
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "C:\\Users\\TU_USUARIO\\.cargo\\bin\\uvx.exe",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+**Limitaciones Conocidas:**
+- ❌ Modo remoto NO soportado (incompatibilidad de protocolo SSE)
+- ⚠️ Puede quedarse bloqueado con conexiones remotas
+- ✅ Modo local funciona con los workarounds anteriores
+
+> **Ver solución de problemas completa**: [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md#antigravity)
+
 </details>
 
 <details>
@@ -297,7 +437,7 @@ Para cualquier cliente compatible con MCP:
 
 **Modo local (STDIO)**: Usa la configuración mostrada arriba
 
-**Modo remoto (HTTP/SSE)**: Usa la URL del servidor:
+**Modo remoto (HTTP)**: Usa la URL del servidor:
 ```
 https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
 ```
@@ -305,7 +445,32 @@ https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
 **Protocolo**: Streamable HTTP (especificación MCP 2024-11-05)  
 **Autenticación**: Ninguna (servidor público)
 
+**Guía completa de configuración**: [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md)
+
 </details>
+
+---
+
+## Matriz de Compatibilidad de Clientes
+
+| Cliente | Local | Remoto | Estado | Notas |
+|---------|-------|--------|--------|-------|
+| Claude Desktop | ✅ | ❌ | Estable | Mejor experiencia |
+| Claude Code CLI | ✅ | ✅ | Estable | **¡NUEVO!** Basado en terminal |
+| Claude.ai Web | ❌ | ✅ | Estable | Sin instalación |
+| ChatGPT Dev Mode | ✅ | ✅ | Beta | **¡NUEVO!** Sept 2025 |
+| VSCode Copilot | ✅ | ⚠️ | GA | **¡NUEVO!** Julio 2025 |
+| Cursor | ✅ | ❌ | Estable | Opción popular |
+| Zed | ✅ | ❌ | Estable | Editor rápido |
+| Windsurf | ✅ | ❌ | Estable | Soporte completo |
+| Antigravity | ⚠️ | ❌ | Problemas | Usar npx/workarounds |
+
+**Leyenda:**
+- ✅ Totalmente soportado
+- ⚠️ Soporte parcial / workarounds necesarios
+- ❌ No soportado
+
+**Detalles completos**: Ver [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md)
 
 ---
 
@@ -359,6 +524,7 @@ curl https://strategy-orchestrator-prod.tailf7d690.ts.net/stats
 
 ## Documentacion
 
+- [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md) - Guía completa para todos los clientes MCP
 - [Deployment & Operations](docs/es/DEPLOYMENT_OPERATIONS.md) - Guia de despliegue y operaciones
 - [Project History](docs/es/PROJECT_HISTORY.md) - Evolucion de la arquitectura del proyecto
 - [Changelog](docs/es/CHANGELOG.md) - Historial de cambios

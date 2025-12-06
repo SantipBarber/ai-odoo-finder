@@ -158,6 +158,51 @@ Restart Claude Desktop.
 </details>
 
 <details>
+<summary><b>Claude Code CLI</b></summary>
+
+**NEW!** Use Claude directly from your terminal.
+
+Install Claude Code:
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Add MCP server:
+```bash
+# Interactive setup
+claude mcp add
+
+# Or edit ~/.claude.json directly
+```
+
+Configuration (`~/.claude.json`):
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+Usage:
+```bash
+claude
+> I need an Odoo 17 module for subscriptions
+```
+
+</details>
+
+<details>
 <summary><b>Claude.ai Web (Remote)</b></summary>
 
 No installation required. Connect directly:
@@ -171,6 +216,103 @@ No installation required. Connect directly:
 4. Save and start searching
 
 > **Protocol**: Streamable HTTP (MCP spec 2024-11-05)
+
+</details>
+
+<details>
+<summary><b>ChatGPT Developer Mode</b></summary>
+
+**NEW!** OpenAI added full MCP support in September 2025.
+
+**Requirements:**
+- ChatGPT Plus/Pro/Team subscription
+- Developer Mode enabled (beta)
+
+**Setup:**
+1. Go to **ChatGPT Settings** > **Beta Features**
+2. Enable **"Developer Mode"**
+3. Navigate to **Integrations** > **MCP Servers**
+4. Add server:
+   - **Remote (easiest)**: `https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp`
+   - **Local**: Use uvx configuration (see full docs)
+
+**Usage:**
+```
+Use ai-odoofinder to find Odoo 17 modules for inventory
+```
+
+> **Note**: Supports both read and write operations (not read-only).
+
+</details>
+
+<details>
+<summary><b>VSCode Copilot</b></summary>
+
+**NEW!** GitHub Copilot supports MCP (GA since July 2025).
+
+**Requirements:**
+- VSCode 1.102+
+- GitHub Copilot subscription
+- MCP policy enabled (Business/Enterprise only)
+
+**Configuration:**
+
+Create `.vscode/mcp.json` (project) or `~/.config/Code/User/mcp.json` (global):
+
+```json
+{
+  "servers": {
+    "ai-odoofinder": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+Reload VSCode (`Ctrl/Cmd + Shift + P` → "Reload Window").
+
+**Usage:**
+```
+@workspace Find an Odoo module for accounting
+```
+
+> **For Business/Enterprise**: Admin must enable "MCP servers in Copilot" policy.
+
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+Restart Cursor.
 
 </details>
 
@@ -199,70 +341,7 @@ Add to `~/.config/zed/settings.json`:
 }
 ```
 
-</details>
-
-<details>
-<summary><b>Cursor</b></summary>
-
-Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><b>Antigravity</b></summary>
-
-Add to your Antigravity MCP configuration file:
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
-```
-
-**Windows troubleshooting**: If `uvx` is not found, use the full path:
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "C:\\Users\\YOUR_USER\\.cargo\\bin\\uvx.exe",
-      "args": [ /* same as above */ ]
-    }
-  }
-}
-```
-
-> **Note**: Antigravity uses SSE protocol. Remote connections may fail due to our Streamable HTTP implementation. Use local mode.
+Restart Zed.
 
 </details>
 
@@ -289,6 +368,67 @@ Add to your Windsurf MCP configuration:
 }
 ```
 
+Restart Windsurf.
+
+</details>
+
+<details>
+<summary><b>Antigravity</b></summary>
+
+⚠️ **Known Issues**: Antigravity has compatibility problems with `uvx` and remote MCP connections.
+
+**Solution 1: Use npx (Recommended)**
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@SantipBarber/ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+**Solution 2: Use full path to uvx (Windows)**
+
+Find your uvx path:
+```bash
+where uvx  # Windows
+which uvx  # macOS/Linux
+```
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "C:\\Users\\YOUR_USER\\.cargo\\bin\\uvx.exe",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+**Known Limitations:**
+- ❌ Remote mode NOT supported (SSE protocol incompatibility)
+- ⚠️ May stall with remote connections
+- ✅ Local mode works with workarounds above
+
+> **See full troubleshooting**: [MCP Client Configurations](docs/en/MCP_CLIENT_CONFIGURATIONS.md#antigravity)
+
 </details>
 
 <details>
@@ -298,7 +438,7 @@ For any MCP-compatible client:
 
 **Local mode (STDIO)**: Use the configuration shown above
 
-**Remote mode (HTTP/SSE)**: Use the server URL:
+**Remote mode (HTTP)**: Use the server URL:
 ```
 https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
 ```
@@ -306,7 +446,32 @@ https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
 **Protocol**: Streamable HTTP (MCP spec 2024-11-05)  
 **Authentication**: None (public server)
 
+**Full configuration guide**: [MCP Client Configurations](docs/en/MCP_CLIENT_CONFIGURATIONS.md)
+
 </details>
+
+---
+
+## Client Compatibility Matrix
+
+| Client | Local | Remote | Status | Notes |
+|--------|-------|--------|--------|-------|
+| Claude Desktop | ✅ | ❌ | Stable | Best experience |
+| Claude Code CLI | ✅ | ✅ | Stable | **NEW!** Terminal-based |
+| Claude.ai Web | ❌ | ✅ | Stable | Zero install |
+| ChatGPT Dev Mode | ✅ | ✅ | Beta | **NEW!** Sept 2025 |
+| VSCode Copilot | ✅ | ⚠️ | GA | **NEW!** July 2025 |
+| Cursor | ✅ | ❌ | Stable | Popular choice |
+| Zed | ✅ | ❌ | Stable | Fast editor |
+| Windsurf | ✅ | ❌ | Stable | Full support |
+| Antigravity | ⚠️ | ❌ | Issues | Use npx/workarounds |
+
+**Legend:**
+- ✅ Fully supported
+- ⚠️ Partial support / workarounds needed
+- ❌ Not supported
+
+**Full details**: See [MCP Client Configurations](docs/en/MCP_CLIENT_CONFIGURATIONS.md)
 
 ---
 
@@ -360,6 +525,7 @@ curl https://strategy-orchestrator-prod.tailf7d690.ts.net/stats
 
 ## Documentation
 
+- [MCP Client Configurations](docs/en/MCP_CLIENT_CONFIGURATIONS.md) - Complete guide for all MCP clients
 - [Deployment & Operations](docs/en/DEPLOYMENT_OPERATIONS.md) - Deployment and operations guide
 - [Project History](docs/en/PROJECT_HISTORY.md) - Evolution of the project architecture
 - [Changelog](docs/en/CHANGELOG.md) - Change history
