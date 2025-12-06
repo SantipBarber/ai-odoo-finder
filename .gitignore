@@ -257,3 +257,6 @@ postgres_data/
 
 # MCP server local venv
 mcp-server/.venv/
+project-docs/
+ai-expert-project/
+.claude/
