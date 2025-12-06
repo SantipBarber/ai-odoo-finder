@@ -9,6 +9,98 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2025-01-19
+
+### MCP Client Configurations Documentation
+
+This version adds comprehensive documentation for MCP client configurations across multiple AI IDEs and platforms.
+
+### Added
+
+#### New MCP Client Support Documentation
+- **Claude Code CLI**: Terminal-based Claude with MCP support
+  - Installation and configuration guide
+  - Interactive and manual setup options
+  - Usage examples with commands
+
+- **ChatGPT Developer Mode**: OpenAI's MCP implementation (Beta - September 2025)
+  - Requirements and setup steps
+  - Remote and local configuration options
+  - Full read/write capabilities
+
+- **VSCode Copilot**: GitHub Copilot with MCP support (GA - July 2025)
+  - Project-level and global configuration
+  - Business/Enterprise policy requirements
+  - Integration with GitHub authentication
+
+#### Comprehensive Configuration Guides
+- **`docs/en/MCP_CLIENT_CONFIGURATIONS.md`**: Complete 790-line technical guide
+  - Detailed setup for 9 different MCP clients
+  - Local (STDIO) vs Remote (HTTP) modes comparison
+  - Troubleshooting section with common issues
+  - Environment variables reference
+  - Client compatibility matrix
+
+- **`docs/es/MCP_CLIENT_CONFIGURATIONS.md`**: Spanish version with full parity
+
+#### Enhanced Antigravity Support
+- **3 workaround solutions** for uvx compatibility issues:
+  1. Use `npx` instead of `uvx` (Recommended)
+  2. Use full path to `uvx.exe` (Windows)
+  3. Use Python directly
+- **Alternative**: `mcp-remote` proxy configuration
+- Clear documentation of limitations (SSE protocol incompatibility)
+
+#### Client Compatibility Matrix
+Added to both READMEs showing:
+- 9 MCP clients with support status
+- Local/Remote mode availability
+- Stability level (Stable/Beta/Issues)
+- Specific notes per client
+
+### Changed
+
+- **README.md** and **README.es.md**:
+  - Reorganized IDE/Client Configuration section
+  - Added Claude Code CLI configuration
+  - Added ChatGPT Developer Mode configuration
+  - Added VSCode Copilot configuration
+  - Improved Antigravity section with multiple solutions
+  - Added compatibility matrix table
+  - Added cross-references to detailed guides
+
+### Documentation Structure
+
+```
+docs/
+├── en/
+│   ├── CHANGELOG.md
+│   ├── DEPLOYMENT_OPERATIONS.md
+│   ├── PROJECT_HISTORY.md
+│   └── MCP_CLIENT_CONFIGURATIONS.md  (NEW)
+└── es/
+    ├── CHANGELOG.md
+    ├── DEPLOYMENT_OPERATIONS.md
+    ├── PROJECT_HISTORY.md
+    └── MCP_CLIENT_CONFIGURATIONS.md  (NEW)
+```
+
+### Supported MCP Clients
+
+| Client | Local | Remote | Status | Notes |
+|--------|-------|--------|--------|-------|
+| Claude Desktop | ✅ | ❌ | Stable | Best experience |
+| Claude Code CLI | ✅ | ✅ | Stable | **NEW!** Terminal-based |
+| Claude.ai Web | ❌ | ✅ | Stable | Zero install |
+| ChatGPT Dev Mode | ✅ | ✅ | Beta | **NEW!** Sept 2025 |
+| VSCode Copilot | ✅ | ⚠️ | GA | **NEW!** July 2025 |
+| Cursor | ✅ | ❌ | Stable | Popular choice |
+| Zed | ✅ | ❌ | Stable | Fast editor |
+| Windsurf | ✅ | ❌ | Stable | Full support |
+| Antigravity | ⚠️ | ❌ | Issues | Multiple workarounds |
+
+---
+
 ## [1.2.0] - 2025-11-30
 
 ### Remote MCP Server Support

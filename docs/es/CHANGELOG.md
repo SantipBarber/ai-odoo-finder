@@ -7,6 +7,98 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [1.3.0] - 2025-01-19
+
+### Documentación de Configuraciones de Clientes MCP
+
+Esta versión añade documentación completa para configuraciones de clientes MCP en múltiples IDEs y plataformas de IA.
+
+### Añadido
+
+#### Documentación de Soporte para Nuevos Clientes MCP
+- **Claude Code CLI**: Claude basado en terminal con soporte MCP
+  - Guía de instalación y configuración
+  - Opciones de configuración interactiva y manual
+  - Ejemplos de uso con comandos
+
+- **ChatGPT Developer Mode**: Implementación MCP de OpenAI (Beta - Septiembre 2025)
+  - Requisitos y pasos de configuración
+  - Opciones de configuración remota y local
+  - Capacidades completas de lectura/escritura
+
+- **VSCode Copilot**: GitHub Copilot con soporte MCP (GA - Julio 2025)
+  - Configuración a nivel de proyecto y global
+  - Requisitos de política Business/Enterprise
+  - Integración con autenticación de GitHub
+
+#### Guías de Configuración Completas
+- **`docs/es/MCP_CLIENT_CONFIGURATIONS.md`**: Guía técnica completa de 790 líneas
+  - Configuración detallada para 9 clientes MCP diferentes
+  - Comparación de modos Local (STDIO) vs Remoto (HTTP)
+  - Sección de solución de problemas con issues comunes
+  - Referencia de variables de entorno
+  - Matriz de compatibilidad de clientes
+
+- **`docs/en/MCP_CLIENT_CONFIGURATIONS.md`**: Versión en inglés con paridad completa
+
+#### Soporte Mejorado para Antigravity
+- **3 soluciones alternativas** para problemas de compatibilidad con uvx:
+  1. Usar `npx` en lugar de `uvx` (Recomendado)
+  2. Usar ruta completa a `uvx.exe` (Windows)
+  3. Usar Python directamente
+- **Alternativa**: Configuración de proxy `mcp-remote`
+- Documentación clara de limitaciones (incompatibilidad de protocolo SSE)
+
+#### Matriz de Compatibilidad de Clientes
+Añadida a ambos READMEs mostrando:
+- 9 clientes MCP con estado de soporte
+- Disponibilidad de modo Local/Remoto
+- Nivel de estabilidad (Estable/Beta/Problemas)
+- Notas específicas por cliente
+
+### Cambiado
+
+- **README.md** y **README.es.md**:
+  - Reorganizada sección de Configuración por IDE/Cliente
+  - Añadida configuración de Claude Code CLI
+  - Añadida configuración de ChatGPT Developer Mode
+  - Añadida configuración de VSCode Copilot
+  - Mejorada sección de Antigravity con múltiples soluciones
+  - Añadida tabla de matriz de compatibilidad
+  - Añadidas referencias cruzadas a guías detalladas
+
+### Estructura de Documentación
+
+```
+docs/
+├── en/
+│   ├── CHANGELOG.md
+│   ├── DEPLOYMENT_OPERATIONS.md
+│   ├── PROJECT_HISTORY.md
+│   └── MCP_CLIENT_CONFIGURATIONS.md  (NUEVO)
+└── es/
+    ├── CHANGELOG.md
+    ├── DEPLOYMENT_OPERATIONS.md
+    ├── PROJECT_HISTORY.md
+    └── MCP_CLIENT_CONFIGURATIONS.md  (NUEVO)
+```
+
+### Clientes MCP Soportados
+
+| Cliente | Local | Remoto | Estado | Notas |
+|---------|-------|--------|--------|-------|
+| Claude Desktop | ✅ | ❌ | Estable | Mejor experiencia |
+| Claude Code CLI | ✅ | ✅ | Estable | **¡NUEVO!** Basado en terminal |
+| Claude.ai Web | ❌ | ✅ | Estable | Sin instalación |
+| ChatGPT Dev Mode | ✅ | ✅ | Beta | **¡NUEVO!** Sept 2025 |
+| VSCode Copilot | ✅ | ⚠️ | GA | **¡NUEVO!** Julio 2025 |
+| Cursor | ✅ | ❌ | Estable | Opción popular |
+| Zed | ✅ | ❌ | Estable | Editor rápido |
+| Windsurf | ✅ | ❌ | Estable | Soporte completo |
+| Antigravity | ⚠️ | ❌ | Problemas | Múltiples workarounds |
+
+---
+
 ## [1.2.0] - 2025-11-30
 
 ### Soporte para Servidor MCP Remoto
