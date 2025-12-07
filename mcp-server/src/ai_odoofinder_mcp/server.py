@@ -108,7 +108,7 @@ User: "subscriptions and recurring contracts"
 """
 
 VERSION_DESCRIPTION = """
-Odoo version (12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, or 19.0).
+Odoo version (10.0, 11.0,12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, or 19.0).
 
 • If user does NOT specify version → ASK before searching
 • If user says "latest" or "current" → use 17.0 or 18.0
@@ -169,7 +169,18 @@ async def search_odoo_modules(
     if not query or not query.strip():
         return "❌ Error: Query cannot be empty"
 
-    valid_versions = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+    valid_versions = [
+        "10.0",
+        "11.0",
+        "12.0",
+        "13.0",
+        "14.0",
+        "15.0",
+        "16.0",
+        "17.0",
+        "18.0",
+        "19.0",
+    ]
     if version not in valid_versions:
         return f"❌ Error: Invalid version '{version}'. Use: {', '.join(valid_versions)}"
 
