@@ -244,7 +244,7 @@ uv publish
 ## Related Documentation
 
 - [Main Project README](../README.md) - User installation guide
-- [Backend API](../backend/README.md) - FastAPI backend
+- [Backend API Documentation](../backend/README.md) - FastAPI backend REST API
 - [CHANGELOG](../docs/en/CHANGELOG.md) - Version history
 - [MCP Protocol](https://modelcontextprotocol.io/) - Official MCP docs
 - [FastMCP](https://github.com/jlowin/fastmcp) - Framework used
