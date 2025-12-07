@@ -784,28 +784,3 @@ See [Contributing Guide](../CONTRIBUTING.md) for details.
 ## License
 
 MIT - See [LICENSE](../LICENSE)
-```
-
-Perfect! He creado un comprehensive README para el backend que incluye:
-
-✅ **Secciones principales:**
-- Overview y características
-- Quick Start con instalación paso a paso
-- Documentación completa de todos los endpoints (Search, Module Details, Stats)
-- Explicación del algoritmo de búsqueda híbrida y RRF
-- Arquitectura detallada con diagrama
-- Schema de base de datos
-- Variables de configuración
-- Estructura del proyecto
-- Guía de desarrollo y testing
-- Troubleshooting extenso
-- Ejemplos de integración en Python, JavaScript y cURL
-- Guía de deployment
-
-✅ **Está en línea con:**
-- El estilo y estructura del README del mcp-server
-- La arquitectura técnica real del backend
-- Las dependencias en pyproject.toml
-- Los endpoints implementados en main.py
-
-Ahora voy a actualizar el README del mcp-server para que el enlace sea válido:
