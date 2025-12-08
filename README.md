@@ -541,6 +541,7 @@ curl https://strategy-orchestrator-prod.tailf7d690.ts.net/stats
 
 ## Documentation
 
+- [Interactive Showcase](https://santipbarber.github.io/ai-odoo-finder/showcase/) - Visual presentation of the project
 - [MCP Client Configurations](docs/en/MCP_CLIENT_CONFIGURATIONS.md) - Complete guide for all MCP clients
 - [Deployment & Operations](docs/en/DEPLOYMENT_OPERATIONS.md) - Deployment and operations guide
 - [Project History](docs/en/PROJECT_HISTORY.md) - Evolution of the project architecture

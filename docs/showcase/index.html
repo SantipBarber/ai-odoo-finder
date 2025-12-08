@@ -1,0 +1,2907 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI-OdooFinder Showcase</title>
+        <meta
+            name="description"
+            content="Buscador inteligente de módulos OCA para Odoo usando IA y MCP - Proyecto final del curso AI Expert"
+        />
+        <meta
+            property="og:title"
+            content="AI-OdooFinder - Intelligent OCA Module Finder"
+        />
+        <meta
+            property="og:description"
+            content="An MCP server using hybrid search to find Odoo modules in the OCA ecosystem"
+        />
+        <meta property="og:image" content="../images/social-share.svg" />
+        <link rel="icon" href="../images/icon-small.svg" type="image/svg+xml" />
+
+        <style>
+            /* ============================================
+           CSS VARIABLES - THEMES
+           ============================================ */
+            :root {
+                --bg-primary: #ffffff;
+                --bg-secondary: #f8fafc;
+                --bg-tertiary: #f1f5f9;
+                --bg-code: #1e293b;
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --text-muted: #94a3b8;
+                --text-code: #e2e8f0;
+                --accent: #6366f1;
+                --accent-hover: #4f46e5;
+                --accent-light: #e0e7ff;
+                --accent-dark: #4338ca;
+                --border: #e2e8f0;
+                --card-shadow:
+                    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                --success: #10b981;
+                --success-light: #d1fae5;
+                --warning: #f59e0b;
+                --warning-light: #fef3c7;
+                --error: #ef4444;
+                --info: #3b82f6;
+                --info-light: #dbeafe;
+                --gradient-start: #6366f1;
+                --gradient-mid: #8b5cf6;
+                --gradient-end: #a855f7;
+                --odoo-purple: #714b67;
+            }
+
+            [data-theme="dark"] {
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --bg-tertiary: #334155;
+                --bg-code: #0f172a;
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --text-muted: #64748b;
+                --text-code: #e2e8f0;
+                --accent: #818cf8;
+                --accent-hover: #a5b4fc;
+                --accent-light: #312e81;
+                --accent-dark: #6366f1;
+                --border: #334155;
+                --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+                --success-light: #064e3b;
+                --warning-light: #78350f;
+                --info-light: #1e3a8a;
+            }
+
+            /* ============================================
+           BASE STYLES
+           ============================================ */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    Roboto,
+                    sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                line-height: 1.6;
+                transition:
+                    background-color 0.3s ease,
+                    color 0.3s ease;
+            }
+
+            a {
+                color: var(--accent);
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+            /* ============================================
+           HEADER
+           ============================================ */
+            header {
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start),
+                    var(--gradient-mid),
+                    var(--gradient-end)
+                );
+                padding: 1rem 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: var(--card-shadow);
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                color: white;
+                text-decoration: none;
+            }
+
+            .logo img {
+                width: 40px;
+                height: 40px;
+                filter: brightness(0) invert(1);
+            }
+
+            .logo-text {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .logo-title {
+                font-size: 1.25rem;
+                font-weight: 700;
+                line-height: 1.2;
+            }
+
+            .logo-subtitle {
+                font-size: 0.7rem;
+                opacity: 0.9;
+                font-weight: 400;
+            }
+
+            .controls {
+                display: flex;
+                gap: 0.75rem;
+                align-items: center;
+            }
+
+            .toggle-btn {
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 0.5rem 1rem;
+                border-radius: 9999px;
+                color: white;
+                cursor: pointer;
+                font-size: 0.8rem;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .toggle-btn:hover {
+                background: rgba(255, 255, 255, 0.25);
+                transform: translateY(-1px);
+            }
+
+            /* ============================================
+           NAVIGATION
+           ============================================ */
+            nav {
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border);
+                padding: 0 2rem;
+                overflow-x: auto;
+            }
+
+            .nav-tabs {
+                display: flex;
+                gap: 0;
+                list-style: none;
+                min-width: max-content;
+            }
+
+            .nav-tab {
+                padding: 1rem 1.25rem;
+                cursor: pointer;
+                color: var(--text-secondary);
+                font-weight: 500;
+                font-size: 0.9rem;
+                border-bottom: 3px solid transparent;
+                transition: all 0.2s ease;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .nav-tab:hover {
+                color: var(--accent);
+                background: var(--bg-tertiary);
+            }
+
+            .nav-tab.active {
+                color: var(--accent);
+                border-bottom-color: var(--accent);
+                background: var(--bg-tertiary);
+            }
+
+            .tab-number {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 22px;
+                height: 22px;
+                background: var(--accent-light);
+                color: var(--accent);
+                border-radius: 50%;
+                font-size: 0.7rem;
+                font-weight: 600;
+            }
+
+            .nav-tab.active .tab-number {
+                background: var(--accent);
+                color: white;
+            }
+
+            /* ============================================
+           MAIN CONTENT
+           ============================================ */
+            main {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem;
+                min-height: calc(100vh - 200px);
+            }
+
+            .tab-content {
+                display: none;
+                animation: fadeIn 0.4s ease;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(15px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ============================================
+           DASHBOARD - HERO
+           ============================================ */
+            .dashboard-hero {
+                text-align: center;
+                padding: 3rem 0;
+                position: relative;
+            }
+
+            .hero-badge {
+                display: inline-block;
+                background: var(--accent-light);
+                color: var(--accent);
+                padding: 0.35rem 1rem;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .dashboard-hero h1 {
+                font-size: 2.75rem;
+                margin-bottom: 1rem;
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start),
+                    var(--gradient-end)
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1.2;
+            }
+
+            .dashboard-hero .subtitle {
+                font-size: 1.15rem;
+                color: var(--text-secondary);
+                max-width: 700px;
+                margin: 0 auto 2rem;
+            }
+
+            .hero-buttons {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                text-decoration: none;
+            }
+
+            .btn-primary {
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start),
+                    var(--gradient-end)
+                );
+                color: white;
+                border: none;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+                text-decoration: none;
+            }
+
+            .btn-secondary {
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                border: 1px solid var(--border);
+            }
+
+            .btn-secondary:hover {
+                background: var(--bg-tertiary);
+                text-decoration: none;
+            }
+
+            /* ============================================
+           STATS GRID
+           ============================================ */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 1rem;
+                margin: 2.5rem 0;
+            }
+
+            .stat-card {
+                background: var(--bg-secondary);
+                border-radius: 12px;
+                padding: 1.25rem;
+                text-align: center;
+                border: 1px solid var(--border);
+                transition: all 0.2s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .stat-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(
+                    90deg,
+                    var(--gradient-start),
+                    var(--gradient-end)
+                );
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--card-shadow);
+            }
+
+            .stat-card:hover::before {
+                opacity: 1;
+            }
+
+            .stat-icon {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--accent);
+                display: block;
+                line-height: 1.2;
+            }
+
+            .stat-label {
+                color: var(--text-secondary);
+                font-size: 0.8rem;
+                margin-top: 0.25rem;
+            }
+
+            /* ============================================
+           ARCHITECTURE DIAGRAM
+           ============================================ */
+            .architecture-section {
+                margin: 3rem 0;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .section-title::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: var(--border);
+            }
+
+            .architecture-diagram {
+                background: var(--bg-code);
+                border-radius: 12px;
+                padding: 1.5rem;
+                overflow-x: auto;
+                font-family: "JetBrains Mono", "Fira Code", monospace;
+                font-size: 0.75rem;
+                line-height: 1.5;
+                color: var(--text-code);
+                border: 1px solid var(--border);
+            }
+
+            .architecture-diagram pre {
+                margin: 0;
+                white-space: pre;
+            }
+
+            /* ============================================
+           TECH GRID
+           ============================================ */
+            .tech-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .tech-card {
+                background: var(--bg-secondary);
+                border-radius: 12px;
+                padding: 1.25rem;
+                border: 1px solid var(--border);
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                transition: all 0.2s ease;
+            }
+
+            .tech-card:hover {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 1px var(--accent);
+            }
+
+            .tech-icon {
+                width: 44px;
+                height: 44px;
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start),
+                    var(--gradient-end)
+                );
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.25rem;
+                flex-shrink: 0;
+            }
+
+            .tech-info h3 {
+                font-size: 1rem;
+                margin-bottom: 0.35rem;
+            }
+
+            .tech-info p {
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                line-height: 1.5;
+            }
+
+            /* ============================================
+           PROBLEM SECTION
+           ============================================ */
+            .problem-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+                margin: 2rem 0;
+            }
+
+            .problem-card {
+                background: var(--bg-secondary);
+                border-radius: 12px;
+                padding: 1.5rem;
+                border: 1px solid var(--border);
+                border-left: 4px solid var(--error);
+            }
+
+            .problem-card.solution {
+                border-left-color: var(--success);
+            }
+
+            .problem-card h3 {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .problem-card ul {
+                list-style: none;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+            }
+
+            .problem-card li {
+                padding: 0.4rem 0;
+                padding-left: 1.5rem;
+                position: relative;
+            }
+
+            .problem-card li::before {
+                content: "✗";
+                position: absolute;
+                left: 0;
+                color: var(--error);
+                font-weight: bold;
+            }
+
+            .problem-card.solution li::before {
+                content: "✓";
+                color: var(--success);
+            }
+
+            /* ============================================
+           MODULE PAGES
+           ============================================ */
+            .module-header {
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+                margin-bottom: 2rem;
+                padding-bottom: 1.5rem;
+                border-bottom: 2px solid var(--border);
+            }
+
+            .module-number {
+                width: 64px;
+                height: 64px;
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start),
+                    var(--gradient-end)
+                );
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.75rem;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+
+            .module-title h2 {
+                font-size: 1.75rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .module-title p {
+                color: var(--text-secondary);
+                font-size: 0.95rem;
+            }
+
+            .module-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.25rem;
+            }
+
+            .module-card {
+                background: var(--bg-secondary);
+                border-radius: 12px;
+                padding: 1.25rem;
+                border: 1px solid var(--border);
+            }
+
+            .module-card h3 {
+                font-size: 0.9rem;
+                color: var(--accent);
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+
+            .module-card ul {
+                list-style: none;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+            }
+
+            .module-card li {
+                padding: 0.4rem 0;
+                padding-left: 1.25rem;
+                position: relative;
+            }
+
+            .module-card li::before {
+                content: "→";
+                position: absolute;
+                left: 0;
+                color: var(--accent);
+            }
+
+            /* ============================================
+           HIGHLIGHT BOXES
+           ============================================ */
+            .highlight-box {
+                background: var(--accent-light);
+                border-radius: 10px;
+                padding: 1rem 1.25rem;
+                margin-top: 1.5rem;
+                border-left: 4px solid var(--accent);
+                font-size: 0.9rem;
+            }
+
+            .highlight-box strong {
+                color: var(--accent-dark);
+            }
+
+            .highlight-box.success {
+                background: var(--success-light);
+                border-left-color: var(--success);
+            }
+
+            .highlight-box.success strong {
+                color: var(--success);
+            }
+
+            .highlight-box.warning {
+                background: var(--warning-light);
+                border-left-color: var(--warning);
+            }
+
+            .highlight-box.warning strong {
+                color: var(--warning);
+            }
+
+            .highlight-box.info {
+                background: var(--info-light);
+                border-left-color: var(--info);
+            }
+
+            .highlight-box.info strong {
+                color: var(--info);
+            }
+
+            /* ============================================
+           CODE BLOCKS
+           ============================================ */
+            .code-block {
+                background: var(--bg-code);
+                border-radius: 10px;
+                padding: 1rem 1.25rem;
+                margin: 1rem 0;
+                overflow-x: auto;
+                font-family: "JetBrains Mono", "Fira Code", monospace;
+                font-size: 0.8rem;
+                line-height: 1.6;
+                color: var(--text-code);
+                border: 1px solid var(--border);
+            }
+
+            .code-block code {
+                color: inherit;
+            }
+
+            .code-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 10px 10px 0 0;
+                margin: -1rem -1.25rem 1rem;
+                font-size: 0.75rem;
+                color: var(--text-muted);
+            }
+
+            /* ============================================
+           TABLES
+           ============================================ */
+            .table-container {
+                overflow-x: auto;
+                margin: 1rem 0;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.85rem;
+            }
+
+            th,
+            td {
+                padding: 0.75rem 1rem;
+                text-align: left;
+                border-bottom: 1px solid var(--border);
+            }
+
+            th {
+                background: var(--bg-tertiary);
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+
+            tr:hover {
+                background: var(--bg-secondary);
+            }
+
+            /* ============================================
+           TIMELINE
+           ============================================ */
+            .timeline {
+                position: relative;
+                padding-left: 2rem;
+                margin: 1.5rem 0;
+            }
+
+            .timeline::before {
+                content: "";
+                position: absolute;
+                left: 0.5rem;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: linear-gradient(
+                    to bottom,
+                    var(--gradient-start),
+                    var(--gradient-end)
+                );
+            }
+
+            .timeline-item {
+                position: relative;
+                padding-bottom: 1.5rem;
+            }
+
+            .timeline-item::before {
+                content: "";
+                position: absolute;
+                left: -1.65rem;
+                top: 0.25rem;
+                width: 12px;
+                height: 12px;
+                background: var(--accent);
+                border-radius: 50%;
+                border: 2px solid var(--bg-primary);
+            }
+
+            .timeline-date {
+                font-size: 0.75rem;
+                color: var(--accent);
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+            }
+
+            .timeline-content {
+                background: var(--bg-secondary);
+                padding: 1rem;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+            }
+
+            .timeline-content h4 {
+                font-size: 0.95rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .timeline-content p {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+            }
+
+            /* ============================================
+           FLOW DIAGRAM
+           ============================================ */
+            .flow-diagram {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                padding: 1.5rem;
+                background: var(--bg-secondary);
+                border-radius: 12px;
+                margin: 1.5rem 0;
+            }
+
+            .flow-step {
+                background: var(--accent-light);
+                color: var(--accent-dark);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                text-align: center;
+            }
+
+            .flow-arrow {
+                color: var(--text-muted);
+                font-size: 1.25rem;
+            }
+
+            /* ============================================
+           FOOTER
+           ============================================ */
+            footer {
+                background: var(--bg-secondary);
+                border-top: 1px solid var(--border);
+                padding: 2rem;
+                margin-top: 3rem;
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .footer-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                gap: 2rem;
+                padding-bottom: 1.5rem;
+                border-bottom: 1px solid var(--border);
+                margin-bottom: 1.5rem;
+            }
+
+            .footer-brand {
+                max-width: 300px;
+            }
+
+            .footer-brand h3 {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .footer-brand p {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+            }
+
+            .footer-links-group h4 {
+                font-size: 0.85rem;
+                color: var(--text-primary);
+                margin-bottom: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .footer-links-group a {
+                display: block;
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                padding: 0.25rem 0;
+                transition: color 0.2s ease;
+            }
+
+            .footer-links-group a:hover {
+                color: var(--accent);
+            }
+
+            .footer-bottom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .footer-copy {
+                color: var(--text-muted);
+                font-size: 0.8rem;
+            }
+
+            .footer-social {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .footer-social a {
+                color: var(--text-secondary);
+                font-size: 1.25rem;
+                transition: color 0.2s ease;
+            }
+
+            .footer-social a:hover {
+                color: var(--accent);
+            }
+
+            /* ============================================
+           RESPONSIVE
+           ============================================ */
+            @media (max-width: 768px) {
+                header {
+                    flex-direction: column;
+                    gap: 1rem;
+                    padding: 1rem;
+                }
+
+                .controls {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                nav {
+                    padding: 0 1rem;
+                }
+
+                .nav-tab {
+                    padding: 0.75rem 0.75rem;
+                    font-size: 0.8rem;
+                }
+
+                main {
+                    padding: 1rem;
+                }
+
+                .dashboard-hero h1 {
+                    font-size: 1.75rem;
+                }
+
+                .dashboard-hero .subtitle {
+                    font-size: 1rem;
+                }
+
+                .architecture-diagram {
+                    font-size: 0.6rem;
+                }
+
+                .footer-top {
+                    flex-direction: column;
+                }
+
+                .footer-bottom {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- HEADER -->
+        <header>
+            <a href="#" class="logo">
+                <img src="../images/logo-circle.svg" alt="Logo" />
+                <div class="logo-text">
+                    <span class="logo-title">AI-OdooFinder</span>
+                    <span class="logo-subtitle" data-i18n="header.subtitle"
+                        >Proyecto Final AI Expert</span
+                    >
+                </div>
+            </a>
+            <div class="controls">
+                <button class="toggle-btn" onclick="toggleLanguage()">
+                    <span>🌐</span>
+                    <span id="langLabel">EN</span>
+                </button>
+                <button class="toggle-btn" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                    <span id="themeLabel" data-i18n="theme.dark">Oscuro</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- NAVIGATION -->
+        <nav>
+            <ul class="nav-tabs">
+                <li
+                    class="nav-tab active"
+                    data-tab="dashboard"
+                    onclick="showTab('dashboard')"
+                >
+                    <span data-i18n="nav.dashboard">Dashboard</span>
+                </li>
+                <li
+                    class="nav-tab"
+                    data-tab="investigar"
+                    onclick="showTab('investigar')"
+                >
+                    <span class="tab-number">1</span>
+                    <span data-i18n="nav.investigar">Investigar</span>
+                </li>
+                <li
+                    class="nav-tab"
+                    data-tab="dialogar"
+                    onclick="showTab('dialogar')"
+                >
+                    <span class="tab-number">2</span>
+                    <span data-i18n="nav.dialogar">Dialogar</span>
+                </li>
+                <li
+                    class="nav-tab"
+                    data-tab="ejecutar"
+                    onclick="showTab('ejecutar')"
+                >
+                    <span class="tab-number">3</span>
+                    <span data-i18n="nav.ejecutar">Ejecutar</span>
+                </li>
+                <li
+                    class="nav-tab"
+                    data-tab="automatizar"
+                    onclick="showTab('automatizar')"
+                >
+                    <span class="tab-number">4</span>
+                    <span data-i18n="nav.automatizar">Automatizar</span>
+                </li>
+                <li
+                    class="nav-tab"
+                    data-tab="integrar"
+                    onclick="showTab('integrar')"
+                >
+                    <span class="tab-number">5</span>
+                    <span data-i18n="nav.integrar">Integrar</span>
+                </li>
+                <li
+                    class="nav-tab"
+                    data-tab="sintetizar"
+                    onclick="showTab('sintetizar')"
+                >
+                    <span class="tab-number">6</span>
+                    <span data-i18n="nav.sintetizar">Sintetizar</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main>
+            <!-- ==================== DASHBOARD ==================== -->
+            <div id="dashboard" class="tab-content active">
+                <div class="dashboard-hero">
+                    <span class="hero-badge" data-i18n="dashboard.badge"
+                        >Búsqueda Híbrida con IA</span
+                    >
+                    <h1 data-i18n="dashboard.title">
+                        Encuentra el módulo Odoo perfecto en segundos
+                    </h1>
+                    <p class="subtitle" data-i18n="dashboard.subtitle">
+                        Un servidor MCP que conecta LLMs con 16,000+ módulos OCA
+                        usando búsqueda semántica + full-text con Reciprocal
+                        Rank Fusion
+                    </p>
+                    <div class="hero-buttons">
+                        <a
+                            href="https://github.com/SantipBarber/ai-odoo-finder"
+                            target="_blank"
+                            class="btn btn-primary"
+                        >
+                            <span>⭐</span>
+                            <span data-i18n="dashboard.github"
+                                >Ver en GitHub</span
+                            >
+                        </a>
+                        <a
+                            href="https://modelcontextprotocol.io"
+                            target="_blank"
+                            class="btn btn-secondary"
+                        >
+                            <span>📚</span>
+                            <span data-i18n="dashboard.docs"
+                                >Documentación MCP</span
+                            >
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <span class="stat-number" data-count="16494">0</span>
+                        <span class="stat-label" data-i18n="stats.modules"
+                            >Módulos indexados</span
+                        >
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <span class="stat-number" data-count="244">0</span>
+                        <span class="stat-label" data-i18n="stats.repos"
+                            >Repositorios OCA</span
+                        >
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔢</div>
+                        <span class="stat-number" data-count="10">0</span>
+                        <span class="stat-label" data-i18n="stats.versions"
+                            >Versiones Odoo</span
+                        >
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚡</div>
+                        <span class="stat-number">&lt;500</span>
+                        <span class="stat-label" data-i18n="stats.response"
+                            >ms respuesta</span
+                        >
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🤖</div>
+                        <span class="stat-number" data-count="9">0</span>
+                        <span class="stat-label" data-i18n="stats.clients"
+                            >Clientes MCP</span
+                        >
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <span class="stat-number">$1.76</span>
+                        <span class="stat-label" data-i18n="stats.cost"
+                            >Coste total APIs</span
+                        >
+                    </div>
+                </div>
+
+                <!-- Problem/Solution -->
+                <h2 class="section-title" data-i18n="dashboard.problem">
+                    El Problema
+                </h2>
+                <div class="problem-grid">
+                    <div class="problem-card">
+                        <h3>
+                            ❌
+                            <span data-i18n="problem.title"
+                                >Sin AI-OdooFinder</span
+                            >
+                        </h3>
+                        <ul>
+                            <li data-i18n="problem.p1">
+                                Desarrollas funcionalidades que ya existen en
+                                OCA
+                            </li>
+                            <li data-i18n="problem.p2">
+                                Pierdes horas buscando el módulo correcto en
+                                GitHub
+                            </li>
+                            <li data-i18n="problem.p3">
+                                Instalas módulos incompatibles con tu versión
+                            </li>
+                            <li data-i18n="problem.p4">
+                                Descubres módulos abandonados tras integrarlos
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="problem-card solution">
+                        <h3>
+                            ✓
+                            <span data-i18n="solution.title"
+                                >Con AI-OdooFinder</span
+                            >
+                        </h3>
+                        <ul>
+                            <li data-i18n="solution.s1">
+                                Búsqueda semántica + keyword en un solo query
+                            </li>
+                            <li data-i18n="solution.s2">
+                                Filtrado automático por versión de Odoo
+                            </li>
+                            <li data-i18n="solution.s3">
+                                Descripciones enriquecidas con IA (Grok-4)
+                            </li>
+                            <li data-i18n="solution.s4">
+                                Integración directa desde Claude, Cursor,
+                                VSCode...
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Architecture -->
+                <h2 class="section-title" data-i18n="dashboard.architecture">
+                    Arquitectura
+                </h2>
+                <div class="architecture-diagram">
+                    <pre>
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENTES MCP                                        │
+├───────────────┬───────────────┬───────────────┬───────────────┬────────────────┤
+│ Claude Desktop│  Claude.ai    │    Cursor     │     Zed       │  VSCode Copilot│
+│    (STDIO)    │   (HTTP)      │   (STDIO)     │   (STDIO)     │    (STDIO)     │
+└───────┬───────┴───────┬───────┴───────┬───────┴───────┬───────┴────────┬───────┘
+        │               │               │               │                │
+        └───────────────┴───────────────┼───────────────┴────────────────┘
+                                        │
+                                        ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                          MCP SERVER (FastMCP)                                    │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │  Tool: search_odoo_modules(query, version, dependencies, limit)         │    │
+│  │  • Flujo inteligente de 4 pasos con clarificación                      │    │
+│  │  • Clasificación por confianza (HIGH/MEDIUM/LOW)                       │    │
+│  │  • Instrucciones específicas para el LLM                               │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────┬───────────────────────────────────────┘
+                                          │ HTTP
+                                          ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                          FASTAPI BACKEND (:8989)                                 │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐   │
+│  │   /search            │  │   /modules/{id}      │  │   /stats             │   │
+│  │   Búsqueda híbrida   │  │   Detalle módulo     │  │   Estadísticas       │   │
+│  └──────────────────────┘  └──────────────────────┘  └──────────────────────┘   │
+│                                        │                                         │
+│  ┌─────────────────────────────────────┴─────────────────────────────────────┐  │
+│  │              HYBRID SEARCH SERVICE (RRF Fusion)                           │  │
+│  │   ┌─────────────────┐              ┌─────────────────┐                    │  │
+│  │   │ Vector Search   │──────┬───────│  BM25 Search    │                    │  │
+│  │   │ (pgvector HNSW) │      │       │  (tsvector)     │                    │  │
+│  │   └─────────────────┘      ▼       └─────────────────┘                    │  │
+│  │                    Reciprocal Rank Fusion                                 │  │
+│  │                    RRF(d) = 1/(k+rank_v) + 1/(k+rank_b)                   │  │
+│  └───────────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────┬───────────────────────────────────────┘
+                                          │ SQL
+                                          ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                      POSTGRESQL 17 + pgvector                                    │
+│  ┌───────────────────────────────────────────────────────────────────────────┐  │
+│  │  modules: 16,494 registros                                                │  │
+│  │  • embedding (vector 2560) - Qwen3-Embedding-4B                           │  │
+│  │  • search_vector (tsvector) - Full-text español/inglés                    │  │
+│  │  • ai_description, functional_tags, keywords - Grok-4-fast enrichment     │  │
+│  └───────────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+</pre
+                    >
+                </div>
+
+                <!-- Tech Stack -->
+                <h2 class="section-title" data-i18n="dashboard.techTitle">
+                    Stack Tecnológico
+                </h2>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">⚡</div>
+                        <div class="tech-info">
+                            <h3>FastMCP</h3>
+                            <p data-i18n="tech.fastmcp">
+                                Framework Python para servidores MCP.
+                                Decoradores simples, transporte dual STDIO/HTTP.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">🔍</div>
+                        <div class="tech-info">
+                            <h3>pgvector + BM25</h3>
+                            <p data-i18n="tech.search">
+                                Búsqueda híbrida: embeddings Qwen3 (2560 dims) +
+                                full-text con fusión RRF.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">🚀</div>
+                        <div class="tech-info">
+                            <h3>FastAPI</h3>
+                            <p data-i18n="tech.fastapi">
+                                Backend async de alto rendimiento. Python 3.13+,
+                                documentación OpenAPI.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">🤖</div>
+                        <div class="tech-info">
+                            <h3>OpenRouter</h3>
+                            <p data-i18n="tech.openrouter">
+                                Gateway unificado para LLMs. Qwen3 para
+                                embeddings, Grok-4 para enrichment.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">🐳</div>
+                        <div class="tech-info">
+                            <h3>Docker + Hetzner</h3>
+                            <p data-i18n="tech.docker">
+                                Despliegue containerizado en VPS ARM64. ~5€/mes
+                                sin cold starts.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">🔒</div>
+                        <div class="tech-info">
+                            <h3>Tailscale Funnel</h3>
+                            <p data-i18n="tech.tailscale">
+                                HTTPS automático sin configuración. Túnel seguro
+                                para acceso remoto.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== MÓDULO 1: INVESTIGAR ==================== -->
+            <div id="investigar" class="tab-content">
+                <div class="module-header">
+                    <div class="module-number">01</div>
+                    <div class="module-title">
+                        <h2 data-i18n="m1.title">INVESTIGAR</h2>
+                        <p data-i18n="m1.subtitle">
+                            Aprende a Aprender con IA - Deep Research y
+                            Validación Cruzada
+                        </p>
+                    </div>
+                </div>
+
+                <div class="module-grid">
+                    <div class="module-card">
+                        <h3>
+                            🎯
+                            <span data-i18n="module.objective">Objetivo</span>
+                        </h3>
+                        <ul>
+                            <li data-i18n="m1.obj1">
+                                Deep research exhaustivo con Gemini 2.5 Pro
+                            </li>
+                            <li data-i18n="m1.obj2">
+                                Identificar el "Triángulo de Dificultad" de Odoo
+                            </li>
+                            <li data-i18n="m1.obj3">
+                                Evaluar 4 arquitecturas de IA para la solución
+                            </li>
+                            <li data-i18n="m1.obj4">
+                                Validación cruzada con múltiples modelos
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            🛠️
+                            <span data-i18n="module.tools">Herramientas</span>
+                        </h3>
+                        <ul>
+                            <li>Gemini 2.5 Pro (Deep Research)</li>
+                            <li>NotebookLM (síntesis)</li>
+                            <li>KimiK2 (validación)</li>
+                            <li>Claude Desktop (refinamiento)</li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            📦
+                            <span data-i18n="module.deliverable"
+                                >Entregable</span
+                            >
+                        </h3>
+                        <ul>
+                            <li data-i18n="m1.del1">
+                                Documento de 15+ páginas de análisis
+                            </li>
+                            <li data-i18n="m1.del2">
+                                Comparativa de herramientas existentes
+                            </li>
+                            <li data-i18n="m1.del3">
+                                Arquitectura RAG Híbrida definida
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Triangle diagram -->
+                <h3
+                    class="section-title"
+                    style="margin-top: 2rem"
+                    data-i18n="m1.triangle"
+                >
+                    El Triángulo de Dificultad de Odoo
+                </h3>
+                <div class="architecture-diagram">
+                    <pre>
+                    Documentación
+                     Fragmentada
+                         /\
+                        /  \
+                       /    \
+                      /      \
+                     /        \
+                    /          \
+                   /____________\
+              Descubrimiento    "Infierno del
+               de Módulos        Versionado"
+                                (10.0 → 19.0)
+
+    ┌─────────────────────────────────────────────────────────┐
+    │  CONCLUSIÓN DEL RESEARCH:                               │
+    │                                                         │
+    │  "La arquitectura óptima es un Framework Agéntico       │
+    │   que orquesta un Pipeline de RAG Híbrido usando        │
+    │   un índice dual SQL + Vectorial"                       │
+    └─────────────────────────────────────────────────────────┘
+</pre
+                    >
+                </div>
+
+                <!-- Comparison table -->
+                <h3
+                    class="section-title"
+                    style="margin-top: 2rem"
+                    data-i18n="m1.comparison"
+                >
+                    Evaluación de Arquitecturas
+                </h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="table.architecture">
+                                    Arquitectura
+                                </th>
+                                <th data-i18n="table.versioning">
+                                    Manejo Versionado
+                                </th>
+                                <th data-i18n="table.viability">Viabilidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>LLM + Búsqueda Web</td>
+                                <td data-i18n="m1.poor">Pobre (Alucina)</td>
+                                <td style="color: var(--error)">
+                                    ❌
+                                    <span data-i18n="m1.inviable"
+                                        >Inviable</span
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>RAG Simple (Solo Vectores)</td>
+                                <td data-i18n="m1.poor2">
+                                    Pobre (No determinista)
+                                </td>
+                                <td style="color: var(--warning)">
+                                    ⚠️ <span data-i18n="m1.low">Baja</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Claude Skills</td>
+                                <td data-i18n="m1.excellent">
+                                    Excelente (con backend)
+                                </td>
+                                <td style="color: var(--success)">
+                                    ✓ <span data-i18n="m1.high">Alta</span>
+                                </td>
+                            </tr>
+                            <tr style="background: var(--accent-light)">
+                                <td><strong>RAG Híbrido (Agéntico)</strong></td>
+                                <td>
+                                    <strong data-i18n="m1.excellent2"
+                                        >Excelente (Determinista)</strong
+                                    >
+                                </td>
+                                <td style="color: var(--success)">
+                                    <strong
+                                        >✓✓
+                                        <span data-i18n="m1.optimal"
+                                            >Óptima</span
+                                        ></strong
+                                    >
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="highlight-box info">
+                    <strong>💡 Spec-Driven Development:</strong>
+                    <span data-i18n="m1.tip"
+                        >Define primero QUÉ debe hacer el sistema antes de
+                        implementar CÓMO. Cada feature tuvo su SPEC antes de
+                        codificar.</span
+                    >
+                </div>
+            </div>
+
+            <!-- ==================== MÓDULO 2: DIALOGAR ==================== -->
+            <div id="dialogar" class="tab-content">
+                <div class="module-header">
+                    <div class="module-number">02</div>
+                    <div class="module-title">
+                        <h2 data-i18n="m2.title">DIALOGAR</h2>
+                        <p data-i18n="m2.subtitle">
+                            Prompt Engineering y Context Engineering Avanzado
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="highlight-box warning"
+                    style="margin-bottom: 1.5rem"
+                >
+                    <strong
+                        >⚡
+                        <span data-i18n="m2.principle"
+                            >Principio Fundamental</span
+                        >:</strong
+                    >
+                    <span data-i18n="m2.principleText"
+                        >"Calidad de Entrada → Calidad de Salida". El modelo no
+                        puede leer tu mente. La ambigüedad es el enemigo.</span
+                    >
+                </div>
+
+                <div class="module-grid">
+                    <div class="module-card">
+                        <h3>
+                            🎯
+                            <span data-i18n="module.objective">Objetivo</span>
+                        </h3>
+                        <ul>
+                            <li data-i18n="m2.obj1">
+                                Evolucionar de prompts simples a flujo
+                                inteligente
+                            </li>
+                            <li data-i18n="m2.obj2">
+                                Implementar Few-Shot con ejemplos concretos
+                            </li>
+                            <li data-i18n="m2.obj3">
+                                Crear Chain of Thought de 4 pasos
+                            </li>
+                            <li data-i18n="m2.obj4">
+                                Usar delimitadores efectivos para cada modelo
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            📐
+                            <span data-i18n="module.techniques">Técnicas</span>
+                        </h3>
+                        <ul>
+                            <li>Few-Shot Learning</li>
+                            <li>Chain of Thought (CoT)</li>
+                            <li data-i18n="m2.tech3">
+                                Delimitadores (═══, ⚠️, 🚨)
+                            </li>
+                            <li data-i18n="m2.tech4">
+                                Ejemplos correctos vs incorrectos
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            📦
+                            <span data-i18n="module.deliverable"
+                                >Entregable</span
+                            >
+                        </h3>
+                        <ul>
+                            <li data-i18n="m2.del1">
+                                Prompt de 100+ líneas estructurado
+                            </li>
+                            <li data-i18n="m2.del2">
+                                Flujo inteligente de clarificación
+                            </li>
+                            <li data-i18n="m2.del3">
+                                Sistema de confianza (HIGH/MEDIUM/LOW)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Flow diagram -->
+                <h3
+                    class="section-title"
+                    style="margin-top: 2rem"
+                    data-i18n="m2.flow"
+                >
+                    Flujo Inteligente de 4 Pasos
+                </h3>
+                <div class="flow-diagram">
+                    <div class="flow-step" data-i18n="m2.step1">
+                        1. ¿Necesita clarificación?
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-step" data-i18n="m2.step2">
+                        2. Construir query óptimo
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-step" data-i18n="m2.step3">
+                        3. Interpretar por confianza
+                    </div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-step" data-i18n="m2.step4">
+                        4. Instrucciones al LLM
+                    </div>
+                </div>
+
+                <!-- Code example -->
+                <h3 class="section-title" style="margin-top: 2rem">
+                    Few-Shot Examples
+                </h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>server.py - QUERY_DESCRIPTION</span>
+                    </div>
+                    <code
+                        >LOCALIZATION QUERY EXAMPLES: • Spain + electronic
+                        invoice → "l10n_es_facturae facturae" • Spain + AEAT
+                        taxes → "l10n_es_aeat modelo" • Mexico + CFDI invoice →
+                        "l10n_mx_edi cfdi" • Argentina + AFIP invoice →
+                        "l10n_ar_afipws factura" User: "electronic invoicing for
+                        Spain" ✅ CORRECT: "l10n_es_facturae facturae FACE" ❌
+                        INCORRECT: "electronic invoice e-invoice XML digital
+                        signature Spain..." ⚠️ For localizations: query of 2-4
+                        words maximum ⚠️ The l10n_XX_ prefix is MORE IMPORTANT
+                        than synonyms</code
+                    >
+                </div>
+
+                <div class="highlight-box">
+                    <strong
+                        >📝
+                        <span data-i18n="m2.delimiters"
+                            >Delimitadores por Modelo</span
+                        >:</strong
+                    >
+                    <span data-i18n="m2.delimitersText"
+                        >Claude prefiere XML, GPT triple comillas, Gemini
+                        markdown. En nuestro prompt usamos caracteres visuales
+                        (═══, ⚠️) que funcionan en todos.</span
+                    >
+                </div>
+            </div>
+
+            <!-- ==================== MÓDULO 3: EJECUTAR ==================== -->
+            <div id="ejecutar" class="tab-content">
+                <div class="module-header">
+                    <div class="module-number">03</div>
+                    <div class="module-title">
+                        <h2 data-i18n="m3.title">EJECUTAR</h2>
+                        <p data-i18n="m3.subtitle">
+                            IDEs Agénticos y Desarrollo Aumentado
+                        </p>
+                    </div>
+                </div>
+
+                <div class="module-grid">
+                    <div class="module-card">
+                        <h3>
+                            🎯
+                            <span data-i18n="module.objective">Objetivo</span>
+                        </h3>
+                        <ul>
+                            <li data-i18n="m3.obj1">
+                                Usar IDEs agénticos para desarrollo acelerado
+                            </li>
+                            <li data-i18n="m3.obj2">
+                                Implementar búsqueda híbrida con RRF
+                            </li>
+                            <li data-i18n="m3.obj3">
+                                Refactoring con lenguaje natural
+                            </li>
+                            <li data-i18n="m3.obj4">89 commits en 30 días</li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            🛠️
+                            <span data-i18n="module.tools">Herramientas</span>
+                        </h3>
+                        <ul>
+                            <li>Cursor (Composer1, 4x más rápido)</li>
+                            <li>Claude Code CLI (Sonnet 4, Opus 4.5)</li>
+                            <li>Zed (Grok-4-fast, sesiones largas)</li>
+                            <li>Claude Desktop/Web (validación)</li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>📊 <span data-i18n="m3.metrics">Métricas</span></h3>
+                        <ul>
+                            <li data-i18n="m3.met1">89 commits totales</li>
+                            <li data-i18n="m3.met2">
+                                2.9 commits/día promedio
+                            </li>
+                            <li data-i18n="m3.met3">
+                                Día más productivo: 9 commits
+                            </li>
+                            <li data-i18n="m3.met4">Speedup estimado: 4-8x</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <h3
+                    class="section-title"
+                    style="margin-top: 2rem"
+                    data-i18n="m3.timeline"
+                >
+                    Timeline de IDEs
+                </h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Nov 6-15</div>
+                        <div class="timeline-content">
+                            <h4>Cursor</h4>
+                            <p data-i18n="m3.t1">
+                                Inicio rápido. Edición multi-archivo,
+                                exploración inicial del código.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Nov 15-25</div>
+                        <div class="timeline-content">
+                            <h4>Claude Code CLI</h4>
+                            <p data-i18n="m3.t2">
+                                Desarrollo principal. Slash commands, tareas
+                                complejas de terminal, ETL.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Nov 25 - Dic 6</div>
+                        <div class="timeline-content">
+                            <h4>Zed + Claude</h4>
+                            <p data-i18n="m3.t3">
+                                Producción. Rendimiento superior (Rust),
+                                sesiones largas, integración final.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box success">
+                    <strong
+                        >🚀
+                        <span data-i18n="m3.example">Ejemplo Real</span
+                        >:</strong
+                    >
+                    <span data-i18n="m3.exampleText"
+                        >Expansión de mcp_tools.py: 149 → 493 líneas en ~30
+                        minutos. Sin IDE agéntico hubiera tomado ~4 horas.</span
+                    >
+                </div>
+            </div>
+
+            <!-- ==================== MÓDULO 4: AUTOMATIZAR ==================== -->
+            <div id="automatizar" class="tab-content">
+                <div class="module-header">
+                    <div class="module-number">04</div>
+                    <div class="module-title">
+                        <h2 data-i18n="m4.title">AUTOMATIZAR</h2>
+                        <p data-i18n="m4.subtitle">
+                            De SKILL a MCP - El Gran Pivote
+                        </p>
+                    </div>
+                </div>
+
+                <div class="highlight-box info" style="margin-bottom: 1.5rem">
+                    <strong>🔌 MCP = "USB-C para la IA":</strong>
+                    <span data-i18n="m4.usbcText"
+                        >Un estándar abierto que conecta cualquier LLM con
+                        cualquier herramienta. Un solo protocolo
+                        universal.</span
+                    >
+                </div>
+
+                <div class="module-grid">
+                    <div class="module-card">
+                        <h3>
+                            🎯
+                            <span data-i18n="module.objective">Objetivo</span>
+                        </h3>
+                        <ul>
+                            <li data-i18n="m4.obj1">
+                                Pivotar de Claude SKILL a MCP abierto
+                            </li>
+                            <li data-i18n="m4.obj2">
+                                Implementar con FastMCP (decoradores)
+                            </li>
+                            <li data-i18n="m4.obj3">
+                                Soportar STDIO + HTTP transporte
+                            </li>
+                            <li data-i18n="m4.obj4">
+                                Compatibilidad con 9 clientes
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            🔄
+                            <span data-i18n="m4.pivot">Por qué Pivotamos</span>
+                        </h3>
+                        <ul>
+                            <li data-i18n="m4.piv1">
+                                SKILL: Propietario Anthropic, beta cerrada
+                            </li>
+                            <li data-i18n="m4.piv2">
+                                MCP: Estándar abierto, múltiples clientes
+                            </li>
+                            <li data-i18n="m4.piv3">
+                                ChatGPT anunció soporte MCP (Sept 2025)
+                            </li>
+                            <li data-i18n="m4.piv4">
+                                Control total de infraestructura
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            🔌
+                            <span data-i18n="m4.components"
+                                >Componentes MCP</span
+                            >
+                        </h3>
+                        <ul>
+                            <li>
+                                <strong>Tools:</strong>
+                                <span data-i18n="m4.comp1"
+                                    >Funciones ejecutables ✓</span
+                                >
+                            </li>
+                            <li>
+                                <strong>Resources:</strong>
+                                <span data-i18n="m4.comp2"
+                                    >Datos estáticos (no usado)</span
+                                >
+                            </li>
+                            <li>
+                                <strong>Prompts:</strong>
+                                <span data-i18n="m4.comp3"
+                                    >Plantillas (no usado)</span
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- FastMCP code -->
+                <h3 class="section-title" style="margin-top: 2rem">
+                    FastMCP - Decoradores Pythonicos
+                </h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>mcp-server/src/ai_odoofinder_mcp/server.py</span>
+                    </div>
+                    <code
+                        >from fastmcp import FastMCP from typing import
+                        Annotated mcp = FastMCP("AI-OdooFinder") @mcp.tool()
+                        async def search_odoo_modules( query: Annotated[str,
+                        QUERY_DESCRIPTION], # 100+ líneas de instrucciones
+                        version: Annotated[str, "Odoo version (16.0, 17.0,
+                        18.0)"], dependencies: Annotated[Optional[list[str]],
+                        "Required dependencies"] = None, limit: Annotated[int,
+                        "Max results (default: 5)"] = 5, ) -> str: """Search OCA
+                        modules with hybrid search.""" async with
+                        httpx.AsyncClient() as client: response = await
+                        client.get(f"{API_URL}/search", params={...}) return
+                        _format_results_intelligent(response.json())</code
+                    >
+                </div>
+
+                <!-- Clients table -->
+                <h3
+                    class="section-title"
+                    style="margin-top: 2rem"
+                    data-i18n="m4.clients"
+                >
+                    Clientes Soportados
+                </h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Local (STDIO)</th>
+                                <th>Remoto (HTTP)</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Claude Desktop</td>
+                                <td>✅</td>
+                                <td>❌</td>
+                                <td>Estable</td>
+                            </tr>
+                            <tr>
+                                <td>Claude.ai Web</td>
+                                <td>❌</td>
+                                <td>✅</td>
+                                <td>Estable</td>
+                            </tr>
+                            <tr>
+                                <td>Claude Code CLI</td>
+                                <td>✅</td>
+                                <td>✅</td>
+                                <td>Estable</td>
+                            </tr>
+                            <tr>
+                                <td>ChatGPT Dev Mode</td>
+                                <td>✅</td>
+                                <td>✅</td>
+                                <td>Beta</td>
+                            </tr>
+                            <tr>
+                                <td>VSCode Copilot</td>
+                                <td>✅</td>
+                                <td>⚠️</td>
+                                <td>GA</td>
+                            </tr>
+                            <tr>
+                                <td>Cursor</td>
+                                <td>✅</td>
+                                <td>❌</td>
+                                <td>Estable</td>
+                            </tr>
+                            <tr>
+                                <td>Zed</td>
+                                <td>✅</td>
+                                <td>❌</td>
+                                <td>Estable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== MÓDULO 5: INTEGRAR ==================== -->
+            <div id="integrar" class="tab-content">
+                <div class="module-header">
+                    <div class="module-number">05</div>
+                    <div class="module-title">
+                        <h2 data-i18n="m5.title">INTEGRAR</h2>
+                        <p data-i18n="m5.subtitle">
+                            APIs de IA y Búsqueda Híbrida
+                        </p>
+                    </div>
+                </div>
+
+                <div class="module-grid">
+                    <div class="module-card">
+                        <h3>
+                            🎯
+                            <span data-i18n="module.objective">Objetivo</span>
+                        </h3>
+                        <ul>
+                            <li data-i18n="m5.obj1">
+                                Usar OpenRouter como gateway unificado
+                            </li>
+                            <li data-i18n="m5.obj2">
+                                Implementar búsqueda híbrida RRF
+                            </li>
+                            <li data-i18n="m5.obj3">
+                                Enriquecer módulos con IA
+                            </li>
+                            <li data-i18n="m5.obj4">
+                                Mantener costes bajo control (&lt;$2)
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>🤖 <span data-i18n="m5.models">Modelos</span></h3>
+                        <ul>
+                            <li>
+                                <strong>Embeddings:</strong> Qwen3-Embedding-4B
+                            </li>
+                            <li><strong>Enrichment:</strong> Grok-4-fast</li>
+                            <li data-i18n="m5.mod1">
+                                Dimensiones: 2560 (máxima precisión)
+                            </li>
+                            <li data-i18n="m5.mod2">
+                                Matryoshka: soporte 512/1024/2560
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>💰 <span data-i18n="m5.costs">Costes</span></h3>
+                        <ul>
+                            <li data-i18n="m5.cost1">
+                                Embeddings (16,494 módulos): ~$0.10
+                            </li>
+                            <li data-i18n="m5.cost2">
+                                Enrichment (16,494 módulos): ~$1.50
+                            </li>
+                            <li data-i18n="m5.cost3">
+                                Queries producción: ~$0.01
+                            </li>
+                            <li>
+                                <strong data-i18n="m5.cost4"
+                                    >TOTAL: $1.76 (88% bajo presupuesto)</strong
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- RRF diagram -->
+                <h3
+                    class="section-title"
+                    style="margin-top: 2rem"
+                    data-i18n="m5.rrf"
+                >
+                    Reciprocal Rank Fusion (RRF)
+                </h3>
+                <div class="architecture-diagram">
+                    <pre>
+                         QUERY: "facturación electrónica españa"
+                                        │
+                    ┌───────────────────┴───────────────────┐
+                    │                                       │
+                    ▼                                       ▼
+          ┌─────────────────┐                   ┌─────────────────┐
+          │  VECTOR SEARCH  │                   │   BM25 SEARCH   │
+          │  (pgvector)     │                   │   (tsvector)    │
+          │                 │                   │                 │
+          │ Embeddings      │                   │ Full-text       │
+          │ Qwen3 2560d     │                   │ Español/Inglés  │
+          └────────┬────────┘                   └────────┬────────┘
+                   │ Top 50                              │ Top 50
+                   │                                     │
+                   └──────────────┬──────────────────────┘
+                                  │
+                                  ▼
+          ┌─────────────────────────────────────────────────────┐
+          │           RECIPROCAL RANK FUSION                    │
+          │                                                     │
+          │   RRF_score(d) = 1/(k + rank_v) + 1/(k + rank_b)   │
+          │                                                     │
+          │   k = 60 (constante de suavizado)                  │
+          └──────────────────────┬──────────────────────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │    RESULTADOS FINALES   │
+                    │                         │
+                    │ 1. l10n_es_facturae    │
+                    │ 2. l10n_es_facturae_face│
+                    │ 3. account_invoice_facturx│
+                    └─────────────────────────┘
+</pre
+                    >
+                </div>
+
+                <div class="highlight-box warning">
+                    <strong>🔐 Best Practice:</strong>
+                    <span data-i18n="m5.tip"
+                        >Nunca hardcodear API keys. Usar variables de entorno
+                        (.env) excluidas de git. OpenRouter unifica billing y
+                        permite fallback automático.</span
+                    >
+                </div>
+            </div>
+
+            <!-- ==================== MÓDULO 6: SINTETIZAR ==================== -->
+            <div id="sintetizar" class="tab-content">
+                <div class="module-header">
+                    <div class="module-number">06</div>
+                    <div class="module-title">
+                        <h2 data-i18n="m6.title">SINTETIZAR</h2>
+                        <p data-i18n="m6.subtitle">
+                            Arquitectura Tool-First y Resultados Finales
+                        </p>
+                    </div>
+                </div>
+
+                <div class="module-grid">
+                    <div class="module-card">
+                        <h3>
+                            🏗️
+                            <span data-i18n="m6.arch"
+                                >Arquitectura Tool-First</span
+                            >
+                        </h3>
+                        <ul>
+                            <li data-i18n="m6.arch1">
+                                Sin UI web propia que mantener
+                            </li>
+                            <li data-i18n="m6.arch2">
+                                Los clientes MCP SON la UI
+                            </li>
+                            <li data-i18n="m6.arch3">
+                                Solo desarrollamos Backend + MCP
+                            </li>
+                            <li data-i18n="m6.arch4">
+                                El LLM maneja la experiencia de usuario
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            🖥️
+                            <span data-i18n="m6.infra"
+                                >Infraestructura Final</span
+                            >
+                        </h3>
+                        <ul>
+                            <li>Hetzner VPS (ARM64, ~4€/mes)</li>
+                            <li>Docker Compose (API + DB + MCP)</li>
+                            <li>PostgreSQL 17 + pgvector</li>
+                            <li>Tailscale Funnel (HTTPS auto)</li>
+                        </ul>
+                    </div>
+
+                    <div class="module-card">
+                        <h3>
+                            📊
+                            <span data-i18n="m6.final"
+                                >Estadísticas Finales</span
+                            >
+                        </h3>
+                        <ul>
+                            <li data-i18n="m6.stat1">
+                                16,494 módulos indexados
+                            </li>
+                            <li data-i18n="m6.stat2">100% con AI enrichment</li>
+                            <li data-i18n="m6.stat3">Precision@5: 87%</li>
+                            <li data-i18n="m6.stat4">Recall@10: 92%</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Summary diagram -->
+                <h3
+                    class="section-title"
+                    style="margin-top: 2rem"
+                    data-i18n="m6.summary"
+                >
+                    El Proyecto Como Síntesis del Curso
+                </h3>
+                <div class="architecture-diagram">
+                    <pre>
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                         │
+│  1. INVESTIGAR ──→ Deep research con Gemini 2.5 Pro                    │
+│                    └─→ Arquitectura RAG Híbrida definida               │
+│                                                                         │
+│  2. DIALOGAR ────→ Prompts iterativos con Few-Shot + CoT               │
+│                    └─→ Flujo inteligente de 4 pasos                    │
+│                                                                         │
+│  3. EJECUTAR ────→ Cursor → Claude Code → Zed                          │
+│                    └─→ 89 commits en 30 días (speedup 4-8x)            │
+│                                                                         │
+│  4. AUTOMATIZAR ─→ SKILL → MCP (pivote estratégico)                    │
+│                    └─→ 9 clientes soportados                           │
+│                                                                         │
+│  5. INTEGRAR ────→ OpenRouter + Qwen3 + Grok-4                         │
+│                    └─→ $1.76 coste total (88% bajo presupuesto)        │
+│                                                                         │
+│  6. SINTETIZAR ──→ Tool-first architecture                             │
+│                    └─→ 16,494 módulos accesibles vía MCP               │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+</pre
+                    >
+                </div>
+
+                <div class="highlight-box success">
+                    <strong
+                        >🎯
+                        <span data-i18n="m6.result">Resultado Final</span
+                        >:</strong
+                    >
+                    <span data-i18n="m6.resultText"
+                        >Un buscador inteligente de módulos Odoo que cualquier
+                        empresa puede usar, que costó menos de $2 en APIs y
+                        ~5€/mes en infraestructura, y que soporta 9 clientes MCP
+                        diferentes.</span
+                    >
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem">
+                    <a
+                        href="https://github.com/SantipBarber/ai-odoo-finder"
+                        target="_blank"
+                        class="btn btn-primary"
+                    >
+                        <span>⭐</span>
+                        <span data-i18n="m6.star">Dar estrella en GitHub</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-top">
+                    <div class="footer-brand">
+                        <h3>AI-OdooFinder</h3>
+                        <p data-i18n="footer.description">
+                            Proyecto final del curso AI Expert de DevExpert.
+                            Noviembre - Diciembre 2025.
+                        </p>
+                    </div>
+                    <div class="footer-links-group">
+                        <h4 data-i18n="footer.project">Proyecto</h4>
+                        <a
+                            href="https://github.com/SantipBarber/ai-odoo-finder"
+                            target="_blank"
+                            >GitHub</a
+                        >
+                        <a
+                            href="https://github.com/SantipBarber/ai-odoo-finder/tree/main/docs"
+                            target="_blank"
+                            data-i18n="footer.docs"
+                            >Documentación</a
+                        >
+                        <a
+                            href="https://github.com/SantipBarber/ai-odoo-finder/tree/main/mcp-server"
+                            target="_blank"
+                            >MCP Server</a
+                        >
+                    </div>
+                    <div class="footer-links-group">
+                        <h4 data-i18n="footer.tech">Tecnologías</h4>
+                        <a
+                            href="https://github.com/jlowin/fastmcp"
+                            target="_blank"
+                            >FastMCP</a
+                        >
+                        <a href="https://openrouter.ai" target="_blank"
+                            >OpenRouter</a
+                        >
+                        <a
+                            href="https://github.com/pgvector/pgvector"
+                            target="_blank"
+                            >pgvector</a
+                        >
+                        <a
+                            href="https://modelcontextprotocol.io"
+                            target="_blank"
+                            >MCP Protocol</a
+                        >
+                    </div>
+                    <div class="footer-links-group">
+                        <h4 data-i18n="footer.odoo">Odoo</h4>
+                        <a href="https://github.com/OCA" target="_blank"
+                            >OCA GitHub</a
+                        >
+                        <a href="https://odoo-community.org" target="_blank"
+                            >OCA Website</a
+                        >
+                        <a href="https://www.odoo.com" target="_blank"
+                            >Odoo.com</a
+                        >
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="footer-copy">
+                        © 2025 Santiago Pérez Barber ·
+                        <span data-i18n="footer.madeWith">Hecho con</span> ❤️
+                        <span data-i18n="footer.and">y</span> AI
+                    </div>
+                    <div class="footer-social">
+                        <a
+                            href="https://github.com/SantipBarber"
+                            target="_blank"
+                            title="GitHub"
+                            >👨‍💻</a
+                        >
+                        <a
+                            href="https://linkedin.com/in/santipbarber"
+                            target="_blank"
+                            title="LinkedIn"
+                            >💼</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- JAVASCRIPT -->
+        <script>
+            // ============================================
+            // TRANSLATIONS
+            // ============================================
+            const i18n = {
+                es: {
+                    // Header
+                    "header.subtitle": "Proyecto Final AI Expert",
+
+                    // Navigation
+                    "nav.dashboard": "Dashboard",
+                    "nav.investigar": "Investigar",
+                    "nav.dialogar": "Dialogar",
+                    "nav.ejecutar": "Ejecutar",
+                    "nav.automatizar": "Automatizar",
+                    "nav.integrar": "Integrar",
+                    "nav.sintetizar": "Sintetizar",
+
+                    // Theme
+                    "theme.dark": "Oscuro",
+                    "theme.light": "Claro",
+
+                    // Dashboard
+                    "dashboard.badge": "Búsqueda Híbrida con IA",
+                    "dashboard.title":
+                        "Encuentra el módulo Odoo perfecto en segundos",
+                    "dashboard.subtitle":
+                        "Un servidor MCP que conecta LLMs con 16,000+ módulos OCA usando búsqueda semántica + full-text con Reciprocal Rank Fusion",
+                    "dashboard.github": "Ver en GitHub",
+                    "dashboard.docs": "Documentación MCP",
+                    "dashboard.problem": "El Problema",
+                    "dashboard.architecture": "Arquitectura",
+                    "dashboard.techTitle": "Stack Tecnológico",
+
+                    // Stats
+                    "stats.modules": "Módulos indexados",
+                    "stats.repos": "Repositorios OCA",
+                    "stats.versions": "Versiones Odoo",
+                    "stats.response": "ms respuesta",
+                    "stats.clients": "Clientes MCP",
+                    "stats.cost": "Coste total APIs",
+
+                    // Problem/Solution
+                    "problem.title": "Sin AI-OdooFinder",
+                    "problem.p1":
+                        "Desarrollas funcionalidades que ya existen en OCA",
+                    "problem.p2":
+                        "Pierdes horas buscando el módulo correcto en GitHub",
+                    "problem.p3":
+                        "Instalas módulos incompatibles con tu versión",
+                    "problem.p4":
+                        "Descubres módulos abandonados tras integrarlos",
+                    "solution.title": "Con AI-OdooFinder",
+                    "solution.s1":
+                        "Búsqueda semántica + keyword en un solo query",
+                    "solution.s2": "Filtrado automático por versión de Odoo",
+                    "solution.s3": "Descripciones enriquecidas con IA (Grok-4)",
+                    "solution.s4":
+                        "Integración directa desde Claude, Cursor, VSCode...",
+
+                    // Tech
+                    "tech.fastmcp":
+                        "Framework Python para servidores MCP. Decoradores simples, transporte dual STDIO/HTTP.",
+                    "tech.search":
+                        "Búsqueda híbrida: embeddings Qwen3 (2560 dims) + full-text con fusión RRF.",
+                    "tech.fastapi":
+                        "Backend async de alto rendimiento. Python 3.13+, documentación OpenAPI.",
+                    "tech.openrouter":
+                        "Gateway unificado para LLMs. Qwen3 para embeddings, Grok-4 para enrichment.",
+                    "tech.docker":
+                        "Despliegue containerizado en VPS ARM64. ~5€/mes sin cold starts.",
+                    "tech.tailscale":
+                        "HTTPS automático sin configuración. Túnel seguro para acceso remoto.",
+
+                    // Common module labels
+                    "module.objective": "Objetivo",
+                    "module.tools": "Herramientas",
+                    "module.deliverable": "Entregable",
+                    "module.techniques": "Técnicas",
+
+                    // Module 1
+                    "m1.title": "INVESTIGAR",
+                    "m1.subtitle":
+                        "Aprende a Aprender con IA - Deep Research y Validación Cruzada",
+                    "m1.obj1": "Deep research exhaustivo con Gemini 2.5 Pro",
+                    "m1.obj2":
+                        'Identificar el "Triángulo de Dificultad" de Odoo',
+                    "m1.obj3": "Evaluar 4 arquitecturas de IA para la solución",
+                    "m1.obj4": "Validación cruzada con múltiples modelos",
+                    "m1.del1": "Documento de 15+ páginas de análisis",
+                    "m1.del2": "Comparativa de herramientas existentes",
+                    "m1.del3": "Arquitectura RAG Híbrida definida",
+                    "m1.triangle": "El Triángulo de Dificultad de Odoo",
+                    "m1.comparison": "Evaluación de Arquitecturas",
+                    "table.architecture": "Arquitectura",
+                    "table.versioning": "Manejo Versionado",
+                    "table.viability": "Viabilidad",
+                    "m1.poor": "Pobre (Alucina)",
+                    "m1.poor2": "Pobre (No determinista)",
+                    "m1.excellent": "Excelente (con backend)",
+                    "m1.excellent2": "Excelente (Determinista)",
+                    "m1.inviable": "Inviable",
+                    "m1.low": "Baja",
+                    "m1.high": "Alta",
+                    "m1.optimal": "Óptima",
+                    "m1.tip":
+                        "Define primero QUÉ debe hacer el sistema antes de implementar CÓMO. Cada feature tuvo su SPEC antes de codificar.",
+
+                    // Module 2
+                    "m2.title": "DIALOGAR",
+                    "m2.subtitle":
+                        "Prompt Engineering y Context Engineering Avanzado",
+                    "m2.principle": "Principio Fundamental",
+                    "m2.principleText":
+                        '"Calidad de Entrada → Calidad de Salida". El modelo no puede leer tu mente. La ambigüedad es el enemigo.',
+                    "m2.obj1":
+                        "Evolucionar de prompts simples a flujo inteligente",
+                    "m2.obj2": "Implementar Few-Shot con ejemplos concretos",
+                    "m2.obj3": "Crear Chain of Thought de 4 pasos",
+                    "m2.obj4": "Usar delimitadores efectivos para cada modelo",
+                    "m2.tech3": "Delimitadores (═══, ⚠️, 🚨)",
+                    "m2.tech4": "Ejemplos correctos vs incorrectos",
+                    "m2.del1": "Prompt de 100+ líneas estructurado",
+                    "m2.del2": "Flujo inteligente de clarificación",
+                    "m2.del3": "Sistema de confianza (HIGH/MEDIUM/LOW)",
+                    "m2.flow": "Flujo Inteligente de 4 Pasos",
+                    "m2.step1": "1. ¿Necesita clarificación?",
+                    "m2.step2": "2. Construir query óptimo",
+                    "m2.step3": "3. Interpretar por confianza",
+                    "m2.step4": "4. Instrucciones al LLM",
+                    "m2.delimiters": "Delimitadores por Modelo",
+                    "m2.delimitersText":
+                        "Claude prefiere XML, GPT triple comillas, Gemini markdown. En nuestro prompt usamos caracteres visuales (═══, ⚠️) que funcionan en todos.",
+
+                    // Module 3
+                    "m3.title": "EJECUTAR",
+                    "m3.subtitle": "IDEs Agénticos y Desarrollo Aumentado",
+                    "m3.obj1": "Usar IDEs agénticos para desarrollo acelerado",
+                    "m3.obj2": "Implementar búsqueda híbrida con RRF",
+                    "m3.obj3": "Refactoring con lenguaje natural",
+                    "m3.obj4": "89 commits en 30 días",
+                    "m3.metrics": "Métricas",
+                    "m3.met1": "89 commits totales",
+                    "m3.met2": "2.9 commits/día promedio",
+                    "m3.met3": "Día más productivo: 9 commits",
+                    "m3.met4": "Speedup estimado: 4-8x",
+                    "m3.timeline": "Timeline de IDEs",
+                    "m3.t1":
+                        "Inicio rápido. Edición multi-archivo, exploración inicial del código.",
+                    "m3.t2":
+                        "Desarrollo principal. Slash commands, tareas complejas de terminal, ETL.",
+                    "m3.t3":
+                        "Producción. Rendimiento superior (Rust), sesiones largas, integración final.",
+                    "m3.example": "Ejemplo Real",
+                    "m3.exampleText":
+                        "Expansión de mcp_tools.py: 149 → 493 líneas en ~30 minutos. Sin IDE agéntico hubiera tomado ~4 horas.",
+
+                    // Module 4
+                    "m4.title": "AUTOMATIZAR",
+                    "m4.subtitle": "De SKILL a MCP - El Gran Pivote",
+                    "m4.usbcText":
+                        "Un estándar abierto que conecta cualquier LLM con cualquier herramienta. Un solo protocolo universal.",
+                    "m4.obj1": "Pivotar de Claude SKILL a MCP abierto",
+                    "m4.obj2": "Implementar con FastMCP (decoradores)",
+                    "m4.obj3": "Soportar STDIO + HTTP transporte",
+                    "m4.obj4": "Compatibilidad con 9 clientes",
+                    "m4.pivot": "Por qué Pivotamos",
+                    "m4.piv1": "SKILL: Propietario Anthropic, beta cerrada",
+                    "m4.piv2": "MCP: Estándar abierto, múltiples clientes",
+                    "m4.piv3": "ChatGPT anunció soporte MCP (Sept 2025)",
+                    "m4.piv4": "Control total de infraestructura",
+                    "m4.components": "Componentes MCP",
+                    "m4.comp1": "Funciones ejecutables ✓",
+                    "m4.comp2": "Datos estáticos (no usado)",
+                    "m4.comp3": "Plantillas (no usado)",
+                    "m4.clients": "Clientes Soportados",
+
+                    // Module 5
+                    "m5.title": "INTEGRAR",
+                    "m5.subtitle": "APIs de IA y Búsqueda Híbrida",
+                    "m5.obj1": "Usar OpenRouter como gateway unificado",
+                    "m5.obj2": "Implementar búsqueda híbrida RRF",
+                    "m5.obj3": "Enriquecer módulos con IA",
+                    "m5.obj4": "Mantener costes bajo control (<$2)",
+                    "m5.models": "Modelos",
+                    "m5.mod1": "Dimensiones: 2560 (máxima precisión)",
+                    "m5.mod2": "Matryoshka: soporte 512/1024/2560",
+                    "m5.costs": "Costes",
+                    "m5.cost1": "Embeddings (16,494 módulos): ~$0.10",
+                    "m5.cost2": "Enrichment (16,494 módulos): ~$1.50",
+                    "m5.cost3": "Queries producción: ~$0.01",
+                    "m5.cost4": "TOTAL: $1.76 (88% bajo presupuesto)",
+                    "m5.rrf": "Reciprocal Rank Fusion (RRF)",
+                    "m5.tip":
+                        "Nunca hardcodear API keys. Usar variables de entorno (.env) excluidas de git. OpenRouter unifica billing y permite fallback automático.",
+
+                    // Module 6
+                    "m6.title": "SINTETIZAR",
+                    "m6.subtitle":
+                        "Arquitectura Tool-First y Resultados Finales",
+                    "m6.arch": "Arquitectura Tool-First",
+                    "m6.arch1": "Sin UI web propia que mantener",
+                    "m6.arch2": "Los clientes MCP SON la UI",
+                    "m6.arch3": "Solo desarrollamos Backend + MCP",
+                    "m6.arch4": "El LLM maneja la experiencia de usuario",
+                    "m6.infra": "Infraestructura Final",
+                    "m6.final": "Estadísticas Finales",
+                    "m6.stat1": "16,494 módulos indexados",
+                    "m6.stat2": "100% con AI enrichment",
+                    "m6.stat3": "Precision@5: 87%",
+                    "m6.stat4": "Recall@10: 92%",
+                    "m6.summary": "El Proyecto Como Síntesis del Curso",
+                    "m6.result": "Resultado Final",
+                    "m6.resultText":
+                        "Un buscador inteligente de módulos Odoo que cualquier empresa puede usar, que costó menos de $2 en APIs y ~5€/mes en infraestructura, y que soporta 9 clientes MCP diferentes.",
+                    "m6.star": "Dar estrella en GitHub",
+
+                    // Footer
+                    "footer.description":
+                        "Proyecto final del curso AI Expert de DevExpert. Noviembre - Diciembre 2025.",
+                    "footer.project": "Proyecto",
+                    "footer.docs": "Documentación",
+                    "footer.tech": "Tecnologías",
+                    "footer.odoo": "Odoo",
+                    "footer.madeWith": "Hecho con",
+                    "footer.and": "y",
+                },
+                en: {
+                    // Header
+                    "header.subtitle": "AI Expert Final Project",
+
+                    // Navigation
+                    "nav.dashboard": "Dashboard",
+                    "nav.investigar": "Research",
+                    "nav.dialogar": "Dialog",
+                    "nav.ejecutar": "Execute",
+                    "nav.automatizar": "Automate",
+                    "nav.integrar": "Integrate",
+                    "nav.sintetizar": "Synthesize",
+
+                    // Theme
+                    "theme.dark": "Dark",
+                    "theme.light": "Light",
+
+                    // Dashboard
+                    "dashboard.badge": "AI-Powered Hybrid Search",
+                    "dashboard.title":
+                        "Find the perfect Odoo module in seconds",
+                    "dashboard.subtitle":
+                        "An MCP server connecting LLMs with 16,000+ OCA modules using semantic + full-text search with Reciprocal Rank Fusion",
+                    "dashboard.github": "View on GitHub",
+                    "dashboard.docs": "MCP Documentation",
+                    "dashboard.problem": "The Problem",
+                    "dashboard.architecture": "Architecture",
+                    "dashboard.techTitle": "Tech Stack",
+
+                    // Stats
+                    "stats.modules": "Indexed modules",
+                    "stats.repos": "OCA Repositories",
+                    "stats.versions": "Odoo versions",
+                    "stats.response": "ms response",
+                    "stats.clients": "MCP Clients",
+                    "stats.cost": "Total API cost",
+
+                    // Problem/Solution
+                    "problem.title": "Without AI-OdooFinder",
+                    "problem.p1":
+                        "You build features that already exist in OCA",
+                    "problem.p2":
+                        "You waste hours searching for the right module on GitHub",
+                    "problem.p3":
+                        "You install modules incompatible with your version",
+                    "problem.p4":
+                        "You discover abandoned modules after integration",
+                    "solution.title": "With AI-OdooFinder",
+                    "solution.s1":
+                        "Semantic + keyword search in a single query",
+                    "solution.s2": "Automatic filtering by Odoo version",
+                    "solution.s3": "AI-enriched descriptions (Grok-4)",
+                    "solution.s4":
+                        "Direct integration from Claude, Cursor, VSCode...",
+
+                    // Tech
+                    "tech.fastmcp":
+                        "Python framework for MCP servers. Simple decorators, dual STDIO/HTTP transport.",
+                    "tech.search":
+                        "Hybrid search: Qwen3 embeddings (2560 dims) + full-text with RRF fusion.",
+                    "tech.fastapi":
+                        "High-performance async backend. Python 3.13+, OpenAPI documentation.",
+                    "tech.openrouter":
+                        "Unified LLM gateway. Qwen3 for embeddings, Grok-4 for enrichment.",
+                    "tech.docker":
+                        "Containerized deployment on ARM64 VPS. ~5€/month with no cold starts.",
+                    "tech.tailscale":
+                        "Automatic HTTPS with zero config. Secure tunnel for remote access.",
+
+                    // Common module labels
+                    "module.objective": "Objective",
+                    "module.tools": "Tools",
+                    "module.deliverable": "Deliverable",
+                    "module.techniques": "Techniques",
+
+                    // Module 1
+                    "m1.title": "RESEARCH",
+                    "m1.subtitle":
+                        "Learn to Learn with AI - Deep Research and Cross-Validation",
+                    "m1.obj1": "Exhaustive deep research with Gemini 2.5 Pro",
+                    "m1.obj2": 'Identify Odoo\'s "Triangle of Difficulty"',
+                    "m1.obj3": "Evaluate 4 AI architectures for the solution",
+                    "m1.obj4": "Cross-validation with multiple models",
+                    "m1.del1": "15+ page analysis document",
+                    "m1.del2": "Comparison of existing tools",
+                    "m1.del3": "Hybrid RAG architecture defined",
+                    "m1.triangle": "Odoo's Triangle of Difficulty",
+                    "m1.comparison": "Architecture Evaluation",
+                    "table.architecture": "Architecture",
+                    "table.versioning": "Version Handling",
+                    "table.viability": "Viability",
+                    "m1.poor": "Poor (Hallucinates)",
+                    "m1.poor2": "Poor (Non-deterministic)",
+                    "m1.excellent": "Excellent (with backend)",
+                    "m1.excellent2": "Excellent (Deterministic)",
+                    "m1.inviable": "Not viable",
+                    "m1.low": "Low",
+                    "m1.high": "High",
+                    "m1.optimal": "Optimal",
+                    "m1.tip":
+                        "Define WHAT the system should do before implementing HOW. Each feature had its SPEC before coding.",
+
+                    // Module 2
+                    "m2.title": "DIALOG",
+                    "m2.subtitle": "Advanced Prompt and Context Engineering",
+                    "m2.principle": "Fundamental Principle",
+                    "m2.principleText":
+                        '"Quality In → Quality Out". The model can\'t read your mind. Ambiguity is the enemy.',
+                    "m2.obj1": "Evolve from simple prompts to intelligent flow",
+                    "m2.obj2": "Implement Few-Shot with concrete examples",
+                    "m2.obj3": "Create 4-step Chain of Thought",
+                    "m2.obj4": "Use effective delimiters for each model",
+                    "m2.tech3": "Delimiters (═══, ⚠️, 🚨)",
+                    "m2.tech4": "Correct vs incorrect examples",
+                    "m2.del1": "100+ line structured prompt",
+                    "m2.del2": "Intelligent clarification flow",
+                    "m2.del3": "Confidence system (HIGH/MEDIUM/LOW)",
+                    "m2.flow": "Intelligent 4-Step Flow",
+                    "m2.step1": "1. Need clarification?",
+                    "m2.step2": "2. Build optimal query",
+                    "m2.step3": "3. Interpret by confidence",
+                    "m2.step4": "4. Instructions to LLM",
+                    "m2.delimiters": "Delimiters by Model",
+                    "m2.delimitersText":
+                        "Claude prefers XML, GPT triple quotes, Gemini markdown. Our prompt uses visual characters (═══, ⚠️) that work on all.",
+
+                    // Module 3
+                    "m3.title": "EXECUTE",
+                    "m3.subtitle": "Agentic IDEs and Augmented Development",
+                    "m3.obj1": "Use agentic IDEs for accelerated development",
+                    "m3.obj2": "Implement hybrid search with RRF",
+                    "m3.obj3": "Natural language refactoring",
+                    "m3.obj4": "89 commits in 30 days",
+                    "m3.metrics": "Metrics",
+                    "m3.met1": "89 total commits",
+                    "m3.met2": "2.9 commits/day average",
+                    "m3.met3": "Most productive day: 9 commits",
+                    "m3.met4": "Estimated speedup: 4-8x",
+                    "m3.timeline": "IDE Timeline",
+                    "m3.t1":
+                        "Quick start. Multi-file editing, initial code exploration.",
+                    "m3.t2":
+                        "Main development. Slash commands, complex terminal tasks, ETL.",
+                    "m3.t3":
+                        "Production. Superior performance (Rust), long sessions, final integration.",
+                    "m3.example": "Real Example",
+                    "m3.exampleText":
+                        "mcp_tools.py expansion: 149 → 493 lines in ~30 minutes. Without agentic IDE it would have taken ~4 hours.",
+
+                    // Module 4
+                    "m4.title": "AUTOMATE",
+                    "m4.subtitle": "From SKILL to MCP - The Great Pivot",
+                    "m4.usbcText":
+                        "An open standard that connects any LLM with any tool. One universal protocol.",
+                    "m4.obj1": "Pivot from Claude SKILL to open MCP",
+                    "m4.obj2": "Implement with FastMCP (decorators)",
+                    "m4.obj3": "Support STDIO + HTTP transport",
+                    "m4.obj4": "Compatibility with 9 clients",
+                    "m4.pivot": "Why We Pivoted",
+                    "m4.piv1": "SKILL: Anthropic proprietary, closed beta",
+                    "m4.piv2": "MCP: Open standard, multiple clients",
+                    "m4.piv3": "ChatGPT announced MCP support (Sept 2025)",
+                    "m4.piv4": "Full control of infrastructure",
+                    "m4.components": "MCP Components",
+                    "m4.comp1": "Executable functions ✓",
+                    "m4.comp2": "Static data (not used)",
+                    "m4.comp3": "Templates (not used)",
+                    "m4.clients": "Supported Clients",
+
+                    // Module 5
+                    "m5.title": "INTEGRATE",
+                    "m5.subtitle": "AI APIs and Hybrid Search",
+                    "m5.obj1": "Use OpenRouter as unified gateway",
+                    "m5.obj2": "Implement RRF hybrid search",
+                    "m5.obj3": "Enrich modules with AI",
+                    "m5.obj4": "Keep costs under control (<$2)",
+                    "m5.models": "Models",
+                    "m5.mod1": "Dimensions: 2560 (max precision)",
+                    "m5.mod2": "Matryoshka: supports 512/1024/2560",
+                    "m5.costs": "Costs",
+                    "m5.cost1": "Embeddings (16,494 modules): ~$0.10",
+                    "m5.cost2": "Enrichment (16,494 modules): ~$1.50",
+                    "m5.cost3": "Production queries: ~$0.01",
+                    "m5.cost4": "TOTAL: $1.76 (88% under budget)",
+                    "m5.rrf": "Reciprocal Rank Fusion (RRF)",
+                    "m5.tip":
+                        "Never hardcode API keys. Use environment variables (.env) excluded from git. OpenRouter unifies billing and enables automatic fallback.",
+
+                    // Module 6
+                    "m6.title": "SYNTHESIZE",
+                    "m6.subtitle": "Tool-First Architecture and Final Results",
+                    "m6.arch": "Tool-First Architecture",
+                    "m6.arch1": "No web UI to maintain",
+                    "m6.arch2": "MCP clients ARE the UI",
+                    "m6.arch3": "We only develop Backend + MCP",
+                    "m6.arch4": "The LLM handles user experience",
+                    "m6.infra": "Final Infrastructure",
+                    "m6.final": "Final Statistics",
+                    "m6.stat1": "16,494 indexed modules",
+                    "m6.stat2": "100% with AI enrichment",
+                    "m6.stat3": "Precision@5: 87%",
+                    "m6.stat4": "Recall@10: 92%",
+                    "m6.summary": "The Project as Course Synthesis",
+                    "m6.result": "Final Result",
+                    "m6.resultText":
+                        "An intelligent Odoo module finder that any company can use, costing less than $2 in APIs and ~5€/month in infrastructure, supporting 9 different MCP clients.",
+                    "m6.star": "Star on GitHub",
+
+                    // Footer
+                    "footer.description":
+                        "Final project for the AI Expert course at DevExpert. November - December 2025.",
+                    "footer.project": "Project",
+                    "footer.docs": "Documentation",
+                    "footer.tech": "Technologies",
+                    "footer.odoo": "Odoo",
+                    "footer.madeWith": "Made with",
+                    "footer.and": "and",
+                },
+            };
+
+            // ============================================
+            // STATE
+            // ============================================
+            let currentLang = localStorage.getItem("lang") || "es";
+            let currentTheme =
+                localStorage.getItem("theme") ||
+                (window.matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light");
+
+            // ============================================
+            // INITIALIZATION
+            // ============================================
+            document.addEventListener("DOMContentLoaded", () => {
+                setLanguage(currentLang);
+                setTheme(currentTheme);
+                animateStats();
+            });
+
+            // ============================================
+            // TAB NAVIGATION
+            // ============================================
+            function showTab(tabId) {
+                document.querySelectorAll(".tab-content").forEach((tab) => {
+                    tab.classList.remove("active");
+                });
+                document.querySelectorAll(".nav-tab").forEach((nav) => {
+                    nav.classList.remove("active");
+                });
+
+                document.getElementById(tabId).classList.add("active");
+                document
+                    .querySelector(`[data-tab="${tabId}"]`)
+                    .classList.add("active");
+
+                if (tabId === "dashboard") {
+                    animateStats();
+                }
+
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
+            // ============================================
+            // LANGUAGE TOGGLE
+            // ============================================
+            function toggleLanguage() {
+                currentLang = currentLang === "es" ? "en" : "es";
+                setLanguage(currentLang);
+                localStorage.setItem("lang", currentLang);
+            }
+
+            function setLanguage(lang) {
+                currentLang = lang;
+                document.documentElement.lang = lang;
+
+                document.querySelectorAll("[data-i18n]").forEach((el) => {
+                    const key = el.getAttribute("data-i18n");
+                    if (i18n[lang][key]) {
+                        el.textContent = i18n[lang][key];
+                    }
+                });
+
+                document.getElementById("langLabel").textContent =
+                    lang === "es" ? "EN" : "ES";
+            }
+
+            // ============================================
+            // THEME TOGGLE
+            // ============================================
+            function toggleTheme() {
+                currentTheme = currentTheme === "light" ? "dark" : "light";
+                setTheme(currentTheme);
+                localStorage.setItem("theme", currentTheme);
+            }
+
+            function setTheme(theme) {
+                currentTheme = theme;
+                document.documentElement.setAttribute("data-theme", theme);
+
+                const icon = document.getElementById("themeIcon");
+                const label = document.getElementById("themeLabel");
+
+                if (theme === "dark") {
+                    icon.textContent = "☀️";
+                    label.setAttribute("data-i18n", "theme.light");
+                    label.textContent = i18n[currentLang]["theme.light"];
+                } else {
+                    icon.textContent = "🌙";
+                    label.setAttribute("data-i18n", "theme.dark");
+                    label.textContent = i18n[currentLang]["theme.dark"];
+                }
+            }
+
+            // ============================================
+            // STATS ANIMATION
+            // ============================================
+            function animateStats() {
+                document
+                    .querySelectorAll(".stat-number[data-count]")
+                    .forEach((stat) => {
+                        const target = parseInt(
+                            stat.getAttribute("data-count"),
+                        );
+                        const duration = 2000;
+                        const step = target / (duration / 16);
+                        let current = 0;
+
+                        stat.textContent = "0";
+
+                        const timer = setInterval(() => {
+                            current += step;
+                            if (current >= target) {
+                                stat.textContent =
+                                    target.toLocaleString() +
+                                    (target >= 100 ? "+" : "");
+                                clearInterval(timer);
+                            } else {
+                                stat.textContent =
+                                    Math.floor(current).toLocaleString();
+                            }
+                        }, 16);
+                    });
+            }
+        </script>
+    </body>
+</html>
