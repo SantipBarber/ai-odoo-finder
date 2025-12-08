@@ -325,17 +325,33 @@ Add to `~/.config/zed/settings.json`:
 {
   "context_servers": {
     "ai-odoofinder": {
-      "command": {
-        "path": "uvx",
-        "args": [
-          "--from",
-          "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-          "ai-odoofinder-mcp"
-        ],
-        "env": {
-          "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-        }
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+        "ai-odoofinder-mcp"
+      ],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
+    }
+  }
+}
+```
+
+Or use **Add Server** in Zed's Agent Panel with this JSON:
+
+```json
+{
+  "ai-odoofinder": {
+    "command": "uvx",
+    "args": [
+      "--from",
+      "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
+      "ai-odoofinder-mcp"
+    ],
+    "env": {
+      "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
     }
   }
 }
