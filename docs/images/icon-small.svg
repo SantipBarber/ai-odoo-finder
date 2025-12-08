@@ -1,14 +1,30 @@
 <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#714B67;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
     </linearGradient>
   </defs>
-  
+
   <!-- Rounded square background -->
-  <rect width="64" height="64" rx="12" fill="url(#iconGrad)"/>
-  
-  <!-- Robot emoji centered -->
-  <text x="32" y="42" font-size="32" text-anchor="middle">🤖</text>
+  <rect width="64" height="64" rx="14" fill="url(#iconGrad)"/>
+
+  <!-- Robot head simplified -->
+  <rect x="18" y="18" width="28" height="22" rx="4" fill="#ffffff"/>
+
+  <!-- Robot antenna -->
+  <line x1="32" y1="18" x2="32" y2="12" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="10" r="2.5" fill="#10b981"/>
+
+  <!-- Robot eyes -->
+  <circle cx="26" cy="26" r="3.5" fill="#6366f1"/>
+  <circle cx="38" cy="26" r="3.5" fill="#6366f1"/>
+
+  <!-- Robot mouth -->
+  <rect x="24" y="33" width="16" height="3" rx="1.5" fill="#6366f1"/>
+
+  <!-- Magnifying glass -->
+  <circle cx="46" cy="48" r="8" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+  <line x1="52" y1="54" x2="58" y2="60" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
 </svg>

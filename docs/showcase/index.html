@@ -29,8 +29,8 @@
 
         <style>
             /* ============================================
-           CSS VARIABLES - THEMES
-           ============================================ */
+            CSS VARIABLES - THEMES
+            ============================================ */
             :root {
                 --bg-primary: #ffffff;
                 --bg-secondary: #f8fafc;
@@ -82,8 +82,8 @@
             }
 
             /* ============================================
-           BASE STYLES
-           ============================================ */
+            BASE STYLES
+            ============================================ */
             * {
                 margin: 0;
                 padding: 0;
@@ -116,8 +116,8 @@
             }
 
             /* ============================================
-           HEADER
-           ============================================ */
+            HEADER
+            ============================================ */
             header {
                 background: linear-gradient(
                     135deg,
@@ -146,7 +146,6 @@
             .logo img {
                 width: 40px;
                 height: 40px;
-                filter: brightness(0) invert(1);
             }
 
             .logo-text {
@@ -194,8 +193,8 @@
             }
 
             /* ============================================
-           NAVIGATION
-           ============================================ */
+            NAVIGATION
+            ============================================ */
             nav {
                 background: var(--bg-secondary);
                 border-bottom: 1px solid var(--border);
@@ -254,8 +253,8 @@
             }
 
             /* ============================================
-           MAIN CONTENT
-           ============================================ */
+            MAIN CONTENT
+            ============================================ */
             main {
                 max-width: 1200px;
                 margin: 0 auto;
@@ -284,8 +283,8 @@
             }
 
             /* ============================================
-           DASHBOARD - HERO
-           ============================================ */
+            DASHBOARD - HERO
+            ============================================ */
             .dashboard-hero {
                 text-align: center;
                 padding: 3rem 0;
@@ -303,6 +302,20 @@
                 margin-bottom: 1rem;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
+                animation: pulse 2s ease-in-out infinite;
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+                }
+                50% {
+                    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+                }
             }
 
             .dashboard-hero h1 {
@@ -353,13 +366,17 @@
                     var(--gradient-end)
                 );
                 color: white;
-                border: none;
+                box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
             }
 
             .btn-primary:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-                text-decoration: none;
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+                color: white;
+            }
+
+            .btn-primary:active {
+                transform: translateY(-1px) scale(0.98);
             }
 
             .btn-secondary {
@@ -374,8 +391,8 @@
             }
 
             /* ============================================
-           STATS GRID
-           ============================================ */
+            STATS GRID
+            ============================================ */
             .stats-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -404,6 +421,7 @@
                 background: linear-gradient(
                     90deg,
                     var(--gradient-start),
+                    var(--gradient-mid),
                     var(--gradient-end)
                 );
                 opacity: 0;
@@ -420,8 +438,13 @@
             }
 
             .stat-icon {
-                font-size: 1.5rem;
+                font-size: 2rem;
                 margin-bottom: 0.5rem;
+                transition: transform 0.3s ease;
+            }
+
+            .stat-card:hover .stat-icon {
+                transform: scale(1.2) rotate(5deg);
             }
 
             .stat-number {
@@ -439,8 +462,8 @@
             }
 
             /* ============================================
-           ARCHITECTURE DIAGRAM
-           ============================================ */
+            ARCHITECTURE DIAGRAM
+            ============================================ */
             .architecture-section {
                 margin: 3rem 0;
             }
@@ -472,14 +495,19 @@
                 border: 1px solid var(--border);
             }
 
+            [data-theme="light"] .architecture-diagram {
+                background: #1e293b;
+                color: #e2e8f0;
+            }
+
             .architecture-diagram pre {
                 margin: 0;
                 white-space: pre;
             }
 
             /* ============================================
-           TECH GRID
-           ============================================ */
+            TECH GRID
+            ============================================ */
             .tech-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -531,8 +559,8 @@
             }
 
             /* ============================================
-           PROBLEM SECTION
-           ============================================ */
+            PROBLEM SECTION
+            ============================================ */
             .problem-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -586,8 +614,8 @@
             }
 
             /* ============================================
-           MODULE PAGES
-           ============================================ */
+            MODULE PAGES
+            ============================================ */
             .module-header {
                 display: flex;
                 align-items: center;
@@ -669,8 +697,8 @@
             }
 
             /* ============================================
-           HIGHLIGHT BOXES
-           ============================================ */
+            HIGHLIGHT BOXES
+            ============================================ */
             .highlight-box {
                 background: var(--accent-light);
                 border-radius: 10px;
@@ -712,8 +740,8 @@
             }
 
             /* ============================================
-           CODE BLOCKS
-           ============================================ */
+            CODE BLOCKS
+            ============================================ */
             .code-block {
                 background: var(--bg-code);
                 border-radius: 10px;
@@ -727,8 +755,23 @@
                 border: 1px solid var(--border);
             }
 
+            [data-theme="light"] .code-block {
+                background: #1e293b;
+                color: #e2e8f0;
+            }
+
+            .code-block pre {
+                margin: 0;
+                padding: 0;
+                white-space: pre;
+                overflow-x: auto;
+            }
+
             .code-block code {
                 color: inherit;
+                font-family: inherit;
+                font-size: inherit;
+                white-space: pre;
             }
 
             .code-header {
@@ -744,8 +787,8 @@
             }
 
             /* ============================================
-           TABLES
-           ============================================ */
+            TABLES
+            ============================================ */
             .table-container {
                 overflow-x: auto;
                 margin: 1rem 0;
@@ -775,8 +818,8 @@
             }
 
             /* ============================================
-           TIMELINE
-           ============================================ */
+            TIMELINE
+            ============================================ */
             .timeline {
                 position: relative;
                 padding-left: 2rem;
@@ -839,8 +882,8 @@
             }
 
             /* ============================================
-           FLOW DIAGRAM
-           ============================================ */
+            FLOW DIAGRAM
+            ============================================ */
             .flow-diagram {
                 display: flex;
                 align-items: center;
@@ -869,8 +912,8 @@
             }
 
             /* ============================================
-           FOOTER
-           ============================================ */
+            FOOTER
+            ============================================ */
             footer {
                 background: var(--bg-secondary);
                 border-top: 1px solid var(--border);
@@ -957,8 +1000,460 @@
             }
 
             /* ============================================
-           RESPONSIVE
-           ============================================ */
+            RESPONSIVE
+            ============================================ */
+            /* ============================================
+            SCROLL REVEAL ANIMATIONS
+            ============================================ */
+            .reveal {
+                opacity: 0;
+                transform: translateY(30px);
+                transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .reveal.active {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .reveal-left {
+                opacity: 0;
+                transform: translateX(-50px);
+                transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .reveal-left.active {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            .reveal-right {
+                opacity: 0;
+                transform: translateX(50px);
+                transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .reveal-right.active {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            .reveal-scale {
+                opacity: 0;
+                transform: scale(0.9);
+                transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .reveal-scale.active {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            /* Staggered animation delays */
+            .stagger-1 {
+                transition-delay: 0.1s;
+            }
+            .stagger-2 {
+                transition-delay: 0.2s;
+            }
+            .stagger-3 {
+                transition-delay: 0.3s;
+            }
+            .stagger-4 {
+                transition-delay: 0.4s;
+            }
+            .stagger-5 {
+                transition-delay: 0.5s;
+            }
+            .stagger-6 {
+                transition-delay: 0.6s;
+            }
+
+            /* Rainbow animation for easter egg */
+            @keyframes rainbow {
+                0% {
+                    filter: hue-rotate(0deg);
+                }
+                100% {
+                    filter: hue-rotate(360deg);
+                }
+            }
+
+            /* ============================================
+            GLASS MORPHISM EFFECTS
+            ============================================ */
+            .glass {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            [data-theme="dark"] .glass {
+                background: rgba(15, 23, 42, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .glass-card {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+
+            [data-theme="dark"] .glass-card {
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* ============================================
+            ENHANCED HOVER EFFECTS
+            ============================================ */
+            .hover-lift {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .hover-lift:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+            }
+
+            .hover-glow {
+                transition: all 0.3s ease;
+            }
+
+            .hover-glow:hover {
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            }
+
+            .hover-border {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hover-border::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 3px;
+                background: linear-gradient(
+                    90deg,
+                    var(--gradient-start),
+                    var(--gradient-end)
+                );
+                transition: width 0.3s ease;
+            }
+
+            .hover-border:hover::after {
+                width: 100%;
+            }
+
+            /* ============================================
+            HERO BACKGROUND ENHANCEMENTS
+            ============================================ */
+            .dashboard-hero {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .dashboard-hero::before {
+                content: "";
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background:
+                    radial-gradient(
+                        circle at 30% 40%,
+                        rgba(99, 102, 241, 0.1) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 70% 60%,
+                        rgba(168, 85, 247, 0.1) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 50% 80%,
+                        rgba(139, 92, 246, 0.08) 0%,
+                        transparent 40%
+                    );
+                animation: heroFloat 20s ease-in-out infinite;
+                z-index: 0;
+            }
+
+            @keyframes heroFloat {
+                0%,
+                100% {
+                    transform: translate(0, 0) rotate(0deg);
+                }
+                25% {
+                    transform: translate(2%, 2%) rotate(1deg);
+                }
+                50% {
+                    transform: translate(0, 4%) rotate(0deg);
+                }
+                75% {
+                    transform: translate(-2%, 2%) rotate(-1deg);
+                }
+            }
+
+            .dashboard-hero > * {
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Floating shapes decoration */
+            .hero-shapes {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                pointer-events: none;
+                z-index: 0;
+                transition: transform 0.1s ease-out;
+                will-change: transform;
+            }
+
+            .shape {
+                position: absolute;
+                border-radius: 50%;
+                opacity: 0.5;
+            }
+
+            .shape-1 {
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start),
+                    var(--gradient-mid)
+                );
+                top: 10%;
+                left: 5%;
+                animation: float1 8s ease-in-out infinite;
+            }
+
+            .shape-2 {
+                width: 120px;
+                height: 120px;
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-mid),
+                    var(--gradient-end)
+                );
+                top: 60%;
+                right: 8%;
+                animation: float2 10s ease-in-out infinite;
+            }
+
+            .shape-3 {
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-end),
+                    var(--gradient-start)
+                );
+                bottom: 20%;
+                left: 15%;
+                animation: float3 7s ease-in-out infinite;
+            }
+
+            @keyframes float1 {
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+                50% {
+                    transform: translate(20px, -30px) scale(1.1);
+                }
+            }
+
+            @keyframes float2 {
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+                50% {
+                    transform: translate(-30px, 20px) scale(0.9);
+                }
+            }
+
+            @keyframes float3 {
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+                50% {
+                    transform: translate(15px, 25px) scale(1.05);
+                }
+            }
+
+            /* ============================================
+            ENHANCED GRADIENTS
+            ============================================ */
+            .gradient-text {
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start) 0%,
+                    var(--gradient-mid) 50%,
+                    var(--gradient-end) 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                background-size: 200% 200%;
+                animation: gradientShift 5s ease-in-out infinite;
+            }
+
+            @keyframes gradientShift {
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .gradient-border {
+                position: relative;
+                background: var(--bg-secondary);
+                border-radius: 12px;
+            }
+
+            .gradient-border::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: 12px;
+                padding: 2px;
+                background: linear-gradient(
+                    135deg,
+                    var(--gradient-start),
+                    var(--gradient-mid),
+                    var(--gradient-end)
+                );
+                -webkit-mask:
+                    linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+                mask:
+                    linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+                -webkit-mask-composite: xor;
+                mask-composite: exclude;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .gradient-border:hover::before {
+                opacity: 1;
+            }
+
+            /* ============================================
+            PULSE ANIMATION FOR STATS
+            ============================================ */
+            .stat-card .stat-icon {
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.1);
+                }
+            }
+
+            /* ============================================
+            ENHANCED BUTTONS
+            ============================================ */
+            .btn-primary {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-primary::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                transition: left 0.5s ease;
+            }
+
+            .btn-primary:hover::before {
+                left: 100%;
+            }
+
+            /* ============================================
+            TIMELINE ENHANCEMENTS
+            ============================================ */
+            .timeline-item {
+                opacity: 1;
+                transform: translateX(0);
+                transition: all 0.5s ease;
+            }
+
+            .timeline-item.active {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            /* ============================================
+            TABLE ROW ANIMATION
+            ============================================ */
+            tbody tr {
+                transition: all 0.2s ease;
+            }
+
+            tbody tr:hover {
+                background: var(--accent-light);
+                transform: scale(1.01);
+            }
+
+            /* ============================================
+            CODE BLOCK ENHANCEMENTS
+            ============================================ */
+            .code-block {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .code-block::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(
+                    90deg,
+                    var(--gradient-start),
+                    var(--gradient-mid),
+                    var(--gradient-end)
+                );
+            }
+
+            /* ============================================
+            RESPONSIVE
+            ============================================ */
             @media (max-width: 768px) {
                 header {
                     flex-direction: column;
@@ -1097,18 +1592,32 @@
             <!-- ==================== DASHBOARD ==================== -->
             <div id="dashboard" class="tab-content active">
                 <div class="dashboard-hero">
-                    <span class="hero-badge" data-i18n="dashboard.badge"
+                    <!-- Floating shapes decoration -->
+                    <div class="hero-shapes">
+                        <div class="shape shape-1"></div>
+                        <div class="shape shape-2"></div>
+                        <div class="shape shape-3"></div>
+                    </div>
+                    <span
+                        class="hero-badge reveal reveal-scale"
+                        data-i18n="dashboard.badge"
                         >Búsqueda Híbrida con IA</span
                     >
-                    <h1 data-i18n="dashboard.title">
+                    <h1
+                        class="gradient-text reveal"
+                        data-i18n="dashboard.title"
+                    >
                         Encuentra el módulo Odoo perfecto en segundos
                     </h1>
-                    <p class="subtitle" data-i18n="dashboard.subtitle">
+                    <p
+                        class="subtitle reveal stagger-1"
+                        data-i18n="dashboard.subtitle"
+                    >
                         Un servidor MCP que conecta LLMs con 16,000+ módulos OCA
                         usando búsqueda semántica + full-text con Reciprocal
                         Rank Fusion
                     </p>
-                    <div class="hero-buttons">
+                    <div class="hero-buttons reveal stagger-2">
                         <a
                             href="https://github.com/SantipBarber/ai-odoo-finder"
                             target="_blank"
@@ -1133,43 +1642,43 @@
                 </div>
 
                 <!-- Stats -->
-                <div class="stats-grid">
-                    <div class="stat-card">
+                <div class="stats-grid reveal-scale">
+                    <div class="stat-card glass-card hover-lift stagger-1">
                         <div class="stat-icon">📦</div>
                         <span class="stat-number" data-count="16494">0</span>
                         <span class="stat-label" data-i18n="stats.modules"
                             >Módulos indexados</span
                         >
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card glass-card hover-lift stagger-2">
                         <div class="stat-icon">🏢</div>
                         <span class="stat-number" data-count="244">0</span>
                         <span class="stat-label" data-i18n="stats.repos"
                             >Repositorios OCA</span
                         >
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card glass-card hover-lift stagger-3">
                         <div class="stat-icon">🔢</div>
                         <span class="stat-number" data-count="10">0</span>
                         <span class="stat-label" data-i18n="stats.versions"
                             >Versiones Odoo</span
                         >
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card glass-card hover-lift stagger-4">
                         <div class="stat-icon">⚡</div>
                         <span class="stat-number">&lt;500</span>
                         <span class="stat-label" data-i18n="stats.response"
                             >ms respuesta</span
                         >
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card glass-card hover-lift stagger-5">
                         <div class="stat-icon">🤖</div>
                         <span class="stat-number" data-count="9">0</span>
                         <span class="stat-label" data-i18n="stats.clients"
                             >Clientes MCP</span
                         >
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card glass-card hover-lift stagger-6">
                         <div class="stat-icon">💰</div>
                         <span class="stat-number">$1.76</span>
                         <span class="stat-label" data-i18n="stats.cost"
@@ -1179,11 +1688,11 @@
                 </div>
 
                 <!-- Problem/Solution -->
-                <h2 class="section-title" data-i18n="dashboard.problem">
+                <h2 class="section-title reveal" data-i18n="dashboard.problem">
                     El Problema
                 </h2>
-                <div class="problem-grid">
-                    <div class="problem-card">
+                <div class="problem-grid reveal">
+                    <div class="problem-card reveal-left glass-card">
                         <h3>
                             ❌
                             <span data-i18n="problem.title"
@@ -1207,7 +1716,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="problem-card solution">
+                    <div class="problem-card solution reveal-right glass-card">
                         <h3>
                             ✓
                             <span data-i18n="solution.title"
@@ -1233,10 +1742,13 @@
                 </div>
 
                 <!-- Architecture -->
-                <h2 class="section-title" data-i18n="dashboard.architecture">
+                <h2
+                    class="section-title reveal"
+                    data-i18n="dashboard.architecture"
+                >
                     Arquitectura
                 </h2>
-                <div class="architecture-diagram">
+                <div class="architecture-diagram reveal-scale">
                     <pre>
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                              CLIENTES MCP                                        │
@@ -1292,11 +1804,16 @@
                 </div>
 
                 <!-- Tech Stack -->
-                <h2 class="section-title" data-i18n="dashboard.techTitle">
+                <h2
+                    class="section-title reveal"
+                    data-i18n="dashboard.techTitle"
+                >
                     Stack Tecnológico
                 </h2>
-                <div class="tech-grid">
-                    <div class="tech-card">
+                <div class="tech-grid reveal">
+                    <div
+                        class="tech-card reveal glass-card hover-lift gradient-border stagger-1"
+                    >
                         <div class="tech-icon">⚡</div>
                         <div class="tech-info">
                             <h3>FastMCP</h3>
@@ -1306,7 +1823,9 @@
                             </p>
                         </div>
                     </div>
-                    <div class="tech-card">
+                    <div
+                        class="tech-card reveal glass-card hover-lift gradient-border stagger-2"
+                    >
                         <div class="tech-icon">🔍</div>
                         <div class="tech-info">
                             <h3>pgvector + BM25</h3>
@@ -1316,7 +1835,9 @@
                             </p>
                         </div>
                     </div>
-                    <div class="tech-card">
+                    <div
+                        class="tech-card reveal glass-card hover-lift gradient-border stagger-3"
+                    >
                         <div class="tech-icon">🚀</div>
                         <div class="tech-info">
                             <h3>FastAPI</h3>
@@ -1326,7 +1847,9 @@
                             </p>
                         </div>
                     </div>
-                    <div class="tech-card">
+                    <div
+                        class="tech-card reveal glass-card hover-lift gradient-border stagger-4"
+                    >
                         <div class="tech-icon">🤖</div>
                         <div class="tech-info">
                             <h3>OpenRouter</h3>
@@ -1336,7 +1859,9 @@
                             </p>
                         </div>
                     </div>
-                    <div class="tech-card">
+                    <div
+                        class="tech-card reveal glass-card hover-lift gradient-border stagger-5"
+                    >
                         <div class="tech-icon">🐳</div>
                         <div class="tech-info">
                             <h3>Docker + Hetzner</h3>
@@ -1346,7 +1871,9 @@
                             </p>
                         </div>
                     </div>
-                    <div class="tech-card">
+                    <div
+                        class="tech-card reveal glass-card hover-lift gradient-border stagger-6"
+                    >
                         <div class="tech-icon">🔒</div>
                         <div class="tech-info">
                             <h3>Tailscale Funnel</h3>
@@ -1372,8 +1899,10 @@
                     </div>
                 </div>
 
-                <div class="module-grid">
-                    <div class="module-card">
+                <div class="module-grid reveal">
+                    <div
+                        class="module-card glass-card hover-lift reveal-left stagger-1"
+                    >
                         <h3>
                             🎯
                             <span data-i18n="module.objective">Objetivo</span>
@@ -1394,7 +1923,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal stagger-2"
+                    >
                         <h3>
                             🛠️
                             <span data-i18n="module.tools">Herramientas</span>
@@ -1407,7 +1938,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal-right stagger-3"
+                    >
                         <h3>
                             📦
                             <span data-i18n="module.deliverable"
@@ -1430,13 +1963,13 @@
 
                 <!-- Triangle diagram -->
                 <h3
-                    class="section-title"
+                    class="section-title reveal"
                     style="margin-top: 2rem"
                     data-i18n="m1.triangle"
                 >
                     El Triángulo de Dificultad de Odoo
                 </h3>
-                <div class="architecture-diagram">
+                <div class="architecture-diagram reveal-scale glass">
                     <pre>
                     Documentación
                      Fragmentada
@@ -1470,7 +2003,7 @@
                 >
                     Evaluación de Arquitecturas
                 </h3>
-                <div class="table-container">
+                <div class="table-container reveal glass">
                     <table>
                         <thead>
                             <tr>
@@ -1532,7 +2065,7 @@
                     </table>
                 </div>
 
-                <div class="highlight-box info">
+                <div class="highlight-box info reveal hover-lift">
                     <strong>💡 Spec-Driven Development:</strong>
                     <span data-i18n="m1.tip"
                         >Define primero QUÉ debe hacer el sistema antes de
@@ -1570,8 +2103,10 @@
                     >
                 </div>
 
-                <div class="module-grid">
-                    <div class="module-card">
+                <div class="module-grid reveal">
+                    <div
+                        class="module-card glass-card hover-lift reveal-left stagger-1"
+                    >
                         <h3>
                             🎯
                             <span data-i18n="module.objective">Objetivo</span>
@@ -1593,10 +2128,12 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal-right stagger-3"
+                    >
                         <h3>
-                            📐
-                            <span data-i18n="module.techniques">Técnicas</span>
+                            📊
+                            <span data-i18n="module.techniques">Métricas</span>
                         </h3>
                         <ul>
                             <li>Few-Shot Learning</li>
@@ -1610,7 +2147,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal-right stagger-3"
+                    >
                         <h3>
                             📦
                             <span data-i18n="module.deliverable"
@@ -1633,13 +2172,13 @@
 
                 <!-- Flow diagram -->
                 <h3
-                    class="section-title"
+                    class="section-title reveal"
                     style="margin-top: 2rem"
                     data-i18n="m2.flow"
                 >
                     Flujo Inteligente de 4 Pasos
                 </h3>
-                <div class="flow-diagram">
+                <div class="flow-diagram reveal-scale">
                     <div class="flow-step" data-i18n="m2.step1">
                         1. ¿Necesita clarificación?
                     </div>
@@ -1658,28 +2197,28 @@
                 </div>
 
                 <!-- Code example -->
-                <h3 class="section-title" style="margin-top: 2rem">
+                <h3 class="section-title reveal" style="margin-top: 2rem">
                     Few-Shot Examples
                 </h3>
-                <div class="code-block">
+                <div class="code-block reveal glass">
                     <div class="code-header">
                         <span>server.py - QUERY_DESCRIPTION</span>
                     </div>
-                    <code
-                        >LOCALIZATION QUERY EXAMPLES: • Spain + electronic
-                        invoice → "l10n_es_facturae facturae" • Spain + AEAT
-                        taxes → "l10n_es_aeat modelo" • Mexico + CFDI invoice →
-                        "l10n_mx_edi cfdi" • Argentina + AFIP invoice →
-                        "l10n_ar_afipws factura" User: "electronic invoicing for
-                        Spain" ✅ CORRECT: "l10n_es_facturae facturae FACE" ❌
-                        INCORRECT: "electronic invoice e-invoice XML digital
-                        signature Spain..." ⚠️ For localizations: query of 2-4
-                        words maximum ⚠️ The l10n_XX_ prefix is MORE IMPORTANT
-                        than synonyms</code
-                    >
+                    <pre><code>LOCALIZATION QUERY EXAMPLES:
+• Spain + electronic invoice → "l10n_es_facturae facturae"
+• Spain + AEAT taxes → "l10n_es_aeat modelo"
+• Mexico + CFDI invoice → "l10n_mx_edi cfdi"
+• Argentina + AFIP invoice → "l10n_ar_afipws factura"
+
+User: "electronic invoicing for Spain"
+✅ CORRECT: "l10n_es_facturae facturae FACE"
+❌ INCORRECT: "electronic invoice e-invoice XML digital signature Spain..."
+
+⚠️ For localizations: query of 2-4 words maximum
+⚠️ The l10n_XX_ prefix is MORE IMPORTANT than synonyms</code></pre>
                 </div>
 
-                <div class="highlight-box">
+                <div class="highlight-box info reveal hover-lift">
                     <strong
                         >📝
                         <span data-i18n="m2.delimiters"
@@ -1689,7 +2228,7 @@
                     <span data-i18n="m2.delimitersText"
                         >Claude prefiere XML, GPT triple comillas, Gemini
                         markdown. En nuestro prompt usamos caracteres visuales
-                        (═══, ⚠️) que funcionan en todos.</span
+                        (───, ⚠️) que funcionan en todos.</span
                     >
                 </div>
             </div>
@@ -1706,8 +2245,10 @@
                     </div>
                 </div>
 
-                <div class="module-grid">
-                    <div class="module-card">
+                <div class="module-grid reveal">
+                    <div
+                        class="module-card glass-card hover-lift reveal-left stagger-1"
+                    >
                         <h3>
                             🎯
                             <span data-i18n="module.objective">Objetivo</span>
@@ -1726,7 +2267,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal stagger-2"
+                    >
                         <h3>
                             🛠️
                             <span data-i18n="module.tools">Herramientas</span>
@@ -1739,7 +2282,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal-right stagger-3"
+                    >
                         <h3>📊 <span data-i18n="m3.metrics">Métricas</span></h3>
                         <ul>
                             <li data-i18n="m3.met1">89 commits totales</li>
@@ -1756,13 +2301,13 @@
 
                 <!-- Timeline -->
                 <h3
-                    class="section-title"
+                    class="section-title reveal"
                     style="margin-top: 2rem"
                     data-i18n="m3.timeline"
                 >
                     Timeline de IDEs
                 </h3>
-                <div class="timeline">
+                <div class="timeline reveal">
                     <div class="timeline-item">
                         <div class="timeline-date">Nov 6-15</div>
                         <div class="timeline-content">
@@ -1795,7 +2340,7 @@
                     </div>
                 </div>
 
-                <div class="highlight-box success">
+                <div class="highlight-box success reveal hover-lift">
                     <strong
                         >🚀
                         <span data-i18n="m3.example">Ejemplo Real</span
@@ -1829,8 +2374,10 @@
                     >
                 </div>
 
-                <div class="module-grid">
-                    <div class="module-card">
+                <div class="module-grid reveal">
+                    <div
+                        class="module-card glass-card hover-lift reveal-left stagger-1"
+                    >
                         <h3>
                             🎯
                             <span data-i18n="module.objective">Objetivo</span>
@@ -1851,7 +2398,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal stagger-2"
+                    >
                         <h3>
                             🔄
                             <span data-i18n="m4.pivot">Por qué Pivotamos</span>
@@ -1872,7 +2421,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal-right stagger-3"
+                    >
                         <h3>
                             🔌
                             <span data-i18n="m4.components"
@@ -1903,38 +2454,40 @@
                 </div>
 
                 <!-- FastMCP code -->
-                <h3 class="section-title" style="margin-top: 2rem">
+                <h3 class="section-title reveal" style="margin-top: 2rem">
                     FastMCP - Decoradores Pythonicos
                 </h3>
-                <div class="code-block">
+                <div class="code-block reveal glass">
                     <div class="code-header">
                         <span>mcp-server/src/ai_odoofinder_mcp/server.py</span>
                     </div>
-                    <code
-                        >from fastmcp import FastMCP from typing import
-                        Annotated mcp = FastMCP("AI-OdooFinder") @mcp.tool()
-                        async def search_odoo_modules( query: Annotated[str,
-                        QUERY_DESCRIPTION], # 100+ líneas de instrucciones
-                        version: Annotated[str, "Odoo version (16.0, 17.0,
-                        18.0)"], dependencies: Annotated[Optional[list[str]],
-                        "Required dependencies"] = None, limit: Annotated[int,
-                        "Max results (default: 5)"] = 5, ) -> str: """Search OCA
-                        modules with hybrid search.""" async with
-                        httpx.AsyncClient() as client: response = await
-                        client.get(f"{API_URL}/search", params={...}) return
-                        _format_results_intelligent(response.json())</code
-                    >
+                    <pre><code>from fastmcp import FastMCP
+from typing import Annotated
+
+mcp = FastMCP("AI-OdooFinder")
+
+@mcp.tool()
+async def search_odoo_modules(
+    query: Annotated[str, QUERY_DESCRIPTION],  # 100+ líneas de instrucciones
+    version: Annotated[str, "Odoo version (16.0, 17.0, 18.0)"],
+    dependencies: Annotated[Optional[list[str]], "Required dependencies"] = None,
+    limit: Annotated[int, "Max results (default: 5)"] = 5,
+) -> str:
+    """Search OCA modules with hybrid search."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{API_URL}/search", params={...})
+    return _format_results_intelligent(response.json())</code></pre>
                 </div>
 
                 <!-- Clients table -->
                 <h3
-                    class="section-title"
+                    class="section-title reveal"
                     style="margin-top: 2rem"
                     data-i18n="m4.clients"
                 >
                     Clientes Soportados
                 </h3>
-                <div class="table-container">
+                <div class="table-container reveal glass">
                     <table>
                         <thead>
                             <tr>
@@ -2004,8 +2557,10 @@
                     </div>
                 </div>
 
-                <div class="module-grid">
-                    <div class="module-card">
+                <div class="module-grid reveal">
+                    <div
+                        class="module-card glass-card hover-lift reveal-left stagger-1"
+                    >
                         <h3>
                             🎯
                             <span data-i18n="module.objective">Objetivo</span>
@@ -2026,7 +2581,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal stagger-2"
+                    >
                         <h3>🤖 <span data-i18n="m5.models">Modelos</span></h3>
                         <ul>
                             <li>
@@ -2042,7 +2599,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal-right stagger-3"
+                    >
                         <h3>💰 <span data-i18n="m5.costs">Costes</span></h3>
                         <ul>
                             <li data-i18n="m5.cost1">
@@ -2065,13 +2624,13 @@
 
                 <!-- RRF diagram -->
                 <h3
-                    class="section-title"
+                    class="section-title reveal"
                     style="margin-top: 2rem"
                     data-i18n="m5.rrf"
                 >
                     Reciprocal Rank Fusion (RRF)
                 </h3>
-                <div class="architecture-diagram">
+                <div class="architecture-diagram reveal-scale glass">
                     <pre>
                          QUERY: "facturación electrónica españa"
                                         │
@@ -2110,7 +2669,7 @@
                     >
                 </div>
 
-                <div class="highlight-box warning">
+                <div class="highlight-box success reveal hover-lift">
                     <strong>🔐 Best Practice:</strong>
                     <span data-i18n="m5.tip"
                         >Nunca hardcodear API keys. Usar variables de entorno
@@ -2132,8 +2691,10 @@
                     </div>
                 </div>
 
-                <div class="module-grid">
-                    <div class="module-card">
+                <div class="module-grid reveal">
+                    <div
+                        class="module-card glass-card hover-lift reveal-left stagger-1"
+                    >
                         <h3>
                             🏗️
                             <span data-i18n="m6.arch"
@@ -2156,7 +2717,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal stagger-2"
+                    >
                         <h3>
                             🖥️
                             <span data-i18n="m6.infra"
@@ -2171,7 +2734,9 @@
                         </ul>
                     </div>
 
-                    <div class="module-card">
+                    <div
+                        class="module-card glass-card hover-lift reveal-right stagger-3"
+                    >
                         <h3>
                             📊
                             <span data-i18n="m6.final"
@@ -2191,13 +2756,13 @@
 
                 <!-- Summary diagram -->
                 <h3
-                    class="section-title"
+                    class="section-title reveal"
                     style="margin-top: 2rem"
                     data-i18n="m6.summary"
                 >
                     El Proyecto Como Síntesis del Curso
                 </h3>
-                <div class="architecture-diagram">
+                <div class="architecture-diagram reveal-scale glass">
                     <pre>
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                                                                         │
@@ -2224,7 +2789,7 @@
                     >
                 </div>
 
-                <div class="highlight-box success">
+                <div class="highlight-box success reveal hover-lift">
                     <strong
                         >🎯
                         <span data-i18n="m6.result">Resultado Final</span
@@ -2239,14 +2804,23 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 2rem">
-                    <a
-                        href="https://github.com/SantipBarber/ai-odoo-finder"
-                        target="_blank"
-                        class="btn btn-primary"
-                    >
-                        <span>⭐</span>
-                        <span data-i18n="m6.star">Dar estrella en GitHub</span>
-                    </a>
+                    <div class="hero-buttons reveal" style="margin-top: 2rem">
+                        <a
+                            href="https://github.com/SantipBarber/ai-odoo-finder"
+                            target="_blank"
+                            class="btn btn-primary hover-glow"
+                            style="
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                            "
+                        >
+                            <span>⭐</span>
+                            <span data-i18n="m6.star"
+                                >Dar estrella en GitHub</span
+                            >
+                        </a>
+                    </div>
                 </div>
             </div>
         </main>
@@ -2804,6 +3378,8 @@
                 setLanguage(currentLang);
                 setTheme(currentTheme);
                 animateStats();
+                initScrollReveal();
+                initParallax();
             });
 
             // ============================================
@@ -2825,6 +3401,9 @@
                 if (tabId === "dashboard") {
                     animateStats();
                 }
+
+                // Reinitialize scroll animations for the new tab
+                reinitAnimations();
 
                 window.scrollTo({ top: 0, behavior: "smooth" });
             }
@@ -2910,6 +3489,150 @@
                         }, 16);
                     });
             }
+
+            // ============================================
+            // SCROLL REVEAL ANIMATIONS
+            // ============================================
+            function initScrollReveal() {
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: "0px 0px -50px 0px",
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("active");
+                            // Optional: stop observing after animation
+                            // observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                // Observe all reveal elements
+                document
+                    .querySelectorAll(
+                        ".reveal, .reveal-left, .reveal-right, .reveal-scale",
+                    )
+                    .forEach((el) => {
+                        observer.observe(el);
+                    });
+
+                // Timeline items are always visible (no animation needed)
+                document.querySelectorAll(".timeline-item").forEach((el) => {
+                    el.style.opacity = "1";
+                    el.style.transform = "translateX(0)";
+                });
+
+                // Observe table rows
+                document.querySelectorAll("tbody tr").forEach((el) => {
+                    observer.observe(el);
+                });
+            }
+
+            // ============================================
+            // RE-INIT ANIMATIONS ON TAB CHANGE
+            // ============================================
+            function reinitAnimations() {
+                // Remove active class from all reveal elements in current tab
+                const activeTab = document.querySelector(".tab-content.active");
+                if (activeTab) {
+                    activeTab
+                        .querySelectorAll(
+                            ".reveal, .reveal-left, .reveal-right, .reveal-scale",
+                        )
+                        .forEach((el) => {
+                            el.classList.remove("active");
+                        });
+                }
+
+                // Re-observe elements after a small delay
+                setTimeout(() => {
+                    initScrollReveal();
+                }, 100);
+            }
+
+            // ============================================
+            // PARALLAX EFFECT
+            // ============================================
+            function initParallax() {
+                let ticking = false;
+
+                window.addEventListener("scroll", () => {
+                    if (!ticking) {
+                        window.requestAnimationFrame(() => {
+                            const scrolled = window.pageYOffset;
+                            const heroShapes =
+                                document.querySelector(".hero-shapes");
+
+                            if (heroShapes && scrolled < 800) {
+                                // Parallax effect on hero shapes
+                                heroShapes.style.transform = `translateY(${scrolled * 0.5}px)`;
+                            }
+
+                            // Add shadow to header on scroll
+                            const header = document.querySelector("header");
+                            if (scrolled > 50) {
+                                header.style.boxShadow =
+                                    "0 2px 10px rgba(0, 0, 0, 0.1)";
+                            } else {
+                                header.style.boxShadow = "none";
+                            }
+
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                });
+            }
+
+            // ============================================
+            // SMOOTH SCROLL FOR ANCHOR LINKS
+            // ============================================
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(
+                        this.getAttribute("href"),
+                    );
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                    }
+                });
+            });
+
+            // ============================================
+            // EASTER EGG: KONAMI CODE
+            // ============================================
+            let konamiCode = [];
+            const konamiPattern = [
+                "ArrowUp",
+                "ArrowUp",
+                "ArrowDown",
+                "ArrowDown",
+                "ArrowLeft",
+                "ArrowRight",
+                "ArrowLeft",
+                "ArrowRight",
+                "b",
+                "a",
+            ];
+
+            document.addEventListener("keydown", (e) => {
+                konamiCode.push(e.key);
+                konamiCode = konamiCode.slice(-10);
+
+                if (konamiCode.join(",") === konamiPattern.join(",")) {
+                    document.body.style.animation =
+                        "rainbow 2s linear infinite";
+                    setTimeout(() => {
+                        document.body.style.animation = "";
+                    }, 5000);
+                }
+            });
         </script>
     </body>
 </html>
