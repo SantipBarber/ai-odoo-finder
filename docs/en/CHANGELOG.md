@@ -9,6 +9,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2025-12-22
+
+### PyPI Publication
+
+The MCP server is now published on **[PyPI](https://pypi.org/project/ai-odoofinder-mcp/)**, making installation simpler and faster.
+
+### Added
+
+#### PyPI Package
+- **Package name**: `ai-odoofinder-mcp`
+- **Version**: 1.0.0
+- **Python**: >=3.11
+- **License**: MIT
+
+#### Simplified Installation
+Installation is now much simpler:
+
+```bash
+# Using pip
+pip install ai-odoofinder-mcp
+
+# Using uvx
+uvx ai-odoofinder-mcp
+```
+
+#### Simplified MCP Configuration
+Configuration for all MCP clients is now shorter:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": ["ai-odoofinder-mcp"],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+### Changed
+
+- **README.md** and **README.es.md**: Updated installation section with PyPI as primary method
+- **mcp-server/README.md** and **mcp-server/README.es.md**: Updated quick start and publishing sections
+- **docs/en/MCP_CLIENT_CONFIGURATIONS.md** and **docs/es/MCP_CLIENT_CONFIGURATIONS.md**: All client configurations updated
+- Added PyPI badge to all README files
+- Git installation preserved as alternative for development versions
+
+### Benefits
+
+| Aspect | Before (Git) | After (PyPI) |
+|--------|--------------|--------------|
+| Args length | 4 lines | 1 line |
+| Install speed | Clones repo | Downloads package |
+| Versioning | Commit hash | Semantic version |
+| Reliability | Depends on GitHub | PyPI CDN |
+| Config size | ~150 chars | ~30 chars |
+
+---
+
 ## [1.3.0] - 2025-01-19
 
 ### MCP Client Configurations Documentation

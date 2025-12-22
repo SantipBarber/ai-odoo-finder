@@ -31,6 +31,8 @@
 
 ## Inicio Rápido
 
+El servidor MCP está disponible en **[PyPI](https://pypi.org/project/ai-odoofinder-mcp/)**.
+
 **Elige tu método de instalación:**
 
 | Método | Mejor Para | Requisitos |
@@ -45,11 +47,7 @@
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -57,6 +55,27 @@
   }
 }
 ```
+
+<details>
+<summary><b>Alternativa: Instalar desde Git (desarrollo)</b></summary>
+
+Para la última versión de desarrollo:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": ["ai-odoofinder-mcp"],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+</details>
 
 ---
 
@@ -140,11 +159,7 @@ https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -214,11 +229,7 @@ Edita `~/.claude.json`:
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -307,11 +318,7 @@ Crea `~/.chatgpt/mcp.json`:
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -356,11 +363,7 @@ Crea `.vscode/mcp.json` en tu proyecto:
     "ai-odoofinder": {
       "type": "stdio",
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -379,11 +382,7 @@ Edita `~/.config/Code/User/mcp.json`:
     "ai-odoofinder": {
       "type": "stdio",
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -436,11 +435,7 @@ nano ~/.cursor/mcp.json
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -485,11 +480,7 @@ Añade a tu configuración:
     "ai-odoofinder": {
       "command": {
         "path": "uvx",
-        "args": [
-          "--from",
-          "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-          "ai-odoofinder-mcp"
-        ],
+        "args": ["ai-odoofinder-mcp"],
         "env": {
           "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
         }
@@ -516,11 +507,7 @@ Añade a tu configuración:
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -583,11 +570,7 @@ Actualiza la configuración con la ruta completa:
   "mcpServers": {
     "ai-odoofinder": {
       "command": "C:\\Users\\TU_USUARIO\\.cargo\\bin\\uvx.exe",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }

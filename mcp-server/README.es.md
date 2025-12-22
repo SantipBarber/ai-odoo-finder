@@ -10,20 +10,26 @@ Este servidor MCP proporciona una herramienta llamada `search_odoo_modules` que 
 
 ## Inicio Rápido
 
-Para instrucciones de instalación, consulta el [README principal del proyecto](../README.es.md#instalacion).
+El servidor MCP está disponible en **[PyPI](https://pypi.org/project/ai-odoofinder-mcp/)**.
 
-Configuración básica:
+### Instalación
+
+```bash
+# Usando pip
+pip install ai-odoofinder-mcp
+
+# Usando uvx (recomendado para clientes MCP)
+uvx ai-odoofinder-mcp
+```
+
+### Configuración de Cliente MCP
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -33,6 +39,8 @@ Configuración básica:
 ```
 
 > **Nota**: Requiere el gestor de paquetes [uv](https://docs.astral.sh/uv/) instalado.
+
+Para instrucciones de instalación completas y configuraciones específicas por cliente, consulta el [README principal del proyecto](../README.es.md#instalacion).
 
 ---
 
@@ -225,16 +233,29 @@ Donde `k=60` (constante estándar RRF)
 
 ## Publicación
 
-El servidor MCP es instalable via `uvx` directamente desde Git:
+El servidor MCP está publicado en **[PyPI](https://pypi.org/project/ai-odoofinder-mcp/)**.
+
+### Instalar desde PyPI
+
+```bash
+# Usando pip
+pip install ai-odoofinder-mcp
+
+# Usando uvx
+uvx ai-odoofinder-mcp
+```
+
+### Instalar desde Git (desarrollo)
 
 ```bash
 uvx --from git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server ai-odoofinder-mcp
 ```
 
-Para publicar en PyPI (futuro):
+### Publicar una nueva versión
 
 ```bash
 cd mcp-server
+# Actualizar versión en pyproject.toml
 uv build
 uv publish
 ```

@@ -8,8 +8,9 @@ An MCP (Model Context Protocol) server that enables LLMs to search Odoo modules 
 
 ![AI-OdooFinder Banner](docs/logo-banner.svg)
 
+[![PyPI version](https://img.shields.io/pypi/v/ai-odoofinder-mcp.svg)](https://pypi.org/project/ai-odoofinder-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Odoo](https://img.shields.io/badge/Odoo-10.0%20to%2019.0-714B67)](https://www.odoo.com)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/SantipBarber/ai-odoo-finder)
@@ -101,18 +102,14 @@ As an Odoo developer:
 
 ## Installation
 
-Add the following config to your MCP client:
+The MCP server is available on [PyPI](https://pypi.org/project/ai-odoofinder-mcp/). Add the following config to your MCP client:
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -122,6 +119,27 @@ Add the following config to your MCP client:
 ```
 
 > **Note**: Requires [uv](https://docs.astral.sh/uv/) package manager installed.
+
+<details>
+<summary><b>Alternative: Install from Git (development)</b></summary>
+
+For the latest development version:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "command": "uvx",
+      "args": ["ai-odoofinder-mcp"],
+      "env": {
+        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+      }
+    }
+  }
+}
+```
+
+</details>
 
 ### IDE/Client Configuration
 
@@ -140,11 +158,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -181,11 +195,7 @@ Configuration (`~/.claude.json`):
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -265,11 +275,7 @@ Create `.vscode/mcp.json` (project) or `~/.config/Code/User/mcp.json` (global):
     "ai-odoofinder": {
       "type": "stdio",
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -299,11 +305,7 @@ Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -326,11 +328,7 @@ Add to `~/.config/zed/settings.json`:
   "context_servers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -345,11 +343,7 @@ Or use **Add Server** in Zed's Agent Panel with this JSON:
 {
   "ai-odoofinder": {
     "command": "uvx",
-    "args": [
-      "--from",
-      "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-      "ai-odoofinder-mcp"
-    ],
+    "args": ["ai-odoofinder-mcp"],
     "env": {
       "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
     }
@@ -371,11 +365,7 @@ Add to your Windsurf MCP configuration:
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
@@ -425,11 +415,7 @@ which uvx  # macOS/Linux
   "mcpServers": {
     "ai-odoofinder": {
       "command": "C:\\Users\\YOUR_USER\\.cargo\\bin\\uvx.exe",
-      "args": [
-        "--from",
-        "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server",
-        "ai-odoofinder-mcp"
-      ],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
         "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
       }
