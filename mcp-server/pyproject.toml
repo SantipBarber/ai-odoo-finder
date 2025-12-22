@@ -1,14 +1,36 @@
 [project]
 name = "ai-odoofinder-mcp"
 version = "1.0.0"
-description = "MCP Server for AI-OdooFinder - Semantic search for Odoo modules"
+description = "MCP Server for AI-OdooFinder - Semantic search for Odoo modules in the OCA ecosystem"
 readme = "README.md"
 requires-python = ">=3.11"
+license = "MIT"
+authors = [
+    {name = "Santiago Pérez Barber", email = "santipbr@gmail.com"}
+]
+keywords = ["mcp", "odoo", "oca", "search", "semantic-search", "llm", "claude", "ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     "fastmcp>=2.0.0",
     "httpx>=0.27.0",
     "python-dotenv>=1.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/SantipBarber/ai-odoo-finder"
+Repository = "https://github.com/SantipBarber/ai-odoo-finder"
+Documentation = "https://github.com/SantipBarber/ai-odoo-finder/tree/main/mcp-server"
+Issues = "https://github.com/SantipBarber/ai-odoo-finder/issues"
 
 [project.scripts]
 ai-odoofinder-mcp = "ai_odoofinder_mcp.server:main"
