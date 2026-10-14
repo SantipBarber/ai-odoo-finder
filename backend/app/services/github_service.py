@@ -6,8 +6,6 @@ import requests
 
 from ..config import get_settings
 
-settings = get_settings()
-
 
 def _safe_ast_eval(node: ast.AST) -> Any:
     """Safely evaluate AST nodes allowing only literal data structures."""
@@ -38,8 +36,9 @@ def _safe_ast_eval(node: ast.AST) -> Any:
 
 
 class GitHubService:
-    def __init__(self):
-        self.token = settings.gh_token
+    def __init__(self, token: Optional[str] = None):
+        # Token explícito para scripts que no necesitan el resto de la configuración
+        self.token = token or get_settings().gh_token
         self.headers = {"Authorization": f"token {self.token}"}
         self.base_url = "https://api.github.com"
 
@@ -68,7 +67,9 @@ class GitHubService:
 
         # Filtrar solo versiones de Odoo
         odoo_versions = [
-            b["name"] for b in branches if b["name"] in ["14.0", "15.0", "16.0", "17.0", "18.0"]
+            b["name"]
+            for b in branches
+            if b["name"] in ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
         ]
 
         return sorted(odoo_versions)

@@ -400,6 +400,18 @@ cd /opt/ai-odoo-finder
 uv run python scripts/etl_oca_modules.py
 ```
 
+### Counting modules without indexing
+
+`scripts/count_oca_modules.py` walks the OCA repos with the same discovery functions as the ETL and counts modules per version. It does not touch the database or OpenRouter; it only needs `GH_TOKEN`. It takes a couple of minutes.
+
+```bash
+uv run python scripts/count_oca_modules.py
+# Compare with what is indexed and save the per-repo breakdown
+uv run python scripts/count_oca_modules.py --stats-url http://localhost:8989/stats --output count.json
+```
+
+It counts what exists on GitHub today, not what is indexed: if the index keeps branches or modules that are gone, the numbers will differ.
+
 ### ETL Logs
 
 ```bash
