@@ -13,7 +13,7 @@ El backend proporciona la API REST y el motor de búsqueda híbrida de AI-OdooFi
 - **Búsqueda vectorial**: similitud semántica con embeddings de Qwen3-Embedding-4B (2560 dimensiones), generados a través de la API de OpenRouter
 - **Búsqueda de texto completo**: búsqueda por palabras clave con `tsvector` de PostgreSQL (columna `searchable_text`, ordenada con `ts_rank_cd`)
 - **Búsqueda híbrida**: combina ambos rankings con Reciprocal Rank Fusion (RRF, `k=60`)
-- **Filtrado por versión**: Odoo 14.0 a 19.0
+- **Filtrado por versión**: Odoo 12.0 a 19.0
 - **Enriquecimiento con IA**: descripciones, etiquetas y palabras clave generadas por Grok-4-fast vía OpenRouter
 
 ## Inicio rápido
@@ -126,7 +126,7 @@ Búsqueda híbrida de módulos de Odoo con consultas en lenguaje natural. Ambos 
 | Parámetro | Tipo | Obligatorio | Descripción |
 |-----------|------|-------------|-------------|
 | `query` | string | Sí | Consulta en lenguaje natural |
-| `version` | string | Sí | Versión de Odoo (`14.0` a `19.0`) |
+| `version` | string | Sí | Versión de Odoo (`12.0` a `19.0`) |
 | `dependencies` | string (repetible) | No | Dependencia requerida. Repite el parámetro para indicar varias (`&dependencies=sale&dependencies=stock`); un módulo coincide si depende de **cualquiera** de ellas |
 | `limit` | integer | No | Máximo de resultados (1-50, por defecto: 10) |
 | `min_score` | integer | No | Puntuación mínima (0-100, por defecto: 0) |
@@ -540,7 +540,7 @@ Los embeddings de las consultas se obtienen de la API de OpenRouter. Si falla su
 ```bash
 curl http://localhost:8989/stats
 ```
-3. **Comprueba la versión**: debe tener módulos (`by_version` en `/stats`) y estar entre `14.0` y `19.0`.
+3. **Comprueba la versión**: debe tener módulos (`by_version` en `/stats`) y estar entre `12.0` y `19.0`.
 
 ---
 

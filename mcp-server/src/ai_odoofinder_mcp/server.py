@@ -30,7 +30,7 @@ logger = logging.getLogger("ai-odoofinder-mcp")
 API_BASE_URL = os.getenv("AI_ODOOFINDER_API_URL", "http://localhost:8989")
 API_TIMEOUT = int(os.getenv("AI_ODOOFINDER_API_TIMEOUT", "60"))
 
-SUPPORTED_VERSIONS = ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+SUPPORTED_VERSIONS = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
 
 mcp = FastMCP("AI-OdooFinder")
 
@@ -118,7 +118,7 @@ User: "subscriptions and recurring contracts"
 """
 
 VERSION_DESCRIPTION = """
-Odoo version (14.0, 15.0, 16.0, 17.0, 18.0, or 19.0).
+Odoo version (12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, or 19.0).
 
 • If user does NOT specify version → ASK before searching
 • If user says "latest" or "current" → use 18.0 or 19.0

@@ -37,7 +37,7 @@ Como desarrollador de Odoo:
 **AI-OdooFinder** proporciona:
 
 - **Búsqueda Híbrida**: Combina búsqueda semántica (embeddings) con BM25 full-text
-- **Filtrado por Versión**: Solo muestra módulos compatibles (14.0 a 19.0)
+- **Filtrado por Versión**: Solo muestra módulos compatibles (12.0 a 19.0)
 - **Enriquecimiento con IA**: Descripciones, tags y keywords generados por Grok-4-fast
 - **Integración MCP**: Úsalo desde Claude, ChatGPT, Cursor, VS Code, Zed... mediante una URL pública
 
@@ -78,7 +78,7 @@ Como desarrollador de Odoo:
 | Métrica | Valor |
 |---------|-------|
 | Módulos indexados | **19.700+** |
-| Versiones de Odoo | 6 (14.0 – 19.0) |
+| Versiones de Odoo | 8 (12.0 – 19.0) |
 | Con enriquecimiento IA | **100%** |
 
 ---

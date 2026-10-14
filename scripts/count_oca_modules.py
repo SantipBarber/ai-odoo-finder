@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from backend.app.services.github_service import GitHubService
 
 # Mismas versiones que procesa el ETL (scripts/etl_oca_modules.py)
-ODOO_VERSIONS: List[str] = ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+ODOO_VERSIONS: List[str] = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
 
 # Peticiones simultáneas a la API de GitHub
 MAX_WORKERS = 8

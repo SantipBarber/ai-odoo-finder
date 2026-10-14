@@ -94,7 +94,7 @@ GET /search?query=<text>&version=<version>&limit=<n>&dependencies=<dep1>&depende
 | Parameter | Required | Example | Description |
 |-----------|----------|---------|-------------|
 | `query` | Yes | `sale order` | Search text (natural language) |
-| `version` | Yes | `16.0` | Odoo version: `14.0` to `19.0` |
+| `version` | Yes | `16.0` | Odoo version: `12.0` to `19.0` |
 | `limit` | No | `10` | Max results, 1–50 (default: 10) |
 | `min_score` | No | `30` | Minimum score, 0–100 (default: 0) |
 | `dependencies` | No | `dependencies=sale&dependencies=stock` | Repeat the parameter for each dependency; returns modules that depend on **any** of them |

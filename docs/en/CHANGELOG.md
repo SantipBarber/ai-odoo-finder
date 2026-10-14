@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.2] - 2026-10-14
+
+### Changed
+
+- **Supported versions: 12.0–19.0**, matching what is indexed in production. They had been narrowed to 14.0–19.0, but the public server's index includes 12.0 and 13.0. Applies to the MCP tool, `/search` and `/stats`, the ETL, `list_versions()` and the docs.
+
+### Added
+
+- **`scripts/count_oca_modules.py`**: counts OCA modules per version without indexing (no database or OpenRouter).
+
 ## [1.5.1] - 2026-10-14
 
 ### Fixed

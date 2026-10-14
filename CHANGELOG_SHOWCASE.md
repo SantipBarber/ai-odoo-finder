@@ -1,5 +1,9 @@
 # Changelog - AI-OdooFinder Showcase
 
+## [3.0.1] - 2026-10-14
+
+- Versiones de Odoo: 12.0–19.0 (antes 14.0–19.0), lo que hay indexado en producción.
+
 ## [3.0.0] - 2026-10-14
 
 ### Rediseño completo

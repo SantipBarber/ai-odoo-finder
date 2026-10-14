@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AI-OdooFinder</title>
-<meta name="description" content="Servidor MCP que conecta Claude, ChatGPT, Cursor y otros asistentes de IA con más de 19.700 módulos de la OCA para Odoo 14 a 19. Gratis y sin registro." />
+<meta name="description" content="Servidor MCP que conecta Claude, ChatGPT, Cursor y otros asistentes de IA con más de 19.700 módulos de la OCA para Odoo 12 a 19. Gratis y sin registro." />
 <meta property="og:title" content="AI-OdooFinder" />
 <meta property="og:description" content="Describe lo que necesitas en Odoo y recibe el módulo OCA que ya lo hace. Servidor MCP público y gratuito." />
 <meta property="og:type" content="website" />
@@ -285,7 +285,7 @@ footer .wrap { display: grid; gap: 20px; }
     <div class="wrap hero-grid">
       <div>
         <h1 data-i18n="hero.title">Describe lo que necesitas. Recibe el módulo OCA que ya lo hace.</h1>
-        <p class="lead" data-i18n-html="hero.lead">AI-OdooFinder conecta Claude, ChatGPT, Cursor y otros asistentes de IA con <strong>más de 19.700 módulos de la OCA</strong>. Busca por significado y por palabras clave, y solo te muestra módulos de tu versión de Odoo, de la 14 a la 19.</p>
+        <p class="lead" data-i18n-html="hero.lead">AI-OdooFinder conecta Claude, ChatGPT, Cursor y otros asistentes de IA con <strong>más de 19.700 módulos de la OCA</strong>. Busca por significado y por palabras clave, y solo te muestra módulos de tu versión de Odoo, de la 12 a la 19.</p>
 
         <div class="endpoint">
           <label for="mcpUrl" data-i18n="hero.urlLabel">URL del servidor MCP</label>
@@ -372,7 +372,7 @@ footer .wrap { display: grid; gap: 20px; }
           <h3 data-i18n="how.s4.t">Filtra por versión y te dice cuánto fiarte</h3>
           <p data-i18n="how.s4.p">Solo devuelve módulos de tu rama de Odoo y clasifica la respuesta por confianza para que el asistente sepa si recomendar o preguntar más.</p>
           <div class="how-ill">
-            <div class="versions" aria-label="Versiones de Odoo"><span class="on">14.0</span><span class="on">15.0</span><span class="on">16.0</span><span class="on">17.0</span><span class="on">18.0</span><span class="on">19.0</span></div>
+            <div class="versions" aria-label="Versiones de Odoo"><span class="on">12.0</span><span class="on">13.0</span><span class="on">14.0</span><span class="on">15.0</span><span class="on">16.0</span><span class="on">17.0</span><span class="on">18.0</span><span class="on">19.0</span></div>
             <div class="levels">
               <div><b class="h" data-i18n="lvl.high">Alta</b><span data-i18n="lvl.highD">80–100: lo recomienda</span></div>
               <div><b class="m" data-i18n="lvl.med">Media</b><span data-i18n="lvl.medD">50–79: ofrece alternativas</span></div>
@@ -468,7 +468,7 @@ footer .wrap { display: grid; gap: 20px; }
 <pre>@mcp.tool()
 async def search_odoo_modules(
     query: str,
-    version: str,                       # 14.0 – 19.0
+    version: str,                       # 12.0 – 19.0
     dependencies: list[str] | None = None,
     limit: int = 5,                     # 1 – 20
 ) -&gt; str: ...</pre>
@@ -616,7 +616,7 @@ async def search_odoo_modules(
       "skip": "Skip to content",
       "nav.connect": "Connect", "nav.how": "How it searches", "nav.story": "How it was built",
       "hero.title": "Describe what you need. Get the OCA module that already does it.",
-      "hero.lead": "AI-OdooFinder connects Claude, ChatGPT, Cursor and other AI assistants to <strong>more than 19,700 OCA modules</strong>. It searches by meaning and by keyword, and only shows modules for your Odoo version, from 14 to 19.",
+      "hero.lead": "AI-OdooFinder connects Claude, ChatGPT, Cursor and other AI assistants to <strong>more than 19,700 OCA modules</strong>. It searches by meaning and by keyword, and only shows modules for your Odoo version, from 12 to 19.",
       "hero.urlLabel": "MCP server URL", "copy": "Copy", "copied": "Copied",
       "hero.urlNote": "Free, no sign-up. Paste it as a connector in your assistant.",
       "hero.howConnect": "How to connect it to your client", "hero.github": "Code on GitHub",

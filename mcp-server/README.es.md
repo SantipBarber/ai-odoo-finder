@@ -58,7 +58,7 @@ Configuración del cliente MCP:
 ## Características
 
 - **Búsqueda híbrida**: Combina búsqueda semántica (embeddings) con búsqueda de texto completo BM25
-- **Filtrado por versión**: Solo muestra módulos compatibles (Odoo 14.0 a 19.0)
+- **Filtrado por versión**: Solo muestra módulos compatibles (Odoo 12.0 a 19.0)
 - **Enriquecimiento con IA**: Descripciones, etiquetas y palabras clave generadas por Grok-4-fast
 - **Flujo inteligente**: Aclaraciones, expansión de consultas y niveles de confianza
 
@@ -101,7 +101,7 @@ Busca módulos de Odoo usando consultas en lenguaje natural.
 
 **Parámetros:**
 - `query` (string, obligatorio): Consulta de búsqueda en lenguaje natural
-- `version` (string, obligatorio): Versión de Odoo, de `14.0` a `19.0` (p. ej. `"16.0"`, `"17.0"`)
+- `version` (string, obligatorio): Versión de Odoo, de `12.0` a `19.0` (p. ej. `"16.0"`, `"17.0"`)
 - `dependencies` (lista de strings, opcional): Filtra por dependencias requeridas, p. ej. `["account"]`
 - `limit` (integer, opcional): Máximo de resultados (por defecto: 5, máximo: 20; los valores fuera de rango se ajustan a 1–20)
 

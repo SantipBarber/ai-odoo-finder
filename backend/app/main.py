@@ -16,7 +16,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-SUPPORTED_VERSIONS = ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+SUPPORTED_VERSIONS = ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
 
 
 @asynccontextmanager
@@ -73,7 +73,7 @@ async def health_check(db: Session = Depends(get_db)):
 @app.post("/search")
 async def search_modules(
     query: str = Query(..., description="Consulta en lenguaje natural"),
-    version: str = Query(..., description="Versión de Odoo (14.0 a 19.0)"),
+    version: str = Query(..., description="Versión de Odoo (12.0 a 19.0)"),
     dependencies: Optional[List[str]] = Query(None, description="Dependencias requeridas"),
     limit: int = Query(10, ge=1, le=50, description="Número máximo de resultados"),
     min_score: int = Query(0, ge=0, le=100, description="Minimum score (0-100)"),

@@ -65,7 +65,7 @@ async def test_no_dependencies_param_when_not_given(captured):
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("version", ["10.0", "12.0", "13.0", "20.0"])
+@pytest.mark.parametrize("version", ["10.0", "11.0", "20.0"])
 async def test_unsupported_versions_are_rejected_without_calling_backend(captured, version):
     result = await search(query="sales", version=version)
 
