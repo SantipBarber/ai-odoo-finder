@@ -210,7 +210,7 @@ section.block { padding: 88px 0; border-top: 1px solid var(--line); }
 .stage { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 0 16px; position: relative; padding-bottom: 36px; }
 @media (min-width: 720px) { .stage { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 0 24px; } }
 .stage::before { content: ""; position: absolute; left: 1.5rem; top: 3rem; bottom: 4px; width: 1px; background: var(--line); }
-@media (min-width: 720px) { .stage::before { left: 2.25rem; } }
+@media (min-width: 720px) { .stage::before { left: 2.25rem; top: 4.5rem; } }
 .stage:last-child::before { display: none; }
 .num { width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; font-weight: 800; font-size: 1.05rem; color: var(--plum); }
 @media (min-width: 720px) { .num { width: 4.5rem; height: 4.5rem; font-size: 1.5rem; } }
