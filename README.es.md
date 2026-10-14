@@ -1,8 +1,8 @@
 # AI-OdooFinder
 
-> **Encuentra el modulo de Odoo perfecto con IA en segundos.**
+> **Encuentra el módulo de Odoo perfecto con IA en segundos.**
 
-Un servidor MCP (Model Context Protocol) que permite a los LLMs buscar modulos de Odoo en los repositorios de OCA usando busqueda hibrida (semantica + full-text).
+Un servidor MCP (Model Context Protocol) que permite a los LLMs buscar módulos de Odoo en los repositorios de OCA usando búsqueda híbrida (semántica + full-text).
 
 <div align="center">
 
@@ -11,7 +11,7 @@ Un servidor MCP (Model Context Protocol) que permite a los LLMs buscar modulos d
 [![PyPI version](https://img.shields.io/pypi/v/ai-odoofinder-mcp.svg)](https://pypi.org/project/ai-odoofinder-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Odoo](https://img.shields.io/badge/Odoo-10.0%20to%2019.0-714B67)](https://www.odoo.com)
+[![Odoo](https://img.shields.io/badge/Odoo-14.0%20to%2019.0-714B67)](https://www.odoo.com)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/SantipBarber/ai-odoo-finder)
 
@@ -26,181 +26,112 @@ Un servidor MCP (Model Context Protocol) que permite a los LLMs buscar modulos d
 Como desarrollador de Odoo:
 
 - Desarrollas funcionalidades que ya existen en OCA
-- Pierdes horas buscando el modulo correcto en GitHub
-- Instalas modulos incompatibles con tu version
-- Descubres modulos abandonados despues de integrarlos
+- Pierdes horas buscando el módulo correcto en GitHub
+- Instalas módulos incompatibles con tu versión
+- Descubres módulos abandonados después de integrarlos
 
 ---
 
-## La Solucion
+## La Solución
 
 **AI-OdooFinder** proporciona:
 
-- **Busqueda Hibrida**: Combina busqueda semantica (embeddings) con BM25 full-text
-- **Filtrado por Version**: Solo muestra modulos compatibles (10.0 a 19.0)
-- **Enrichment con IA**: Descripciones, tags y keywords generados por Grok-4-fast
-- **Integracion MCP**: Usa directamente desde Claude Desktop o Claude.ai
+- **Búsqueda Híbrida**: Combina búsqueda semántica (embeddings) con BM25 full-text
+- **Filtrado por Versión**: Solo muestra módulos compatibles (14.0 a 19.0)
+- **Enriquecimiento con IA**: Descripciones, tags y keywords generados por Grok-4-fast
+- **Integración MCP**: Úsalo desde Claude, ChatGPT, Cursor, VS Code, Zed... mediante una URL pública
 
 ---
 
 ## Arquitectura
 
 ```
-┌─────────────────────┐      ┌──────────────────────────────────────┐
-│  Claude.ai Web      │      │        Hetzner VPS (Docker)          │
-│  Zed / Cursor       │─────►│  ┌─────────────┐  ┌──────────────┐   │
-│  (remote MCP)       │ HTTPS│  │ MCP Server  │  │   FastAPI    │   │
-└─────────────────────┘      │  │  :8080/mcp  │─►│   :8989      │   │
-                             │  └─────────────┘  └──────┬───────┘   │
-┌─────────────────────┐      │                          │           │
-│   Claude Desktop    │      │                   ┌──────▼───────┐   │
-│   + MCP Server      │─────►│                   │  PostgreSQL  │   │
-│   (local, STDIO)    │ HTTPS│                   │  + pgvector  │   │
-└─────────────────────┘      │                   └──────────────┘   │
-                             └──────────────────────────────────────┘
+┌──────────────────────────┐         ┌───────────────────────────────────────┐
+│  Claude.ai / Desktop     │         │  Infraestructura de Eticco (Docker)   │
+│  Claude Code · ChatGPT   │  HTTPS  │  ┌──────────────┐   ┌─────────────┐   │
+│  Cursor · VS Code · Zed  │────────►│  │  MCP Server  │──►│   FastAPI   │   │
+│  Windsurf · ...          │         │  │ (Streamable  │   │   backend   │   │
+└──────────────────────────┘         │  │    HTTP)     │   └──────┬──────┘   │
+   https://addon-finder.eticco.es    │  └──────────────┘          │          │
+                                     │                     ┌──────▼──────┐   │
+                                     │                     │ PostgreSQL  │   │
+                                     │                     │ + pgvector  │   │
+                                     │                     └─────────────┘   │
+                                     └───────────────────────────────────────┘
 ```
 
 **Modos de uso:**
-- **Remote MCP** (Claude.ai Web, Zed, Cursor): Conectan al MCP Server remoto via HTTP
-- **Local MCP** (Claude Desktop): MCP Server corre localmente via STDIO
-- **API REST directa**: Para integraciones custom
+- **MCP remoto (recomendado)**: Apunta cualquier cliente MCP a `https://addon-finder.eticco.es`, sin instalar nada
+- **MCP local (STDIO)**: El [paquete de PyPI](https://pypi.org/project/ai-odoofinder-mcp/) se ejecuta en local contra tu propio backend (self-hosting)
 
 **Componentes:**
-- **MCP Server HTTP** (remoto, :8080): Servidor MCP para clientes remotos
-- **FastAPI Backend** (remoto, :8989): API REST con busqueda hibrida
-- **PostgreSQL + pgvector** (remoto): 16,494 modulos con embeddings
+- **MCP Server** (Streamable HTTP): endpoint público para clientes MCP
+- **FastAPI Backend**: motor de búsqueda híbrida (interno)
+- **PostgreSQL + pgvector**: más de 19.700 módulos con embeddings
+
+> **Instancia pública** alojada por [Eticco](https://www.eticco.es). La búsqueda sobre módulos de la comunidad OCA es **abierta y no requiere login**. Eticco también está ampliando el servicio con sus propios módulos internos; esa parte requiere autenticación y es solo para uso interno.
 
 ---
 
-## Estadisticas
+## Estadísticas
 
-| Metrica | Valor |
+| Métrica | Valor |
 |---------|-------|
-| Modulos Indexados | **16,494** |
-| Versiones Odoo | 10 (v10.0 - v19.0) |
-| Repositorios OCA | **244** |
-| Con AI Enrichment | **100%** |
-| Tiempo respuesta | < 500ms |
-
-### Modulos por Version
-
-| Version | Modulos |
-|---------|---------|
-| 10.0 | 2,312 |
-| 11.0 | 2,105 |
-| 12.0 | 2,215 |
-| 13.0 | 1,990 |
-| 14.0 | 2,886 |
-| 15.0 | 2,074 |
-| 16.0 | 2,886 |
-| 17.0 | 1,699 |
-| 18.0 | 2,022 |
-| 19.0 | 112 |
+| Módulos indexados | **19.700+** |
+| Versiones de Odoo | 6 (14.0 – 19.0) |
+| Con enriquecimiento IA | **100%** |
 
 ---
 
-## Instalacion
+## Instalación
 
-El servidor MCP está disponible en [PyPI](https://pypi.org/project/ai-odoofinder-mcp/). Añade la siguiente configuración a tu cliente MCP:
+**No hace falta instalar nada.** AI-OdooFinder está disponible como servidor MCP remoto público:
+
+```
+https://addon-finder.eticco.es
+```
+
+| | |
+|---|---|
+| **Transporte** | Streamable HTTP |
+| **Autenticación** | Ninguna para módulos de la comunidad OCA |
+| **Herramienta** | `search_odoo_modules` |
+
+Añade esa URL a tu cliente MCP (ver más abajo). Si tu cliente solo admite servidores locales STDIO, usa el puente [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) (requiere Node.js):
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://addon-finder.eticco.es"]
     }
   }
 }
 ```
-
-> **Nota**: Requiere el gestor de paquetes [uv](https://docs.astral.sh/uv/) instalado.
-
-<details>
-<summary><b>Alternativa: Instalar desde Git (desarrollo)</b></summary>
-
-Para la última versión de desarrollo:
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
-```
-
-</details>
 
 ### Configuración por IDE/Cliente
 
 <details>
-<summary><b>Claude Desktop</b></summary>
+<summary><b>Claude.ai Web / Claude Desktop</b></summary>
 
-Añade a `claude_desktop_config.json`:
+1. Ve a **Ajustes** > **Conectores**
+2. Haz clic en **"Añadir conector personalizado"**
+3. Introduce la URL del servidor MCP:
+   ```
+   https://addon-finder.eticco.es
+   ```
+4. Guarda y empieza a buscar
 
-**Ubicación del archivo:**
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **Linux**: `~/.config/claude/claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
-```
-
-Reinicia Claude Desktop.
+> Los conectores personalizados se comparten entre Claude.ai y Claude Desktop. En versiones antiguas de Desktop sin conectores, usa la configuración de `mcp-remote` de arriba en `claude_desktop_config.json`.
 
 </details>
 
 <details>
 <summary><b>Claude Code CLI</b></summary>
 
-**¡NUEVO!** Usa Claude directamente desde tu terminal.
-
-Instala Claude Code:
 ```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-Añade el servidor MCP:
-```bash
-# Configuración interactiva
-claude mcp add
-
-# O edita ~/.claude.json directamente
-```
-
-Configuración (`~/.claude.json`):
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
+claude mcp add --transport http ai-odoofinder https://addon-finder.eticco.es
 ```
 
 Uso:
@@ -212,82 +143,33 @@ claude
 </details>
 
 <details>
-<summary><b>Claude.ai Web (Remoto)</b></summary>
+<summary><b>ChatGPT (Developer Mode)</b></summary>
 
-Sin instalación requerida. Conéctate directamente:
-
-1. Ve a **Claude.ai** > **Settings** > **Conectores**
-2. Haz clic en **"Añadir conector personalizado"**
-3. Introduce la URL del servidor MCP:
-   ```
-   https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
-   ```
-4. Guarda y empieza a buscar
-
-> **Protocolo**: Streamable HTTP (especificación MCP 2024-11-05)
-
-</details>
-
-<details>
-<summary><b>ChatGPT Developer Mode</b></summary>
-
-**¡NUEVO!** OpenAI añadió soporte completo MCP en septiembre de 2025.
-
-**Requisitos:**
-- Suscripción a ChatGPT Plus/Pro/Team
-- Developer Mode habilitado (beta)
-
-**Configuración:**
-1. Ve a **ChatGPT Settings** > **Beta Features**
-2. Habilita **"Developer Mode"**
-3. Navega a **Integrations** > **MCP Servers**
-4. Añade el servidor:
-   - **Remoto (más fácil)**: `https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp`
-   - **Local**: Usa la configuración con uvx (ver documentación completa)
+1. Ve a **Settings** > **Apps & Connectors** > **Advanced** y activa **Developer Mode**
+2. Crea un nuevo conector con la URL `https://addon-finder.eticco.es`
+3. Autenticación: **Ninguna**
 
 **Uso:**
 ```
 Usa ai-odoofinder para buscar módulos de Odoo 17 para inventario
 ```
 
-> **Nota**: Soporta operaciones de lectura y escritura (no solo lectura).
-
 </details>
 
 <details>
-<summary><b>VSCode Copilot</b></summary>
+<summary><b>VS Code (GitHub Copilot)</b></summary>
 
-**¡NUEVO!** GitHub Copilot soporta MCP (GA desde julio de 2025).
-
-**Requisitos:**
-- VSCode 1.102+
-- Suscripción a GitHub Copilot
-- Política MCP habilitada (solo Business/Enterprise)
-
-**Configuración:**
-
-Crea `.vscode/mcp.json` (proyecto) o `~/.config/Code/User/mcp.json` (global):
+Crea `.vscode/mcp.json` (proyecto) o añádelo a tu `mcp.json` de usuario:
 
 ```json
 {
   "servers": {
     "ai-odoofinder": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
+      "type": "http",
+      "url": "https://addon-finder.eticco.es"
     }
   }
 }
-```
-
-Recarga VSCode (`Ctrl/Cmd + Shift + P` → "Reload Window").
-
-**Uso:**
-```
-@workspace Encuentra un módulo de Odoo para contabilidad
 ```
 
 > **Para Business/Enterprise**: El administrador debe habilitar la política "MCP servers in Copilot".
@@ -303,17 +185,28 @@ Añade a `.cursor/mcp.json` (proyecto) o `~/.cursor/mcp.json` (global):
 {
   "mcpServers": {
     "ai-odoofinder": {
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
+      "url": "https://addon-finder.eticco.es"
     }
   }
 }
 ```
 
-Reinicia Cursor.
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Añade a `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "ai-odoofinder": {
+      "serverUrl": "https://addon-finder.eticco.es"
+    }
+  }
+}
+```
 
 </details>
 
@@ -326,151 +219,74 @@ Añade a `~/.config/zed/settings.json`:
 {
   "context_servers": {
     "ai-odoofinder": {
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
+      "url": "https://addon-finder.eticco.es"
     }
   }
 }
 ```
-
-O usa **Add Server** en el Agent Panel de Zed con este JSON:
-
-```json
-{
-  "ai-odoofinder": {
-    "command": "uvx",
-    "args": ["ai-odoofinder-mcp"],
-    "env": {
-      "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-    }
-  }
-}
-```
-
-Reinicia Zed.
 
 </details>
 
 <details>
-<summary><b>Windsurf</b></summary>
+<summary><b>Antigravity y otros clientes solo STDIO</b></summary>
 
-Añade a tu configuración MCP de Windsurf:
-
-```json
-{
-  "mcpServers": {
-    "ai-odoofinder": {
-      "command": "uvx",
-      "args": ["ai-odoofinder-mcp"],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
-    }
-  }
-}
-```
-
-Reinicia Windsurf.
-
-</details>
-
-<details>
-<summary><b>Antigravity</b></summary>
-
-⚠️ **Problemas Conocidos**: Antigravity tiene problemas de compatibilidad con `uvx` y conexiones MCP remotas.
-
-**Solución 1: Usar npx (Recomendado)**
+Usa el puente `mcp-remote`:
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@SantipBarber/ai-odoofinder-mcp"
-      ],
-      "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
-      }
+      "args": ["-y", "mcp-remote", "https://addon-finder.eticco.es"]
     }
   }
 }
 ```
 
-**Solución 2: Usar ruta completa a uvx (Windows)**
+> **Ver solución de problemas completa**: [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md)
 
-Encuentra la ruta de uvx:
-```bash
-where uvx  # Windows
-which uvx  # macOS/Linux
-```
+</details>
+
+<details>
+<summary><b>Paquete STDIO local (backend propio)</b></summary>
+
+El paquete de PyPI [`ai-odoofinder-mcp`](https://pypi.org/project/ai-odoofinder-mcp/) ejecuta el servidor MCP en local y se comunica con la API REST del backend FastAPI. La instancia pública no expone esa API REST, así que este modo está pensado para **tu propio despliegue** (ver [Despliegue y operaciones](docs/es/DEPLOYMENT_OPERATIONS.md)):
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
-      "command": "C:\\Users\\TU_USUARIO\\.cargo\\bin\\uvx.exe",
+      "command": "uvx",
       "args": ["ai-odoofinder-mcp"],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+        "AI_ODOOFINDER_API_URL": "http://localhost:8989"
       }
     }
   }
 }
 ```
 
-**Limitaciones Conocidas:**
-- ❌ Modo remoto NO soportado (incompatibilidad de protocolo SSE)
-- ⚠️ Puede quedarse bloqueado con conexiones remotas
-- ✅ Modo local funciona con los workarounds anteriores
-
-> **Ver solución de problemas completa**: [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md#antigravity)
+> Requiere [uv](https://docs.astral.sh/uv/).
 
 </details>
-
-<details>
-<summary><b>Otros Clientes MCP</b></summary>
-
-Para cualquier cliente compatible con MCP:
-
-**Modo local (STDIO)**: Usa la configuración mostrada arriba
-
-**Modo remoto (HTTP)**: Usa la URL del servidor:
-```
-https://strategy-orchestrator-prod.tailf7d690.ts.net/mcp
-```
-
-**Protocolo**: Streamable HTTP (especificación MCP 2024-11-05)  
-**Autenticación**: Ninguna (servidor público)
 
 **Guía completa de configuración**: [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md)
-
-</details>
 
 ---
 
 ## Matriz de Compatibilidad de Clientes
 
-| Cliente | Local | Remoto | Estado | Notas |
-|---------|-------|--------|--------|-------|
-| Claude Desktop | ✅ | ❌ | Estable | Mejor experiencia |
-| Claude Code CLI | ✅ | ✅ | Estable | **¡NUEVO!** Basado en terminal |
-| Claude.ai Web | ❌ | ✅ | Estable | Sin instalación |
-| ChatGPT Dev Mode | ✅ | ✅ | Beta | **¡NUEVO!** Sept 2025 |
-| VSCode Copilot | ✅ | ⚠️ | GA | **¡NUEVO!** Julio 2025 |
-| Cursor | ✅ | ❌ | Estable | Opción popular |
-| Zed | ✅ | ❌ | Estable | Editor rápido |
-| Windsurf | ✅ | ❌ | Estable | Soporte completo |
-| Antigravity | ⚠️ | ❌ | Problemas | Usar npx/workarounds |
-
-**Leyenda:**
-- ✅ Totalmente soportado
-- ⚠️ Soporte parcial / workarounds necesarios
-- ❌ No soportado
+| Cliente | URL remota | Vía `mcp-remote` | Notas |
+|---------|:----------:|:----------------:|-------|
+| Claude.ai Web | ✅ | — | Conector personalizado |
+| Claude Desktop | ✅ | ✅ | Conector o puente |
+| Claude Code CLI | ✅ | ✅ | `--transport http` |
+| ChatGPT Dev Mode | ✅ | — | Developer Mode |
+| VS Code Copilot | ✅ | ✅ | `type: http` |
+| Cursor | ✅ | ✅ | |
+| Windsurf | ✅ | ✅ | `serverUrl` |
+| Zed | ✅ | ✅ | |
+| Antigravity | ⚠️ | ✅ | Usa el puente |
 
 **Detalles completos**: Ver [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md)
 
@@ -484,54 +300,46 @@ Ver [docs/es/DEPLOYMENT_OPERATIONS.md](docs/es/DEPLOYMENT_OPERATIONS.md) para in
 
 ## Uso
 
-### Desde Claude Desktop (MCP)
-
-Simplemente pregunta en lenguaje natural:
+Una vez conectado, basta con preguntar en lenguaje natural:
 
 ```
-"Necesito un modulo para Odoo 17 que maneje pagos recurrentes"
+"Necesito un módulo para Odoo 17 que gestione pagos recurrentes"
 ```
 
-Claude usara el MCP Server para buscar y te mostrara los resultados.
+Tu asistente llamará a `search_odoo_modules` y te mostrará los módulos OCA compatibles con su repositorio, resumen y enlace a GitHub.
 
-### API REST Directa
+Comprueba el estado del servicio:
 
 ```bash
-# Health check
-curl https://strategy-orchestrator-prod.tailf7d690.ts.net/health
-
-# Busqueda
-curl "https://strategy-orchestrator-prod.tailf7d690.ts.net/search?query=subscription&version=17.0&limit=5"
-
-# Estadisticas
-curl https://strategy-orchestrator-prod.tailf7d690.ts.net/stats
+curl https://addon-finder.eticco.es/health
 ```
 
+> La API REST de FastAPI (`/search`, `/stats`) solo está expuesta en despliegues propios (`http://localhost:8989`).
+
 ---
 
-## Stack Tecnologico
+## Stack Tecnológico
 
-| Componente | Tecnologia |
+| Componente | Tecnología |
 |------------|------------|
-| Backend | FastAPI (Python 3.13+) |
+| Backend | FastAPI (Python 3.14) |
 | Base de Datos | PostgreSQL 17 + pgvector |
-| Embeddings | Qwen3-Embedding-4B via OpenRouter |
-| Enrichment | Grok-4-fast via OpenRouter |
+| Embeddings | Qwen3-Embedding-4B vía OpenRouter |
+| Enriquecimiento | Grok-4-fast vía OpenRouter |
 | MCP Server | FastMCP (Python) |
 | Contenedores | Docker + Docker Compose |
-| Hosting | Hetzner VPS (ARM64) |
-| Tunnel | Tailscale Funnel (HTTPS) |
+| Hosting | Infraestructura de Eticco (Docker + nginx) |
 
 ---
 
-## Documentacion
+## Documentación
 
 - [Showcase Interactivo](https://santipbarber.github.io/ai-odoo-finder/showcase/) - Presentación visual del proyecto
 - [Configuraciones de Clientes MCP](docs/es/MCP_CLIENT_CONFIGURATIONS.md) - Guía completa para todos los clientes MCP
-- [Deployment & Operations](docs/es/DEPLOYMENT_OPERATIONS.md) - Guia de despliegue y operaciones
-- [Project History](docs/es/PROJECT_HISTORY.md) - Evolucion de la arquitectura del proyecto
-- [Changelog](docs/es/CHANGELOG.md) - Historial de cambios
-- [MCP Server README](mcp-server/README.md) - Instalacion y configuracion del servidor MCP
+- [Despliegue y operaciones](docs/es/DEPLOYMENT_OPERATIONS.md) - Guía de despliegue y operaciones
+- [Historia del proyecto](docs/es/PROJECT_HISTORY.md) - Evolución de la arquitectura del proyecto
+- [Registro de cambios](docs/es/CHANGELOG.md) - Historial de cambios
+- [README del servidor MCP](mcp-server/README.es.md) - Instalación y configuración del servidor MCP
 
 ---
 
@@ -539,11 +347,11 @@ curl https://strategy-orchestrator-prod.tailf7d690.ts.net/stats
 
 ### Requisitos
 
-- Python 3.13+
+- Python 3.14+
 - [uv](https://docs.astral.sh/uv/) (gestor de dependencias)
 - Docker (para PostgreSQL local)
 
-### Setup Local
+### Configuración local
 
 ```bash
 # Clonar
@@ -560,7 +368,7 @@ cp .env.example .env
 # Iniciar PostgreSQL
 docker compose up -d db
 
-# Ejecutar ETL (indexar modulos)
+# Ejecutar ETL (indexar módulos)
 uv run python scripts/etl_oca_modules.py
 
 # Iniciar API
@@ -577,7 +385,7 @@ MIT - Ver [LICENSE](LICENSE)
 
 ## Autor
 
-**Santiago Perez Barber**
+**Santiago Pérez Barber**
 - GitHub: [@SantipBarber](https://github.com/SantipBarber)
 - LinkedIn: [santipbarber](https://linkedin.com/in/santipbarber)
 

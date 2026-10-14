@@ -2,102 +2,115 @@
 
 **Language**: [English](../en/DEPLOYMENT_OPERATIONS.md) | [Español](../es/DEPLOYMENT_OPERATIONS.md)
 
+> **Note:** The public AI-OdooFinder instance runs on [Eticco](https://www.eticco.es) infrastructure at **`https://addon-finder.eticco.es`** (MCP endpoint at the root URL). You don't need to deploy anything to use it. This guide documents the **reference self-hosted Docker deployment**, for running your own instance.
+
 ## Architecture Overview
 
-Self-hosted solution on Hetzner VPS with Docker. Previously used Neon (PostgreSQL) and Render (API hosting), now consolidated to a single server for cost efficiency and simplicity.
+A single VPS runs the three services defined in `docker-compose.yml`. A reverse proxy in front of it terminates TLS and forwards traffic to the MCP server.
 
 ```
-                    +------------------+
-                    |   Client/Claude  |
-                    +--------+---------+
-                             |
-                             | HTTP :8989
-                             v
-+---------------------------------------------------+
-|                 Hetzner VPS (Docker)               |
-|                                                   |
-|  +-------------+          +-------------------+   |
-|  | PostgreSQL  |<-------->|   FastAPI (API)   |   |
-|  | + pgvector  |  :5432   |                   |   |
-|  | (db)        |          | - /search         |   |
-|  +-------------+          | - /stats          |   |
-|                           | - /health         |   |
-|                           +-------------------+   |
-|                                                   |
-+---------------------------------------------------+
+                 +------------------+
+                 |  MCP client (AI) |
+                 +--------+---------+
+                          |
+                          | HTTPS
+                          v
++--------------------------------------------------+
+|                   VPS (Docker)                   |
+|                                                  |
+|   +------------------------------------------+   |
+|   |          Reverse proxy (TLS)             |   |
+|   +--------------------+---------------------+   |
+|                        |                         |
+|                        v                         |
+|   +------------------------------------------+   |
+|   |  mcp   :8080   (MCP endpoint at path /)  |   |
+|   +--------------------+---------------------+   |
+|                        |                         |
+|                        v                         |
+|   +------------------------------------------+   |
+|   |  api   :8989   (FastAPI REST)            |   |
+|   +--------------------+---------------------+   |
+|                        |                         |
+|                        v                         |
+|   +------------------------------------------+   |
+|   |  db    :5432   (PostgreSQL 17 + pgvector)|   |
+|   +------------------------------------------+   |
+|                                                  |
++--------------------------------------------------+
 ```
+
+Only the MCP server needs to be reachable from the internet. The REST API (`:8989`) is used internally by the MCP server; expose it only if you want to use the [local STDIO package](#local-mode-stdio) from other machines.
 
 ## Server Information
 
 | Item | Value |
 |------|-------|
-| **Public URL** | `https://<your-server>.ts.net` |
-| **Provider** | VPS (exposed via Tailscale Funnel) |
+| **Public URL** | `https://<your-domain>` |
+| **Provider** | Any VPS |
 | **Architecture** | ARM64 or x86_64 |
 | **OS** | Ubuntu 22.04+ LTS |
-| **Recommended Resources** | 2 vCPU, 4GB RAM, 40GB disk |
-| **Project Path** | `/opt/ai-odoo-finder` |
+| **Resources** | A small VPS (~2 GB RAM) is enough for the API and PostgreSQL |
+| **Project path** | `/opt/ai-odoo-finder` (the helper scripts and systemd unit assume this path) |
 
 ## Services
 
 ### Docker Containers
 
-| Container | Image | Port | Purpose |
-|-----------|-------|------|---------|
-| `odoofinder-postgres` | pgvector/pgvector:pg17 | 5432 | PostgreSQL 17 + pgvector |
-| `odoofinder-api` | custom build | 8989 | FastAPI Backend |
-| `odoofinder-mcp` | custom build | 8080 | MCP Server (Remote HTTP) |
+| Service | Container | Image | Port | Purpose |
+|---------|-----------|-------|------|---------|
+| `db` | `odoofinder-postgres` | `pgvector/pgvector:pg17` | 5432 | PostgreSQL 17 + pgvector |
+| `api` | `odoofinder-api` | Built from `Dockerfile` | 8989 | FastAPI backend (REST API) |
+| `mcp` | `odoofinder-mcp` | Built from `mcp-server/Dockerfile` | 8080 | MCP server (Streamable HTTP) |
+
+`mcp-server/Dockerfile` defaults to `MCP_PATH=/mcp`, but `docker-compose.yml` sets `MCP_PATH=/`, so the MCP endpoint of the Compose deployment is the root path.
 
 ### API Endpoints (FastAPI - :8989)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | API info and MCP configuration |
-| `/health` | GET | Health check (DB connection) |
-| `/search` | GET | Hybrid search (Vector + BM25 + RRF) |
-| `/modules/{id}` | GET | Get module by ID |
-| `/stats` | GET | Database statistics |
-| `/docs` | GET | Swagger UI documentation |
+| `/` | GET | API info |
+| `/health` | GET | Health check (database connection and module count) |
+| `/search` | GET, POST | Hybrid search (vector + BM25 + RRF) |
+| `/modules/{id}` | GET | Get a module by ID |
+| `/stats` | GET | Database statistics (modules per version) |
+| `/docs` | GET | Swagger UI |
 
-### MCP Endpoints (MCP Server - :8080)
+### MCP Endpoint (MCP Server - :8080)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/mcp` | POST | MCP JSON-RPC endpoint (Streamable HTTP) |
-| `/mcp` | GET | MCP SSE endpoint (legacy) |
+| `/` | POST, GET | MCP endpoint (Streamable HTTP) |
+
+> **Health check:** `docker-compose.yml` checks the `mcp` container with `curl -f http://localhost:8080/health`, but the MCP server in this repository does not define a `/health` route, so Docker may report the container as `unhealthy` even when it works. Use the [initialize request](#remote-mode-docker) to check it. The public instance does answer on `https://addon-finder.eticco.es/health`.
 
 ### Search Parameters
 
+Both `GET` and `POST` take the parameters in the query string:
+
 ```
-GET /search?query=<text>&version=<version>&limit=<n>&dependencies=<dep1,dep2>
+GET /search?query=<text>&version=<version>&limit=<n>&dependencies=<dep1>&dependencies=<dep2>
 ```
 
 | Parameter | Required | Example | Description |
 |-----------|----------|---------|-------------|
 | `query` | Yes | `sale order` | Search text (natural language) |
-| `version` | Yes | `16.0` | Odoo version filter |
-| `limit` | No | `10` | Max results (default: 10) |
-| `dependencies` | No | `sale,stock` | Filter by dependencies |
+| `version` | Yes | `16.0` | Odoo version: `14.0` to `19.0` |
+| `limit` | No | `10` | Max results, 1–50 (default: 10) |
+| `min_score` | No | `30` | Minimum score, 0–100 (default: 0) |
+| `dependencies` | No | `dependencies=sale&dependencies=stock` | Repeat the parameter for each dependency; returns modules that depend on **any** of them |
 
 ## Database Statistics
 
-- **Total modules**: 15,884
-- **With embeddings**: 100%
+The number of indexed modules changes with every ETL run. Check your instance:
 
-| Version | Modules |
-|---------|---------|
-| 12.0 | 2,215 |
-| 13.0 | 1,990 |
-| 14.0 | 2,886 |
-| 15.0 | 2,074 |
-| 16.0 | 2,886 |
-| 17.0 | 1,699 |
-| 18.0 | 2,022 |
-| 19.0 | 112 |
+```bash
+curl http://localhost:8989/stats
+```
 
 ## Systemd Service (Auto-start)
 
-The system is configured as a systemd service that starts automatically on boot.
+`scripts/ai-odoo-finder.service` defines a systemd unit that starts the Docker stack on boot. Install it with `scripts/install_service.sh`.
 
 ### Service Commands
 
@@ -117,7 +130,7 @@ systemctl restart ai-odoo-finder
 # View logs
 journalctl -u ai-odoo-finder
 
-# Follow logs in real-time
+# Follow logs in real time
 journalctl -u ai-odoo-finder -f
 
 # View last 50 lines
@@ -131,9 +144,9 @@ Located in `/opt/ai-odoo-finder/scripts/`:
 | Script | Description |
 |--------|-------------|
 | `start_system.sh` | Start all Docker services with health check |
-| `stop_system.sh` | Stop all Docker services and cleanup |
+| `stop_system.sh` | Stop all Docker services and clean up |
 | `status_system.sh` | Show detailed system status |
-| `install_service.sh` | Install/reinstall systemd service |
+| `install_service.sh` | Install/reinstall the systemd service |
 
 ### Manual Status Check
 
@@ -148,12 +161,7 @@ This shows: Docker containers, API health, database stats, disk usage.
 ### SSH Access
 
 ```bash
-# Via Tailscale (recommended)
-ssh user@<your-server-name>
-
-# Or via Tailscale IP
-ssh user@<tailscale-ip>
-
+ssh user@<your-server>
 cd /opt/ai-odoo-finder
 ```
 
@@ -165,6 +173,9 @@ docker compose logs -f
 
 # API only
 docker compose logs -f api
+
+# MCP server only
+docker compose logs -f mcp
 
 # PostgreSQL only
 docker compose logs -f db
@@ -181,8 +192,8 @@ docker compose restart api
 
 # Full rebuild (after code changes)
 git pull
-docker compose build --no-cache api
-docker compose up -d api
+docker compose build --no-cache api mcp
+docker compose up -d api mcp
 ```
 
 ### Check Service Status
@@ -204,7 +215,7 @@ docker exec odoofinder-postgres psql -U odoofinder -d ai_odoofinder -c "SELECT C
 # Check by version
 docker exec odoofinder-postgres psql -U odoofinder -d ai_odoofinder -c "SELECT version, COUNT(*) FROM odoo_modules GROUP BY version ORDER BY version;"
 
-# Backup database
+# Back up database
 docker exec odoofinder-postgres pg_dump -U odoofinder -d ai_odoofinder -F c -f /tmp/backup.dump
 docker cp odoofinder-postgres:/tmp/backup.dump ./backup_$(date +%Y%m%d).dump
 
@@ -222,44 +233,50 @@ curl http://localhost:8989/health
 # Search test
 curl "http://localhost:8989/search?query=sale%20order&version=16.0&limit=3"
 
+# Search with dependencies
+curl "http://localhost:8989/search?query=delivery&version=17.0&dependencies=sale&dependencies=stock"
+
 # Stats
 curl http://localhost:8989/stats
 ```
 
 ## Environment Variables
 
-Located at `/opt/ai-odoo-finder/.env`:
+Located at `/opt/ai-odoo-finder/.env` (copy `.env.example`):
 
 ```env
 # Database
-DATABASE_URL=postgresql://odoofinder:<password>@db:5432/ai_odoofinder
+DATABASE_URL=postgresql://odoofinder:<password>@localhost:5432/ai_odoofinder
 POSTGRES_DB=ai_odoofinder
 POSTGRES_USER=odoofinder
 POSTGRES_PASSWORD=<password>
 
 # External APIs
-OPENROUTER_API_KEY=<key>    # For embeddings generation
-GH_TOKEN=<token>            # For GitHub API (optional)
+OPENROUTER_API_KEY=<key>    # Embeddings + AI enrichment (required)
+GH_TOKEN=<token>            # GitHub API for the ETL (must exist, may be empty)
 
 # App config
 ENVIRONMENT=production
 LOG_LEVEL=INFO
 ```
 
-**Note**: The `.env` file is in `.gitignore` and should never be committed.
+- **`DATABASE_URL`**: Docker Compose sets its own value for the `api` container (`postgresql+psycopg://...@db:5432/...`), built from the `POSTGRES_*` variables. The value in `.env` is only used by scripts that run on the host (such as the ETL), so it points to `localhost:5432`.
+- **`GH_TOKEN`**: the backend settings declare it without a default, so the variable must be defined even if it is empty. A token gives higher GitHub API rate limits during the ETL.
+
+**Note**: The `.env` file is in `.gitignore` and must never be committed.
 
 ## Hybrid Search Algorithm
 
 The search uses **Reciprocal Rank Fusion (RRF)** combining:
 
-1. **Vector Search**: Semantic similarity using Qwen3-Embedding (2560 dimensions)
-2. **BM25 Full-Text**: Keyword matching on technical_name, name, summary, description
+1. **Vector search**: semantic similarity with `qwen/qwen3-embedding-4b` embeddings (2560 dimensions, via OpenRouter), computed as exact cosine distance in pgvector
+2. **BM25-style full-text**: PostgreSQL full-text ranking over the module's technical name, name, summary, repository name, AI-generated description, keywords and tags, description and README (name fields carry the highest weight, README the lowest)
 
 ```
 RRF_score = 1/(k + rank_vector) + 1/(k + rank_bm25)
 ```
 
-Where `k=60` (standard RRF constant)
+Where `k=60` (standard RRF constant).
 
 ## Troubleshooting
 
@@ -289,9 +306,9 @@ docker exec odoofinder-postgres psql -U odoofinder -l
 
 ### Search returns 0 results
 
-1. Check version exists: `curl http://localhost:8989/stats`
+1. Check the version exists: `curl http://localhost:8989/stats`
 2. Check logs for errors: `docker compose logs api --tail 20`
-3. Test with simple query: `curl "http://localhost:8989/search?query=sale&version=16.0&limit=1"`
+3. Test with a simple query: `curl "http://localhost:8989/search?query=sale&version=16.0&limit=1"`
 
 ### Out of disk space
 
@@ -308,70 +325,62 @@ du -sh /opt/ai-odoo-finder/*
 
 ## MCP Server
 
-The MCP Server supports two modes of operation:
+The MCP server supports two modes of operation.
 
-### Remote Mode (Docker - for Claude.ai Web, Zed, Cursor)
+### Remote Mode (Docker)
 
-The MCP server runs as a Docker container alongside the API:
+For Claude.ai, Claude Code, Cursor, Zed and other clients with remote MCP support. The MCP server runs as a Docker container alongside the API:
 
 ```bash
 # Deploy MCP server (without affecting other services)
 docker compose build mcp
 docker compose up -d mcp
 
-# Check MCP server status
+# Check MCP server logs
 docker compose logs mcp --tail 20
 
 # Test MCP endpoint
-curl -X POST "http://localhost:8080/mcp" \
+curl -X POST "http://localhost:8080/" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 ```
 
-**Tailscale Funnel Setup** (expose MCP on port 8080):
+**Exposing it:** expose port 8080 through your reverse proxy (TLS) at the root path, so clients connect to `https://<your-domain>`. Any reverse proxy works (Caddy, nginx, Traefik...); a tunnel such as Tailscale Funnel is another option.
 
-```bash
-# Add port 8080 to Tailscale Funnel
-tailscale funnel 8080
-```
+### Local Mode (STDIO)
 
-### Local Mode (STDIO - for Claude Desktop)
-
-For Claude Desktop, run the MCP server locally:
-
-```bash
-cd mcp-server
-uv run ai-odoofinder-mcp
-```
-
-Configure in Claude Desktop:
-
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-**Linux**: `~/.config/claude/claude_desktop_config.json`
+For clients that run the MCP server as a local process. Install the [`ai-odoofinder-mcp`](https://pypi.org/project/ai-odoofinder-mcp/) package from PyPI and point it to your API. This requires the API port (8989) to be reachable from the client machine.
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://<your-server>.ts.net"
+        "AI_ODOOFINDER_API_URL": "http://<your-server>:8989"
       }
     }
   }
 }
 ```
 
+Claude Desktop config file location:
+
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/claude/claude_desktop_config.json`
+
+For other clients, see [MCP Client Configurations](MCP_CLIENT_CONFIGURATIONS.md).
+
 ## Scheduled ETL
 
-The ETL process runs automatically via cron job on the server to keep the module index updated.
+The ETL process runs on the server via cron to keep the module index updated. It runs from the root project, which requires **Python 3.14** (managed by `uv`).
 
 ### Cron Configuration
 
-The ETL runs daily at 3 AM UTC. To configure:
+To run the ETL daily at 3 AM:
 
 ```bash
 # Edit crontab
@@ -404,10 +413,10 @@ tail -100 /var/log/ai-odoofinder-etl.log
 
 ### ETL Features
 
-- **Incremental updates**: Only processes new/changed modules
-- **Checkpoints**: Can be interrupted and resumed
-- **AI Enrichment**: Generates descriptions, tags, and keywords with Grok-4-fast
-- **Embeddings**: Creates vectors with Qwen3-Embedding-4B
+- **Incremental updates**: only processes new/changed modules
+- **Checkpoints**: can be interrupted and resumed
+- **AI enrichment**: generates descriptions, tags and keywords with `x-ai/grok-4-fast` (via OpenRouter)
+- **Embeddings**: creates vectors with `qwen/qwen3-embedding-4b` (via OpenRouter)
 
 ---
 
@@ -420,8 +429,9 @@ tail -100 /var/log/ai-odoofinder-etl.log
 | 2025-11-29 | Data migration | 15,884 modules with embeddings |
 | 2025-11-30 | Systemd service | Added auto-start on boot |
 | 2025-11-30 | Removed Render | Consolidated to self-hosted Docker |
+| 2026-10 | Public instance moved to Eticco infrastructure | `https://addon-finder.eticco.es` |
 
-## Cost Summary
+## Cost Summary (historical, personal deployment)
 
 | Service | Before | After |
 |---------|--------|-------|
@@ -432,4 +442,4 @@ tail -100 /var/log/ai-odoofinder-etl.log
 
 ---
 
-*Last updated: 2025-11-30*
+*Last updated: 2026-10-14*

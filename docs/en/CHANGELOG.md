@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2026-10-14
+
+### Migration to Eticco Infrastructure
+
+The public AI-OdooFinder MCP server now runs on **[Eticco](https://www.eticco.es)** infrastructure at **`https://addon-finder.eticco.es`**. The previous Tailscale Funnel URL is no longer available.
+
+### Changed
+
+- **Public endpoint**: `https://addon-finder.eticco.es` (Streamable HTTP). The MCP endpoint is served at the **root URL** (no `/mcp` suffix)
+- **Health check**: `https://addon-finder.eticco.es/health`
+- **Authentication**: none required for OCA community modules
+- **Remote mode is now the primary installation method** for all clients (Claude.ai/Desktop connectors, Claude Code `--transport http`, VS Code, Cursor, Windsurf, Zed, ChatGPT Developer Mode)
+- STDIO-only clients connect through the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) bridge: `npx -y mcp-remote https://addon-finder.eticco.es`
+- The PyPI package `ai-odoofinder-mcp` is now documented as the option for **self-hosted backends** (`AI_ODOOFINDER_API_URL=http://localhost:8989`), since the public instance does not expose the REST API (`/search`, `/stats`)
+- Odoo versions documented as 14.0–19.0
+- Corrected documented parameters (limit, dependencies, endpoints, env vars) to match the code
+
+### Documentation rewritten
+
+- **README.md** / **README.es.md**: rewritten around the remote URL
+- **mcp-server/README.md** / **mcp-server/README.es.md**: remote mode first; PyPI package for self-hosted backends
+- **backend/README.md** / **backend/README.es.md**: REST API reference aligned with the code
+- **docs/en|es/MCP_CLIENT_CONFIGURATIONS.md**: rewritten around the remote URL, with tool reference, environment variables, compatibility matrix and troubleshooting updated
+- **docs/en|es/DEPLOYMENT_OPERATIONS.md**: rewritten as the reference self-hosted Docker deployment guide
+- **Showcase** (`docs/showcase/`): updated to point to the new public instance
+
+### Removed
+
+- References to the non-existent npm package `@SantipBarber/ai-odoofinder-mcp` (replaced by `mcp-remote`)
+
+---
+
 ## [1.4.0] - 2025-12-22
 
 ### PyPI Publication
@@ -44,7 +76,7 @@ Configuration for all MCP clients is now shorter:
       "command": "uvx",
       "args": ["ai-odoofinder-mcp"],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+        "AI_ODOOFINDER_API_URL": "https://<your-server>.ts.net"
       }
     }
   }
@@ -71,7 +103,7 @@ Configuration for all MCP clients is now shorter:
 
 ---
 
-## [1.3.0] - 2025-01-19
+## [1.3.0] - 2025-12-06
 
 ### MCP Client Configurations Documentation
 
@@ -197,7 +229,7 @@ MCP Server now accessible at:
 
 ---
 
-## [1.1.0] - 2025-01-XX
+## [1.1.0] - 2025-11-29
 
 ### Phase 6: Intelligent MCP (SPEC-602)
 
@@ -318,7 +350,7 @@ Testing results with Claude Desktop:
 
 #### Added
 - Embeddings with Qwen3-Embedding-4B
-- HNSW index for vector search
+- Vector similarity search with pgvector (exact cosine distance)
 - pgVector integration
 
 ---

@@ -1,108 +1,121 @@
-# Guía de Despliegue y Operaciones de AI-OdooFinder
+# Guía de despliegue y operaciones de AI-OdooFinder
 
-**Language**: [English](../en/DEPLOYMENT_OPERATIONS.md) | [Español](../es/DEPLOYMENT_OPERATIONS.md)
+**Idioma**: [English](../en/DEPLOYMENT_OPERATIONS.md) | [Español](../es/DEPLOYMENT_OPERATIONS.md)
 
-## Resumen de Arquitectura
+> **Nota:** La instancia pública de AI-OdooFinder se ejecuta en la infraestructura de [Eticco](https://www.eticco.es) en **`https://addon-finder.eticco.es`** (endpoint MCP en la URL raíz). No necesitas desplegar nada para usarla. Esta guía documenta el **despliegue Docker autoalojado de referencia**, para ejecutar tu propia instancia.
 
-Solución auto-hospedada en VPS Hetzner con Docker. Anteriormente usaba Neon (PostgreSQL) y Render (API hosting), ahora consolidada en un solo servidor para eficiencia de costo y simplicidad.
+## Resumen de la arquitectura
+
+Un único VPS ejecuta los tres servicios definidos en `docker-compose.yml`. Un proxy inverso situado delante termina TLS y reenvía el tráfico al servidor MCP.
 
 ```
-                    +------------------+
-                    |   Cliente/Claude  |
-                    +--------+---------+
-                             |
-                             | HTTP :8989
-                             v
-+---------------------------------------------------+
-|                 VPS Hetzner (Docker)               |
-|                                                   |
-|  +-------------+          +-------------------+   |
-|  | PostgreSQL  |<-------->|   FastAPI (API)   |   |
-|  | + pgvector  |  :5432   |                   |   |
-|  | (db)        |          | - /search         |   |
-|  +-------------+          | - /stats          |   |
-|                           | - /health         |   |
-|                           +-------------------+   |
-|                                                   |
-+---------------------------------------------------+
+                 +------------------+
+                 | Cliente MCP (IA) |
+                 +--------+---------+
+                          |
+                          | HTTPS
+                          v
++--------------------------------------------------+
+|                   VPS (Docker)                   |
+|                                                  |
+|   +------------------------------------------+   |
+|   |          Proxy inverso (TLS)             |   |
+|   +--------------------+---------------------+   |
+|                        |                         |
+|                        v                         |
+|   +------------------------------------------+   |
+|   |  mcp   :8080   (endpoint MCP en ruta /)  |   |
+|   +--------------------+---------------------+   |
+|                        |                         |
+|                        v                         |
+|   +------------------------------------------+   |
+|   |  api   :8989   (REST con FastAPI)        |   |
+|   +--------------------+---------------------+   |
+|                        |                         |
+|                        v                         |
+|   +------------------------------------------+   |
+|   |  db    :5432   (PostgreSQL 17 + pgvector)|   |
+|   +------------------------------------------+   |
+|                                                  |
++--------------------------------------------------+
 ```
 
-## Información del Servidor
+Solo el servidor MCP necesita ser accesible desde internet. La API REST (`:8989`) la usa internamente el servidor MCP; exponla únicamente si quieres usar el [paquete STDIO local](#modo-local-stdio) desde otras máquinas.
 
-| Item | Valor |
-|------|-------|
-| **URL Pública** | `https://<tu-servidor>.ts.net` |
-| **Proveedor** | VPS (expuesto via Tailscale Funnel) |
+## Información del servidor
+
+| Elemento | Valor |
+|----------|-------|
+| **URL pública** | `https://<tu-dominio>` |
+| **Proveedor** | Cualquier VPS |
 | **Arquitectura** | ARM64 o x86_64 |
-| **OS** | Ubuntu 22.04+ LTS |
-| **Recursos Recomendados** | 2 vCPU, 4GB RAM, 40GB disco |
-| **Ruta del Proyecto** | `/opt/ai-odoo-finder` |
+| **Sistema operativo** | Ubuntu 22.04+ LTS |
+| **Recursos** | Un VPS pequeño (~2 GB de RAM) es suficiente para la API y PostgreSQL |
+| **Ruta del proyecto** | `/opt/ai-odoo-finder` (los scripts auxiliares y la unidad systemd asumen esta ruta) |
 
 ## Servicios
 
 ### Contenedores Docker
 
-| Contenedor | Imagen | Puerto | Propósito |
-|------------|--------|--------|-----------|
-| `odoofinder-postgres` | pgvector/pgvector:pg17 | 5432 | PostgreSQL 17 + pgvector |
-| `odoofinder-api` | imagen personal | 8989 | Backend FastAPI |
-| `odoofinder-mcp` | imagen personal | 8080 | Servidor MCP (HTTP Remoto) |
+| Servicio | Contenedor | Imagen | Puerto | Propósito |
+|----------|------------|--------|--------|-----------|
+| `db` | `odoofinder-postgres` | `pgvector/pgvector:pg17` | 5432 | PostgreSQL 17 + pgvector |
+| `api` | `odoofinder-api` | Construida desde `Dockerfile` | 8989 | Backend FastAPI (API REST) |
+| `mcp` | `odoofinder-mcp` | Construida desde `mcp-server/Dockerfile` | 8080 | Servidor MCP (Streamable HTTP) |
 
-### Endpoints API (FastAPI - :8989)
+`mcp-server/Dockerfile` usa por defecto `MCP_PATH=/mcp`, pero `docker-compose.yml` establece `MCP_PATH=/`, así que el endpoint MCP del despliegue con Compose es la ruta raíz.
 
-| Endpoint | Método | Descripción |
-|----------|--------|-------------|
-| `/` | GET | Información de la API y configuración MCP |
-| `/health` | GET | Verificación de salud (conexión DB) |
-| `/search` | GET | Búsqueda híbrida (Vector + BM25 + RRF) |
-| `/modules/{id}` | GET | Obtener módulo por ID |
-| `/stats` | GET | Estadísticas de base de datos |
-| `/docs` | GET | Documentación Swagger UI |
-
-### Endpoints MCP (Servidor MCP - :8080)
+### Endpoints de la API (FastAPI - :8989)
 
 | Endpoint | Método | Descripción |
 |----------|--------|-------------|
-| `/mcp` | POST | Endpoint JSON-RPC de MCP (HTTP Streamable) |
-| `/mcp` | GET | Endpoint SSE de MCP (legado) |
+| `/` | GET | Información de la API |
+| `/health` | GET | Comprobación de estado (conexión a la base de datos y número de módulos) |
+| `/search` | GET, POST | Búsqueda híbrida (vectorial + BM25 + RRF) |
+| `/modules/{id}` | GET | Obtener un módulo por ID |
+| `/stats` | GET | Estadísticas de la base de datos (módulos por versión) |
+| `/docs` | GET | Swagger UI |
 
-### Parámetros de Búsqueda
+### Endpoint MCP (servidor MCP - :8080)
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/` | POST, GET | Endpoint MCP (Streamable HTTP) |
+
+> **Comprobación de estado:** `docker-compose.yml` comprueba el contenedor `mcp` con `curl -f http://localhost:8080/health`, pero el servidor MCP de este repositorio no define la ruta `/health`, por lo que Docker puede marcar el contenedor como `unhealthy` aunque funcione. Usa la [petición initialize](#modo-remoto-docker) para comprobarlo. La instancia pública sí responde en `https://addon-finder.eticco.es/health`.
+
+### Parámetros de búsqueda
+
+Tanto `GET` como `POST` reciben los parámetros en la query string:
 
 ```
-GET /search?query=<texto>&version=<version>&limit=<n>&dependencies=<dep1,dep2>
+GET /search?query=<texto>&version=<versión>&limit=<n>&dependencies=<dep1>&dependencies=<dep2>
 ```
 
-| Parámetro | Requerido | Ejemplo | Descripción |
-|-----------|-----------|---------|-------------|
-| `query` | Sí | `orden de venta` | Texto de búsqueda (lenguaje natural) |
-| `version` | Sí | `16.0` | Filtro de versión Odoo |
-| `limit` | No | `10` | Máx resultados (predeterminado: 10) |
-| `dependencies` | No | `sale,stock` | Filtrar por dependencias |
+| Parámetro | Obligatorio | Ejemplo | Descripción |
+|-----------|-------------|---------|-------------|
+| `query` | Sí | `sale order` | Texto de búsqueda (lenguaje natural) |
+| `version` | Sí | `16.0` | Versión de Odoo: de `14.0` a `19.0` |
+| `limit` | No | `10` | Máximo de resultados, 1–50 (por defecto: 10) |
+| `min_score` | No | `30` | Puntuación mínima, 0–100 (por defecto: 0) |
+| `dependencies` | No | `dependencies=sale&dependencies=stock` | Repite el parámetro por cada dependencia; devuelve los módulos que dependen de **cualquiera** de ellas |
 
-## Estadísticas de Base de Datos
+## Estadísticas de la base de datos
 
-- **Módulos totales**: 15,884
-- **Con embeddings**: 100%
-
-| Versión | Módulos |
-|---------|---------|
-| 12.0 | 2,215 |
-| 13.0 | 1,990 |
-| 14.0 | 2,886 |
-| 15.0 | 2,074 |
-| 16.0 | 2,886 |
-| 17.0 | 1,699 |
-| 18.0 | 2,022 |
-| 19.0 | 112 |
-
-## Servicio Systemd (Auto-inicio)
-
-El sistema está configurado como un servicio systemd que se inicia automáticamente al arranque.
-
-### Comandos del Servicio
+El número de módulos indexados cambia con cada ejecución del ETL. Consúltalo en tu instancia:
 
 ```bash
-# Verificar estado
+curl http://localhost:8989/stats
+```
+
+## Servicio systemd (arranque automático)
+
+`scripts/ai-odoo-finder.service` define una unidad systemd que arranca el stack Docker al iniciar el sistema. Instálala con `scripts/install_service.sh`.
+
+### Comandos del servicio
+
+```bash
+# Ver estado
 systemctl status ai-odoo-finder
 
 # Iniciar servicios
@@ -120,79 +133,77 @@ journalctl -u ai-odoo-finder
 # Seguir logs en tiempo real
 journalctl -u ai-odoo-finder -f
 
-# Ver últimas 50 líneas
+# Ver las últimas 50 líneas
 journalctl -u ai-odoo-finder -n 50
 ```
 
-### Scripts de Ayuda
+### Scripts auxiliares
 
 Ubicados en `/opt/ai-odoo-finder/scripts/`:
 
 | Script | Descripción |
 |--------|-------------|
-| `start_system.sh` | Iniciar todos los contenedores Docker con verificación de salud |
-| `stop_system.sh` | Detener todos los contenedores Docker y limpieza |
-| `status_system.sh` | Mostrar estado detallado del sistema |
-| `install_service.sh` | Instalar/reinstalar servicio systemd |
+| `start_system.sh` | Inicia todos los servicios Docker con comprobación de estado |
+| `stop_system.sh` | Detiene todos los servicios Docker y limpia |
+| `status_system.sh` | Muestra el estado detallado del sistema |
+| `install_service.sh` | Instala o reinstala el servicio systemd |
 
-### Verificación Manual de Estado
+### Comprobación manual del estado
 
 ```bash
 /opt/ai-odoo-finder/scripts/status_system.sh
 ```
 
-Muestra: contenedores Docker, salud API, estadísticas DB, uso de disco.
+Muestra: contenedores Docker, estado de la API, estadísticas de la base de datos y uso de disco.
 
-## Operaciones Comunes
+## Operaciones comunes
 
 ### Acceso SSH
 
 ```bash
-# Via Tailscale (recomendado)
-ssh user@<tu-servidor-name>
-
-# O via IP de Tailscale
-ssh user@<tailscale-ip>
-
+ssh user@<tu-servidor>
 cd /opt/ai-odoo-finder
 ```
 
-### Ver Logs
+### Ver logs
 
 ```bash
 # Todos los servicios
 docker compose logs -f
 
-# Solo API
+# Solo la API
 docker compose logs -f api
+
+# Solo el servidor MCP
+docker compose logs -f mcp
 
 # Solo PostgreSQL
 docker compose logs -f db
 ```
 
-### Reiniciar Servicios
+### Reiniciar servicios
 
 ```bash
 # Reiniciar todo
 docker compose restart
 
-# Reiniciar solo API
+# Reiniciar solo la API
 docker compose restart api
 
-# Reconstrucción completa (después de cambios en código)
+# Reconstrucción completa (tras cambios de código)
 git pull
-docker compose build --no-cache api
-docker compose up -d api
+docker compose build --no-cache api mcp
+docker compose up -d api mcp
 ```
 
-### Verificar Estado del Servicio
+### Comprobar el estado de los servicios
 
 ```bash
 docker compose ps
 docker compose logs --tail 20
 ```
 
-### Operaciones de Base de Datos
+### Operaciones de base de datos
 
 ```bash
 # Conectar a PostgreSQL
@@ -201,177 +212,175 @@ docker exec -it odoofinder-postgres psql -U odoofinder -d ai_odoofinder
 # Contar módulos
 docker exec odoofinder-postgres psql -U odoofinder -d ai_odoofinder -c "SELECT COUNT(*) FROM odoo_modules;"
 
-# Verificar por versión
+# Contar por versión
 docker exec odoofinder-postgres psql -U odoofinder -d ai_odoofinder -c "SELECT version, COUNT(*) FROM odoo_modules GROUP BY version ORDER BY version;"
 
-# Backup de base de datos
+# Copia de seguridad de la base de datos
 docker exec odoofinder-postgres pg_dump -U odoofinder -d ai_odoofinder -F c -f /tmp/backup.dump
 docker cp odoofinder-postgres:/tmp/backup.dump ./backup_$(date +%Y%m%d).dump
 
-# Restaurar base de datos
+# Restaurar la base de datos
 docker cp backup.dump odoofinder-postgres:/tmp/backup.dump
 docker exec odoofinder-postgres pg_restore -U odoofinder -d ai_odoofinder --clean /tmp/backup.dump
 ```
 
-### Probar API
+### Probar la API
 
 ```bash
-# Verificación de salud
+# Comprobación de estado
 curl http://localhost:8989/health
 
 # Prueba de búsqueda
-curl "http://localhost:8989/search?query=orden%20de%20venta&version=16.0&limit=3"
+curl "http://localhost:8989/search?query=sale%20order&version=16.0&limit=3"
+
+# Búsqueda con dependencias
+curl "http://localhost:8989/search?query=delivery&version=17.0&dependencies=sale&dependencies=stock"
 
 # Estadísticas
 curl http://localhost:8989/stats
 ```
 
-## Variables de Entorno
+## Variables de entorno
 
-Ubicadas en `/opt/ai-odoo-finder/.env`:
+Ubicadas en `/opt/ai-odoo-finder/.env` (copia `.env.example`):
 
 ```env
 # Base de datos
-DATABASE_URL=postgresql://odoofinder:<password>@db:5432/ai_odoofinder
+DATABASE_URL=postgresql://odoofinder:<password>@localhost:5432/ai_odoofinder
 POSTGRES_DB=ai_odoofinder
 POSTGRES_USER=odoofinder
 POSTGRES_PASSWORD=<password>
 
 # APIs externas
-OPENROUTER_API_KEY=<key>    # Para generación de embeddings
-GH_TOKEN=<token>            # Para API de GitHub (opcional)
+OPENROUTER_API_KEY=<key>    # Embeddings + enriquecimiento con IA (obligatoria)
+GH_TOKEN=<token>            # API de GitHub para el ETL (debe existir, puede estar vacía)
 
-# Configuración de la app
+# Configuración de la aplicación
 ENVIRONMENT=production
 LOG_LEVEL=INFO
 ```
 
-**Nota**: El archivo `.env` está en `.gitignore` y nunca debe ser commited.
+- **`DATABASE_URL`**: Docker Compose establece su propio valor para el contenedor `api` (`postgresql+psycopg://...@db:5432/...`) a partir de las variables `POSTGRES_*`. El valor de `.env` solo lo usan los scripts que se ejecutan en el host (como el ETL), por eso apunta a `localhost:5432`.
+- **`GH_TOKEN`**: la configuración del backend la declara sin valor por defecto, así que la variable debe estar definida aunque esté vacía. Un token permite límites de peticiones más altos en la API de GitHub durante el ETL.
 
-## Algoritmo de Búsqueda Híbrida
+**Nota**: El archivo `.env` está en `.gitignore` y nunca debe subirse al repositorio.
 
-La búsqueda usa **Fusión Recíproca de Ranking (RRF)** combinando:
+## Algoritmo de búsqueda híbrida
 
-1. **Búsqueda Vectorial**: Similitud semántica usando Qwen3-Embedding (2560 dimensiones)
-2. **Full-Text BM25**: Coincidencia de keywords en technical_name, name, summary, description
+La búsqueda usa **Reciprocal Rank Fusion (RRF)** combinando:
+
+1. **Búsqueda vectorial**: similitud semántica con embeddings `qwen/qwen3-embedding-4b` (2560 dimensiones, vía OpenRouter), calculada como distancia coseno exacta en pgvector
+2. **Texto completo tipo BM25**: ranking de texto completo de PostgreSQL sobre el nombre técnico, el nombre, el resumen, el nombre del repositorio, la descripción generada por IA, las palabras clave y etiquetas, la descripción y el README del módulo (los campos de nombre tienen el mayor peso y el README el menor)
 
 ```
 RRF_score = 1/(k + rank_vector) + 1/(k + rank_bm25)
 ```
 
-Dónde `k=60` (constante estándar RRF)
+Donde `k=60` (constante estándar de RRF).
 
-## Solución de Problemas
+## Solución de problemas
 
-### API no responde
+### La API no responde
 
 ```bash
-# Verificar que el contenedor está corriendo
+# Comprobar si el contenedor está en ejecución
 docker compose ps
 
-# Verificar logs por errores
+# Revisar los logs en busca de errores
 docker compose logs api --tail 50
 
-# Reiniciar API
+# Reiniciar la API
 docker compose restart api
 ```
 
-### Problemas de conexión a base de datos
+### Problemas de conexión a la base de datos
 
 ```bash
-# Verificar que PostgreSQL esté saludable
+# Comprobar que PostgreSQL está sano
 docker compose ps db
 docker exec odoofinder-postgres pg_isready -U odoofinder
 
-# Verificar que la base de datos existe
+# Comprobar que la base de datos existe
 docker exec odoofinder-postgres psql -U odoofinder -l
 ```
 
-### Búsqueda devuelve 0 resultados
+### La búsqueda devuelve 0 resultados
 
-1. Verificar versión existe: `curl http://localhost:8989/stats`
-2. Verificar logs por errores: `docker compose logs api --tail 20`
-3. Probar con consulta simple: `curl "http://localhost:8989/search?query=venta&version=16.0&limit=1"`
+1. Verificar que la versión existe: `curl http://localhost:8989/stats`
+2. Revisar los logs en busca de errores: `docker compose logs api --tail 20`
+3. Probar con una consulta sencilla: `curl "http://localhost:8989/search?query=sale&version=16.0&limit=1"`
 
 ### Sin espacio en disco
 
 ```bash
-# Verificar uso de disco
+# Ver uso de disco
 df -h
 
 # Limpiar Docker
 docker system prune -a
 
-# Verificar archivos grandes
+# Buscar archivos grandes
 du -sh /opt/ai-odoo-finder/*
 ```
 
 ## Servidor MCP
 
-El Servidor MCP soporta dos modos de operación:
+El servidor MCP admite dos modos de funcionamiento.
 
-### Modo Remoto (Docker - para Claude.ai Web, Zed, Cursor)
+### Modo remoto (Docker)
 
-El servidor MCP corre como un contenedor Docker junto a la API:
+Para Claude.ai, Claude Code, Cursor, Zed y otros clientes con soporte MCP remoto. El servidor MCP se ejecuta como contenedor Docker junto a la API:
 
 ```bash
-# Desplegar servidor MCP (sin afectar otros servicios)
+# Desplegar el servidor MCP (sin afectar a otros servicios)
 docker compose build mcp
 docker compose up -d mcp
 
-# Verificar estado del servidor MCP
+# Ver los logs del servidor MCP
 docker compose logs mcp --tail 20
 
-# Probar endpoint MCP
-curl -X POST "http://localhost:8080/mcp" \
+# Probar el endpoint MCP
+curl -X POST "http://localhost:8080/" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 ```
 
-**Configuración de Tailscale Funnel** (exponer MCP en puerto 8080):
+**Exposición:** expón el puerto 8080 a través de tu proxy inverso (TLS) en la ruta raíz, para que los clientes se conecten a `https://<tu-dominio>`. Sirve cualquier proxy inverso (Caddy, nginx, Traefik...); un túnel como Tailscale Funnel es otra opción.
 
-```bash
-# Añadir puerto 8080 a Tailscale Funnel
-tailscale funnel 8080
-```
+### Modo local (STDIO)
 
-### Modo Local (STDIO - para Claude Desktop)
-
-Para Claude Desktop, ejecuta el servidor MCP localmente:
-
-```bash
-cd mcp-server
-uv run ai-odoofinder-mcp
-```
-
-Configura en Claude Desktop:
-
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-**Linux**: `~/.config/claude/claude_desktop_config.json`
+Para clientes que ejecutan el servidor MCP como proceso local. Instala el paquete [`ai-odoofinder-mcp`](https://pypi.org/project/ai-odoofinder-mcp/) de PyPI y apúntalo a tu API. Requiere que el puerto de la API (8989) sea accesible desde la máquina del cliente.
 
 ```json
 {
   "mcpServers": {
     "ai-odoofinder": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/SantipBarber/ai-odoo-finder#subdirectory=mcp-server", "ai-odoofinder-mcp"],
+      "args": ["ai-odoofinder-mcp"],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://<tu-servidor>.ts.net"
+        "AI_ODOOFINDER_API_URL": "http://<tu-servidor>:8989"
       }
     }
   }
 }
 ```
 
-## ETL Programado
+Ubicación del archivo de configuración de Claude Desktop:
 
-El proceso ETL se ejecuta automáticamente via cron job en el servidor para mantener el índice de módulos actualizado.
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/claude/claude_desktop_config.json`
 
-### Configuración del Cron
+Para otros clientes, consulta [Configuraciones de clientes MCP](MCP_CLIENT_CONFIGURATIONS.md).
 
-El ETL se ejecuta diariamente a las 3 AM UTC. Para configurar:
+## ETL programado
+
+El proceso ETL se ejecuta en el servidor mediante cron para mantener actualizado el índice de módulos. Se ejecuta desde el proyecto raíz, que requiere **Python 3.14** (gestionado con `uv`).
+
+### Configuración de cron
+
+Para ejecutar el ETL a diario a las 3:00:
 
 ```bash
 # Editar crontab
@@ -381,10 +390,10 @@ crontab -e
 0 3 * * * /opt/ai-odoo-finder/scripts/cron_etl.sh >> /var/log/ai-odoofinder-etl.log 2>&1
 ```
 
-### Ejecución Manual
+### Ejecución manual
 
 ```bash
-# Ejecutar ETL manualmente
+# Ejecutar el ETL manualmente
 /opt/ai-odoo-finder/scripts/cron_etl.sh
 
 # O directamente con uv
@@ -395,41 +404,42 @@ uv run python scripts/etl_oca_modules.py
 ### Logs del ETL
 
 ```bash
-# Ver logs del ETL
+# Ver los logs del ETL
 tail -f /var/log/ai-odoofinder-etl.log
 
-# Ver últimas 100 líneas
+# Ver las últimas 100 líneas
 tail -100 /var/log/ai-odoofinder-etl.log
 ```
 
 ### Características del ETL
 
-- **Actualizaciones incrementales**: Solo procesa módulos nuevos/modificados
-- **Checkpoints**: Se puede interrumpir y reanudar
-- **Enriquecimiento IA**: Genera descripciones, tags y keywords con Grok-4-fast
-- **Embeddings**: Crea vectores con Qwen3-Embedding-4B
+- **Actualizaciones incrementales**: solo procesa módulos nuevos o modificados
+- **Puntos de control**: se puede interrumpir y reanudar
+- **Enriquecimiento con IA**: genera descripciones, etiquetas y palabras clave con `x-ai/grok-4-fast` (vía OpenRouter)
+- **Embeddings**: crea vectores con `qwen/qwen3-embedding-4b` (vía OpenRouter)
 
 ---
 
-## Historial de Migraciones
+## Historial de migraciones
 
 | Fecha | Acción | Detalles |
-|------|--------|---------|
-| 2025-11-29 | Despliegue inicial | Migrado de Neon a auto-hospedado |
-| 2025-11-29 | PostgreSQL 16 -> 17 | Actualizado para compatibilidad de dump |
-| 2025-11-29 | Migración de datos | 15,884 módulos con embeddings |
-| 2025-11-30 | Servicio systemd | Añadido auto-inicio al arranque |
-| 2025-11-30 | Removido Render | Consolidado a auto-hospedado Docker |
+|-------|--------|----------|
+| 2025-11-29 | Despliegue inicial | Migrado de Neon a autoalojado |
+| 2025-11-29 | PostgreSQL 16 -> 17 | Actualizado por compatibilidad del dump |
+| 2025-11-29 | Migración de datos | 15.884 módulos con embeddings |
+| 2025-11-30 | Servicio systemd | Añadido arranque automático al iniciar |
+| 2025-11-30 | Eliminado Render | Consolidado en Docker autoalojado |
+| 2026-10 | Instancia pública trasladada a la infraestructura de Eticco | `https://addon-finder.eticco.es` |
 
-## Resumen de Costos
+## Resumen de costes (histórico, despliegue personal)
 
 | Servicio | Antes | Después |
-|---------|--------|-------|
-| PostgreSQL Neon | $5/mes | $0 (auto-hospedado) |
-| API Render | Tier gratuito (limitado) | $0 (auto-hospedado) |
-| VPS Hetzner | Ya owned | Sin costo adicional |
-| **Total** | ~$5/mes | **$0/mes** |
+|----------|-------|---------|
+| PostgreSQL en Neon | 5 $/mes | 0 $ (autoalojado) |
+| API en Render | Plan gratuito (limitado) | 0 $ (autoalojado) |
+| VPS de Hetzner | Ya contratado | Sin coste adicional |
+| **Total** | ~5 $/mes | **0 $/mes** |
 
 ---
 
-*Última actualización: 2025-11-30*
+*Última actualización: 2026-10-14*

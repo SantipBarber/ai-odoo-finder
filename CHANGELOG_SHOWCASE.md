@@ -1,5 +1,32 @@
 # Changelog - AI-OdooFinder Showcase
 
+## [2.1.0] - 2026-10-14
+
+### 🔄 Actualizado
+
+#### Datos y servicio público
+- Contador de módulos actualizado a más de 19.700; eliminado el contador de repositorios (pendiente de cifra verificada) (los costes históricos de indexación mantienen 16,494 módulos)
+- Versiones Odoo buscables: 14.0–19.0 (contador 10 → 6, snippet de código actualizado)
+- Clientes MCP: 9 → 8 (contador, objetivos, diagrama resumen y resultado final) para cuadrar con la tabla
+- "~5€/mes en infraestructura" sustituido por "alojado por Eticco" (MCP público en https://addon-finder.eticco.es)
+- Grok-4 → Grok-4-fast en todas las menciones de enrichment
+
+#### Diagrama de arquitectura
+- Clientes conectados en remoto (HTTP); STDIO posible vía `mcp-remote`
+- `pgvector HNSW` → `pgvector cosine` (búsqueda exacta, sin índice HNSW)
+- Tabla `odoo_modules` y columna full-text `searchable_text`
+
+#### Tabla de clientes
+- Conexión remota ✅ para Claude Desktop, Cursor, Zed y VS Code (nota de política MCP en Copilot Business/Enterprise); añadido Windsurf
+- Columna "Local (STDIO)" aclarada: backend propio o `mcp-remote`
+- Cabeceras y estados traducibles (claves `m4.th*`, `m4.stable`, `m4.vscodeStatus`)
+
+### 🌐 i18n
+- Añadidas claves `m6.infra1`–`m6.infra4` (Infraestructura Final ya se traduce en EN)
+- Clave `tech.tailscale` renombrada a `tech.eticco`
+
+---
+
 ## [2.0.0] - 2025-12-08
 
 ### ✨ Añadido

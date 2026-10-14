@@ -1,18 +1,31 @@
 # Servidor MCP de AI-OdooFinder
 
-**Language**: [English](README.md) | [Español](README.es.md)
+**Idioma**: [English](README.md) | [Español](README.es.md)
 
-Servidor MCP (Protocolo de Contexto Modelo) para búsqueda semántica de módulos de Odoo en el ecosistema OCA.
+Servidor MCP (Model Context Protocol) para búsqueda semántica de módulos de Odoo en el ecosistema OCA.
 
 ## Resumen
 
-Este servidor MCP proporciona una herramienta llamada `search_odoo_modules` que permite a los LLMs buscar entre 16,494 módulos de Odoo indexados desde repositorios OCA usando búsqueda híbrida (semántica + BM25).
+Este servidor MCP proporciona una herramienta llamada `search_odoo_modules` que permite a los LLMs buscar entre más de 19.700 módulos de Odoo indexados desde repositorios OCA usando búsqueda híbrida (semántica + BM25).
 
-## Inicio Rápido
+## Inicio rápido
 
-El servidor MCP está disponible en **[PyPI](https://pypi.org/project/ai-odoofinder-mcp/)**.
+### Opción 1: Servidor remoto público (recomendado, sin instalación)
 
-### Instalación
+La forma más sencilla de usar AI-OdooFinder es el servidor MCP remoto público alojado por [Eticco](https://www.eticco.es):
+
+```
+https://addon-finder.eticco.es
+```
+
+- **Transporte**: Streamable HTTP
+- **Autenticación**: Ninguna para módulos de la comunidad OCA
+
+Añade esa URL a tu cliente MCP. Los clientes que solo admiten STDIO pueden usar el puente [`mcp-remote`](https://www.npmjs.com/package/mcp-remote): `npx -y mcp-remote https://addon-finder.eticco.es`. Para la configuración de cada cliente, consulta el [README principal del proyecto](../README.es.md#instalación).
+
+### Opción 2: Paquete STDIO local (backend propio)
+
+Este paquete está disponible en **[PyPI](https://pypi.org/project/ai-odoofinder-mcp/)**. Ejecuta el servidor MCP en local por STDIO y se comunica con la API REST del backend FastAPI. La instancia pública no expone esa API REST, así que usa este modo con **tu propio despliegue del backend** (ver [Despliegue y operaciones](../docs/es/DEPLOYMENT_OPERATIONS.md)).
 
 ```bash
 # Usando pip
@@ -22,7 +35,7 @@ pip install ai-odoofinder-mcp
 uvx ai-odoofinder-mcp
 ```
 
-### Configuración de Cliente MCP
+Configuración del cliente MCP:
 
 ```json
 {
@@ -31,7 +44,7 @@ uvx ai-odoofinder-mcp
       "command": "uvx",
       "args": ["ai-odoofinder-mcp"],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+        "AI_ODOOFINDER_API_URL": "http://localhost:8989"
       }
     }
   }
@@ -40,16 +53,14 @@ uvx ai-odoofinder-mcp
 
 > **Nota**: Requiere el gestor de paquetes [uv](https://docs.astral.sh/uv/) instalado.
 
-Para instrucciones de instalación completas y configuraciones específicas por cliente, consulta el [README principal del proyecto](../README.es.md#instalacion).
-
 ---
 
 ## Características
 
-- **Búsqueda Híbrida**: Combina búsqueda semántica (embeddings) con BM25 full-text
-- **Filtrado por Versión**: Solo muestra módulos compatibles (Odoo 10.0 a 19.0)
-- **Enriquecimiento IA**: Descripciones, tags y keywords generados por Grok-4-fast
-- **Flujo Inteligente**: Aclaraciones inteligentes, expansión de consultas, niveles de confianza
+- **Búsqueda híbrida**: Combina búsqueda semántica (embeddings) con búsqueda de texto completo BM25
+- **Filtrado por versión**: Solo muestra módulos compatibles (Odoo 14.0 a 19.0)
+- **Enriquecimiento con IA**: Descripciones, etiquetas y palabras clave generadas por Grok-4-fast
+- **Flujo inteligente**: Aclaraciones, expansión de consultas y niveles de confianza
 
 ---
 
@@ -61,14 +72,14 @@ Para instrucciones de instalación completas y configuraciones específicas por 
 │  (STDIO/HTTP)   │
 └────────┬────────┘
          │
-         │ JSON-RPC / SSE
+         │ MCP (STDIO o Streamable HTTP)
          │
 ┌────────▼────────┐
 │  Servidor MCP   │ (Este componente)
 │  FastMCP + uv   │
 └────────┬────────┘
          │
-         │ HTTPS
+         │ HTTP (REST)
          │
 ┌────────▼────────┐
 │   Backend API   │ (FastAPI + PostgreSQL)
@@ -77,8 +88,8 @@ Para instrucciones de instalación completas y configuraciones específicas por 
 ```
 
 **Dos modos:**
-- **STDIO**: Para clientes locales (Claude Desktop)
-- **HTTP/SSE**: Para clientes remotos (Claude.ai Web, requiere puerto 8080)
+- **STDIO** (por defecto): para clientes locales que lanzan el servidor como subproceso (p. ej. Claude Desktop con `uvx ai-odoofinder-mcp`)
+- **HTTP** (Streamable HTTP, puerto `8080`, ruta `/`): para clientes remotos. Se activa con `--http` o `MCP_TRANSPORT=http`
 
 ---
 
@@ -89,13 +100,13 @@ Para instrucciones de instalación completas y configuraciones específicas por 
 Busca módulos de Odoo usando consultas en lenguaje natural.
 
 **Parámetros:**
-- `query` (string, requerido): Consulta de búsqueda en lenguaje natural
-- `version` (string, requerido): Versión de Odoo (ej. "16.0", "17.0")
-- `limit` (integer, opcional): Máximo de resultados (predeterminado: 10, máx: 50)
-- `dependencies` (string, opcional): Filtrar por dependencias (separadas por comas)
+- `query` (string, obligatorio): Consulta de búsqueda en lenguaje natural
+- `version` (string, obligatorio): Versión de Odoo, de `14.0` a `19.0` (p. ej. `"16.0"`, `"17.0"`)
+- `dependencies` (lista de strings, opcional): Filtra por dependencias requeridas, p. ej. `["account"]`
+- `limit` (integer, opcional): Máximo de resultados (por defecto: 5, máximo: 20; los valores fuera de rango se ajustan a 1–20)
 
 **Devuelve:**
-- JSON estructurado con módulos, nivel de confianza y guía
+- Texto en Markdown con los módulos encontrados, el nivel de confianza y orientaciones para el asistente
 
 **Ejemplo:**
 ```json
@@ -108,13 +119,13 @@ Busca módulos de Odoo usando consultas en lenguaje natural.
 
 ---
 
-## Flujo de Búsqueda Inteligente
+## Flujo de búsqueda inteligente
 
 El servidor implementa un flujo de búsqueda inteligente:
 
 1. **Aclaración**: Solicita detalles si la consulta es genérica o falta versión
-2. **Expansión de Consulta**: Añade sinónimos ES/EN, prefijos de localización (`l10n_XX_`)
-3. **Respuesta Estructurada**: Devuelve resultados con niveles de confianza:
+2. **Expansión de consulta**: Añade sinónimos ES/EN, prefijos de localización (`l10n_XX_`)
+3. **Respuesta estructurada**: Devuelve resultados con niveles de confianza:
    - **HIGH** (puntuación ≥80): Formato detallado con recomendaciones
    - **MEDIUM** (50-79): Formato resumen con alternativas
    - **LOW** (<50): Sugerencias para refinar búsqueda
@@ -122,21 +133,26 @@ El servidor implementa un flujo de búsqueda inteligente:
 
 ---
 
-## Variables de Entorno
+## Variables de entorno
 
 | Variable | Valor por defecto | Descripción |
 |----------|-------------------|-------------|
 | `AI_ODOOFINDER_API_URL` | `http://localhost:8989` | URL de la API backend |
-| `AI_ODOOFINDER_API_TIMEOUT` | `60` | Timeout de la API en segundos |
+| `AI_ODOOFINDER_API_TIMEOUT` | `60` | Tiempo máximo de espera de la API, en segundos |
+| `MCP_TRANSPORT` | `stdio` | Transporte: `stdio` o `http` (`--http` fuerza `http`) |
+| `MCP_HOST` | `0.0.0.0` | Host de escucha en modo HTTP (lo sobrescribe `--host`) |
+| `MCP_PORT` | `8080` | Puerto en modo HTTP (lo sobrescribe `--port`) |
+| `MCP_PATH` | `/` | Ruta del endpoint MCP en modo HTTP |
 
 ---
 
-## Estructura del Proyecto
+## Estructura del proyecto
 
 ```
 mcp-server/
 ├── pyproject.toml           # Configuración del paquete (instalable con uvx)
-├── README.md                # Este archivo
+├── README.md                # Documentación en inglés
+├── README.es.md             # Este archivo
 └── src/
     └── ai_odoofinder_mcp/
         ├── __init__.py
@@ -147,7 +163,7 @@ mcp-server/
 
 ## Desarrollo
 
-### Pruebas Locales
+### Pruebas locales
 
 ```bash
 # Instalar dependencias
@@ -174,15 +190,14 @@ uv run ai-odoofinder-mcp --http --port 8080
 
 El servidor MCP se conecta al backend FastAPI en la URL especificada en `AI_ODOOFINDER_API_URL`.
 
-**Endpoints del backend utilizados:**
-- `GET /api/v1/search` - Búsqueda híbrida
-- `GET /health` - Verificación de salud
+**Endpoint del backend utilizado:**
+- `GET /search` - Búsqueda híbrida
 
 **Algoritmo de búsqueda:**
-1. Generar embedding para la consulta (Qwen3-Embedding-4B)
-2. Búsqueda vectorial (pgvector HNSW)
-3. Búsqueda full-text BM25 (PostgreSQL tsvector)
-4. Combinar resultados con Fusión Recíproca de Ranking (RRF)
+1. Generar el embedding de la consulta (Qwen3-Embedding-4B vía OpenRouter)
+2. Búsqueda vectorial (pgvector, distancia coseno exacta)
+3. Búsqueda de texto completo BM25 (PostgreSQL tsvector)
+4. Combinar resultados con Reciprocal Rank Fusion (RRF)
 
 ```
 RRF_score = 1/(k + rank_vector) + 1/(k + rank_bm25)
@@ -192,7 +207,7 @@ Donde `k=60` (constante estándar RRF)
 
 ---
 
-## Solución de Problemas
+## Solución de problemas
 
 ### El servidor no arranca
 
@@ -213,12 +228,16 @@ Donde `k=60` (constante estándar RRF)
 
 ### Falla la conexión a la API
 
-1. **Verifica que la API es accesible:**
+1. **Verifica que el servicio está disponible:**
    ```bash
-   curl https://strategy-orchestrator-prod.tailf7d690.ts.net/health
+   # Instancia pública
+   curl https://addon-finder.eticco.es/health
+
+   # Backend propio
+   curl http://localhost:8989/health
    ```
 
-2. **Verifica configuración de timeout:**
+2. **Revisa el tiempo máximo de espera:**
    ```bash
    export AI_ODOOFINDER_API_TIMEOUT=120
    ```
@@ -262,11 +281,11 @@ uv publish
 
 ---
 
-## Documentación Relacionada
+## Documentación relacionada
 
-- [README Principal del Proyecto](../README.es.md) - Guía de instalación para usuarios
-- [Backend API](../backend/README.md) - Backend FastAPI
-- [CHANGELOG](../docs/es/CHANGELOG.md) - Historial de versiones
+- [README principal del proyecto](../README.es.md) - Guía de instalación para usuarios
+- [API del backend](../backend/README.es.md) - API REST del backend FastAPI
+- [Registro de cambios](../docs/es/CHANGELOG.md) - Historial de versiones
 - [Protocolo MCP](https://modelcontextprotocol.io/) - Documentación oficial de MCP
 - [FastMCP](https://github.com/jlowin/fastmcp) - Framework utilizado
 

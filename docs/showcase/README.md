@@ -26,7 +26,7 @@
 
 ### Diseño & UX
 - ✅ **Tema claro/oscuro** con transiciones suaves
-- ✅ **Internacionalización** ES/EN (~200 claves)
+- ✅ **Internacionalización** ES/EN (170 claves `data-i18n`)
 - ✅ **Responsive Design** mobile-first
 - ✅ **Persistencia** de preferencias en localStorage
 - ✅ **7 secciones** (Dashboard + 6 módulos del curso)

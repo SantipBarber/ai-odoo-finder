@@ -1,9 +1,41 @@
-# Historial de Cambios
+# Historial de cambios
 
 Todos los cambios notables de AI-OdooFinder se documentarán en este archivo.
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.5.0] - 2026-10-14
+
+### Migración a la infraestructura de Eticco
+
+El servidor MCP público de AI-OdooFinder se ejecuta ahora en la infraestructura de **[Eticco](https://www.eticco.es)** en **`https://addon-finder.eticco.es`**. La URL anterior de Tailscale Funnel ya no está disponible.
+
+### Cambiado
+
+- **Endpoint público**: `https://addon-finder.eticco.es` (Streamable HTTP). El endpoint MCP se sirve en la **URL raíz** (sin sufijo `/mcp`)
+- **Comprobación de estado**: `https://addon-finder.eticco.es/health`
+- **Autenticación**: no se requiere para módulos de la comunidad OCA
+- **El modo remoto es ahora el método de instalación principal** para todos los clientes (conectores de Claude.ai/Desktop, Claude Code `--transport http`, VS Code, Cursor, Windsurf, Zed, ChatGPT Developer Mode)
+- Los clientes solo STDIO se conectan mediante el puente [`mcp-remote`](https://www.npmjs.com/package/mcp-remote): `npx -y mcp-remote https://addon-finder.eticco.es`
+- El paquete de PyPI `ai-odoofinder-mcp` se documenta ahora como la opción para **backends autoalojados** (`AI_ODOOFINDER_API_URL=http://localhost:8989`), ya que la instancia pública no expone la API REST (`/search`, `/stats`)
+- Versiones de Odoo documentadas como 14.0–19.0
+- Corregidos los parámetros documentados (limit, dependencies, endpoints, variables de entorno) para que coincidan con el código
+
+### Documentación reescrita
+
+- **README.md** / **README.es.md**: reescritos en torno a la URL remota
+- **mcp-server/README.md** / **mcp-server/README.es.md**: el modo remoto primero; paquete de PyPI para backends autoalojados
+- **backend/README.md** / **backend/README.es.md**: referencia de la API REST alineada con el código
+- **docs/en|es/MCP_CLIENT_CONFIGURATIONS.md**: reescritos en torno a la URL remota, con referencia de la herramienta, variables de entorno, matriz de compatibilidad y solución de problemas actualizadas
+- **docs/en|es/DEPLOYMENT_OPERATIONS.md**: reescritos como guía del despliegue Docker autoalojado de referencia
+- **Showcase** (`docs/showcase/`): actualizado para apuntar a la nueva instancia pública
+
+### Eliminado
+
+- Referencias al paquete npm inexistente `@SantipBarber/ai-odoofinder-mcp` (sustituido por `mcp-remote`)
 
 ---
 
@@ -42,7 +74,7 @@ La configuración para todos los clientes MCP ahora es más corta:
       "command": "uvx",
       "args": ["ai-odoofinder-mcp"],
       "env": {
-        "AI_ODOOFINDER_API_URL": "https://strategy-orchestrator-prod.tailf7d690.ts.net"
+        "AI_ODOOFINDER_API_URL": "https://<tu-servidor>.ts.net"
       }
     }
   }
@@ -69,7 +101,7 @@ La configuración para todos los clientes MCP ahora es más corta:
 
 ---
 
-## [1.3.0] - 2025-01-19
+## [1.3.0] - 2025-12-06
 
 ### Documentación de Configuraciones de Clientes MCP
 
@@ -195,7 +227,7 @@ El Servidor MCP ahora es accesible en:
 
 ---
 
-## [1.1.0] - 2025-01-XX
+## [1.1.0] - 2025-11-29
 
 ### Fase 6: MCP Inteligente (SPEC-602)
 
@@ -316,7 +348,7 @@ Resultados de pruebas con Claude Desktop:
 
 #### Añadido
 - Embeddings con Qwen3-Embedding-4B
-- Índice HNSW para búsqueda vectorial
+- Búsqueda por similitud vectorial con pgvector (distancia coseno exacta)
 - Integración pgVector
 
 ---
