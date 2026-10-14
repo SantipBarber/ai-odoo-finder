@@ -153,10 +153,13 @@ mcp-server/
 ├── pyproject.toml           # Package configuration (uvx installable)
 ├── README.md                # This file
 ├── README.es.md             # Spanish documentation
-└── src/
-    └── ai_odoofinder_mcp/
-        ├── __init__.py
-        └── server.py        # Main MCP server (FastMCP)
+├── Dockerfile               # HTTP-mode image (MCP at /, /health)
+├── src/
+│   └── ai_odoofinder_mcp/
+│       ├── __init__.py
+│       └── server.py        # Main MCP server (FastMCP)
+└── tests/
+    └── test_server.py       # Request building, versions, /health
 ```
 
 ---
@@ -182,6 +185,14 @@ npx @modelcontextprotocol/inspector uv run ai-odoofinder-mcp
 ```bash
 # Run with HTTP transport
 uv run ai-odoofinder-mcp --http --port 8080
+```
+
+The MCP endpoint is `http://localhost:8080/` and `GET /health` returns `{"status": "healthy"}`.
+
+### Tests
+
+```bash
+uv run --with pytest pytest tests
 ```
 
 ---

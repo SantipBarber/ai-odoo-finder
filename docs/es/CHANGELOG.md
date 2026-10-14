@@ -7,6 +7,23 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [1.5.1] - 2026-10-14
+
+### Corregido
+
+- **Filtro `dependencies` del MCP**: el servidor MCP unía la lista en un único valor `"sale,stock"`, así que el backend nunca encontraba coincidencias. Ahora envía un parámetro `dependencies` por cada valor.
+- **Versiones soportadas alineadas a 14.0–19.0** en la herramienta MCP, en `/search` y `/stats` del backend y en el ETL. Antes la herramienta MCP aceptaba 10.0–19.0 y el backend 12.0–19.0.
+- **Inicialización de una base de datos nueva**: las migraciones `002`–`005` modificaban `odoo_modules` antes de que existiera, y el script de rollback `002_add_fulltext_search_down.sql` también se ejecutaba durante la inicialización. Ahora `001_init_extensions.sql` crea la tabla y los rollbacks están en `backend/migrations/rollback/`. Verificado sobre un volumen limpio de `pgvector/pgvector:pg17`.
+- **Ruta `/health` en el MCP** para el modo HTTP; los healthchecks de Docker ya pasan. `mcp-server/Dockerfile` usa por defecto `MCP_PATH=/`, igual que `docker-compose.yml`.
+- **`LOG_LEVEL`** ya se aplica en el backend (estaba fijado a `INFO`).
+- **`GET /`** ya no devuelve la URL obsoleta del MCP en Render.
+
+### Añadido
+
+- `mcp-server/tests/test_server.py`: tests de construcción de la petición, validación de versiones, límite de resultados y `/health`.
+
+---
+
 ## [1.5.0] - 2026-10-14
 
 ### Migración a la infraestructura de Eticco

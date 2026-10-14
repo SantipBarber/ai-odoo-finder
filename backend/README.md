@@ -72,7 +72,7 @@ ENVIRONMENT=development
 docker compose up -d db
 ```
 
-The SQL files in `backend/migrations/` are mounted into `/docker-entrypoint-initdb.d`, so PostgreSQL runs them automatically **only the first time** the data volume is initialized. `001_init_extensions.sql` enables the `vector` and `pg_trgm` extensions. Migrations `002`–`005` alter the `odoo_modules` table, which is created by the API on startup (`init_db()`); on a brand-new database, apply them with `psql` once the table exists.
+The SQL files in `backend/migrations/` are mounted into `/docker-entrypoint-initdb.d`, so PostgreSQL runs them automatically **only the first time** the data volume is initialized. `001_init_extensions.sql` enables the `vector` and `pg_trgm` extensions. `001` also creates the `odoo_modules` table (mirroring `backend/app/models.py`), and `002`–`005` add full-text search, enrichment fields and indexes on top of it. Rollback scripts live in `backend/migrations/rollback/`, which PostgreSQL ignores during initialization.
 
 5. **Run the backend:**
 ```bash
@@ -102,8 +102,6 @@ Root endpoint with basic API information (`name`, `version`, `status`, `docs`).
   "docs": "/docs"
 }
 ```
-
-> The response also contains a legacy `mcp` block. Ignore it: the MCP server is the separate `mcp-server` package (see [MCP Server](../mcp-server/README.md)), not this API.
 
 #### `GET /health`
 Health check - verifies API and database connectivity. Returns `503` if the database is unreachable.
@@ -419,6 +417,7 @@ Read by `backend/app/config.py` (Pydantic Settings) from the environment or from
 | `OPENROUTER_API_KEY` | - | OpenRouter API key (**required**): query embeddings and AI enrichment |
 | `GH_TOKEN` | - | GitHub token used by the ETL. **Must be defined** (no default), but may be empty |
 | `ENVIRONMENT` | `development` | Free-form environment label |
+| `LOG_LEVEL` | `INFO` | Logging level (`DEBUG`, `INFO`, `WARNING`, `ERROR`) |
 | `EMBEDDING_MODEL` | `qwen/qwen3-embedding-4b` | Optional. Embedding model on OpenRouter |
 | `EMBEDDING_DIMENSIONS` | `2560` | Optional. Must match the `VECTOR(2560)` column |
 

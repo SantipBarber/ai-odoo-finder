@@ -72,7 +72,7 @@ Las URL `postgresql://` se convierten automáticamente a `postgresql+psycopg://`
 docker compose up -d db
 ```
 
-Los ficheros SQL de `backend/migrations/` se montan en `/docker-entrypoint-initdb.d`, así que PostgreSQL los ejecuta automáticamente **solo la primera vez** que se inicializa el volumen de datos. `001_init_extensions.sql` habilita las extensiones `vector` y `pg_trgm`. Las migraciones `002`–`005` modifican la tabla `odoo_modules`, que crea la API al arrancar (`init_db()`); en una base de datos nueva, aplícalas con `psql` cuando la tabla ya exista.
+Los ficheros SQL de `backend/migrations/` se montan en `/docker-entrypoint-initdb.d`, así que PostgreSQL los ejecuta automáticamente **solo la primera vez** que se inicializa el volumen de datos. `001_init_extensions.sql` habilita las extensiones `vector` y `pg_trgm`. `001` crea además la tabla `odoo_modules` (igual que `backend/app/models.py`), y `002`–`005` le añaden la búsqueda de texto completo, los campos de enriquecimiento y los índices. Los scripts de rollback están en `backend/migrations/rollback/`, que PostgreSQL ignora durante la inicialización.
 
 5. **Ejecutar el backend:**
 ```bash
@@ -102,8 +102,6 @@ Endpoint raíz con información básica de la API (`name`, `version`, `status`, 
   "docs": "/docs"
 }
 ```
-
-> La respuesta incluye además un bloque `mcp` heredado. Ignóralo: el servidor MCP es el paquete independiente `mcp-server` (ver [Servidor MCP](../mcp-server/README.es.md)), no esta API.
 
 #### `GET /health`
 Comprobación de estado: verifica la API y la conexión con la base de datos. Devuelve `503` si la base de datos no responde.
@@ -419,6 +417,7 @@ Las lee `backend/app/config.py` (Pydantic Settings) del entorno o de un fichero 
 | `OPENROUTER_API_KEY` | - | Clave de API de OpenRouter (**obligatoria**): embeddings de las consultas y enriquecimiento con IA |
 | `GH_TOKEN` | - | Token de GitHub que usa el ETL. **Debe estar definida** (no tiene valor por defecto), pero puede ir vacía |
 | `ENVIRONMENT` | `development` | Etiqueta libre del entorno |
+| `LOG_LEVEL` | `INFO` | Nivel de log (`DEBUG`, `INFO`, `WARNING`, `ERROR`) |
 | `EMBEDDING_MODEL` | `qwen/qwen3-embedding-4b` | Opcional. Modelo de embeddings en OpenRouter |
 | `EMBEDDING_DIMENSIONS` | `2560` | Opcional. Debe coincidir con la columna `VECTOR(2560)` |
 

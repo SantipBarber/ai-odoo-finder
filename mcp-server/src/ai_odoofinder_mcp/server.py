@@ -14,6 +14,8 @@ from typing import Annotated, Optional
 import httpx
 from dotenv import load_dotenv
 from fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 load_dotenv()
 
@@ -28,7 +30,15 @@ logger = logging.getLogger("ai-odoofinder-mcp")
 API_BASE_URL = os.getenv("AI_ODOOFINDER_API_URL", "http://localhost:8989")
 API_TIMEOUT = int(os.getenv("AI_ODOOFINDER_API_TIMEOUT", "60"))
 
+SUPPORTED_VERSIONS = ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+
 mcp = FastMCP("AI-OdooFinder")
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health(request: Request) -> JSONResponse:
+    """Liveness check for HTTP mode (used by Docker healthchecks)."""
+    return JSONResponse({"status": "healthy"})
 
 
 QUERY_DESCRIPTION = """
@@ -108,10 +118,10 @@ User: "subscriptions and recurring contracts"
 """
 
 VERSION_DESCRIPTION = """
-Odoo version (10.0, 11.0,12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, or 19.0).
+Odoo version (14.0, 15.0, 16.0, 17.0, 18.0, or 19.0).
 
 • If user does NOT specify version → ASK before searching
-• If user says "latest" or "current" → use 17.0 or 18.0
+• If user says "latest" or "current" → use 18.0 or 19.0
 • If context suggests an old version → confirm with user
 """
 
@@ -152,7 +162,7 @@ async def search_odoo_modules(
     limit: Annotated[int, LIMIT_DESCRIPTION] = 5,
 ) -> str:
     """
-    Search Odoo modules in the OCA ecosystem (16,000+ modules).
+    Search Odoo modules in the OCA ecosystem (19,700+ modules).
 
     Intelligent search flow:
     1. CLARIFY if needed (country, version, specific functionality)
@@ -169,20 +179,8 @@ async def search_odoo_modules(
     if not query or not query.strip():
         return "❌ Error: Query cannot be empty"
 
-    valid_versions = [
-        "10.0",
-        "11.0",
-        "12.0",
-        "13.0",
-        "14.0",
-        "15.0",
-        "16.0",
-        "17.0",
-        "18.0",
-        "19.0",
-    ]
-    if version not in valid_versions:
-        return f"❌ Error: Invalid version '{version}'. Use: {', '.join(valid_versions)}"
+    if version not in SUPPORTED_VERSIONS:
+        return f"❌ Error: Invalid version '{version}'. Use: {', '.join(SUPPORTED_VERSIONS)}"
 
     if limit < 1 or limit > 20:
         limit = min(max(1, limit), 20)
@@ -193,7 +191,9 @@ async def search_odoo_modules(
         async with await get_http_client() as client:
             params = {"query": query, "version": version, "limit": limit}
             if dependencies:
-                params["dependencies"] = ",".join(dependencies)
+                # The backend expects a repeated query parameter
+                # (?dependencies=sale&dependencies=stock); httpx encodes lists that way.
+                params["dependencies"] = dependencies
 
             response = await client.get("/search", params=params)
 

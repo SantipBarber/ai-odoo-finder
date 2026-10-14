@@ -63,7 +63,7 @@ Solo el servidor MCP necesita ser accesible desde internet. La API REST (`:8989`
 | `api` | `odoofinder-api` | Construida desde `Dockerfile` | 8989 | Backend FastAPI (API REST) |
 | `mcp` | `odoofinder-mcp` | Construida desde `mcp-server/Dockerfile` | 8080 | Servidor MCP (Streamable HTTP) |
 
-`mcp-server/Dockerfile` usa por defecto `MCP_PATH=/mcp`, pero `docker-compose.yml` establece `MCP_PATH=/`, así que el endpoint MCP del despliegue con Compose es la ruta raíz.
+El endpoint MCP es la ruta raíz (`MCP_PATH=/`, el valor por defecto tanto en `mcp-server/Dockerfile` como en `docker-compose.yml`).
 
 ### Endpoints de la API (FastAPI - :8989)
 
@@ -81,8 +81,7 @@ Solo el servidor MCP necesita ser accesible desde internet. La API REST (`:8989`
 | Endpoint | Método | Descripción |
 |----------|--------|-------------|
 | `/` | POST, GET | Endpoint MCP (Streamable HTTP) |
-
-> **Comprobación de estado:** `docker-compose.yml` comprueba el contenedor `mcp` con `curl -f http://localhost:8080/health`, pero el servidor MCP de este repositorio no define la ruta `/health`, por lo que Docker puede marcar el contenedor como `unhealthy` aunque funcione. Usa la [petición initialize](#modo-remoto-docker) para comprobarlo. La instancia pública sí responde en `https://addon-finder.eticco.es/health`.
+| `/health` | GET | Comprobación de vida, usada por el healthcheck de Docker |
 
 ### Parámetros de búsqueda
 

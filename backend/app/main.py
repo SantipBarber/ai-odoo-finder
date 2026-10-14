@@ -6,14 +6,17 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
+from .config import get_settings
 from .database import get_db, init_db
 from .models import OdooModule
 from .services.search_service import get_search_service
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=getattr(logging, get_settings().log_level.upper(), logging.INFO), format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+SUPPORTED_VERSIONS = ["14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
 
 
 @asynccontextmanager
@@ -51,16 +54,6 @@ async def root():
         "version": "1.0.0",
         "status": "running",
         "docs": "/docs",
-        "mcp": {
-            "endpoint": "/mcp/",
-            "protocol": "HTTP/SSE",
-            "tools": ["search_odoo_modules"],
-            "description": "Model Context Protocol server for Claude and other AI assistants",
-            "claude_config": {
-                "url": "https://ai-odoo-finder.onrender.com/mcp/",
-                "note": "IMPORTANT: Use this URL with trailing slash in Claude Web → Settings → Integrations → MCP",
-            },
-        },
     }
 
 
@@ -80,7 +73,7 @@ async def health_check(db: Session = Depends(get_db)):
 @app.post("/search")
 async def search_modules(
     query: str = Query(..., description="Consulta en lenguaje natural"),
-    version: str = Query(..., description="Versión de Odoo (16.0, 17.0, 18.0)"),
+    version: str = Query(..., description="Versión de Odoo (14.0 a 19.0)"),
     dependencies: Optional[List[str]] = Query(None, description="Dependencias requeridas"),
     limit: int = Query(10, ge=1, le=50, description="Número máximo de resultados"),
     min_score: int = Query(0, ge=0, le=100, description="Minimum score (0-100)"),
@@ -118,10 +111,10 @@ async def search_modules(
     try:
         logger.info(f"Search: query='{query[:50]}...', version={version}, limit={limit}")
 
-        if version not in ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]:
+        if version not in SUPPORTED_VERSIONS:
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid version. Use: 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 or 19.0",
+                detail=f"Invalid version. Use: {', '.join(SUPPORTED_VERSIONS)}",
             )
 
         search_service = get_search_service(db)
@@ -209,7 +202,7 @@ async def get_stats(db: Session = Depends(get_db)):
         total = db.query(OdooModule).count()
 
         by_version = {}
-        for version in ["12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]:
+        for version in SUPPORTED_VERSIONS:
             count = db.query(OdooModule).filter(OdooModule.version == version).count()
             if count > 0:
                 by_version[version] = count

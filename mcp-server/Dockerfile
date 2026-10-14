@@ -29,16 +29,16 @@ USER appuser
 ENV MCP_TRANSPORT=http \
     MCP_HOST=0.0.0.0 \
     MCP_PORT=8080 \
-    MCP_PATH=/mcp \
+    MCP_PATH=/ \
     AI_ODOOFINDER_API_URL=http://api:8989 \
     AI_ODOOFINDER_API_TIMEOUT=60
 
 # Expose port
 EXPOSE 8080
 
-# Health check endpoint (FastMCP doesn't have one by default, so we check if port is open)
+# Health check (custom /health route defined in server.py)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8080/ || exit 1
+    CMD curl -f http://localhost:8080/health || exit 1
 
 # Run MCP server in HTTP mode
 CMD ["uv", "run", "ai-odoofinder-mcp", "--http"]
