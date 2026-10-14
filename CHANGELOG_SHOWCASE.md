@@ -1,5 +1,16 @@
 # Changelog - AI-OdooFinder Showcase
 
+## [3.0.0] - 2026-10-14
+
+### Rediseño completo
+
+- **Producto primero**: la página abre con lo que hace la herramienta y cómo conectarla; el proceso del curso AI Expert pasa a una sección propia ("Cómo se construyó"). Antes ambas cosas se mezclaban en pestañas y confundían a quien buscaba el producto.
+- **Demo en el hero** con resultados reales del servidor público (Facturae, suscripciones, helpdesk, solicitudes de compra, gestión documental), en lugar de tarjetas de estadísticas.
+- **Sección "Conectar"** con la configuración de cada cliente y botón de copiar.
+- **Identidad visual nueva**: ciruela de Odoo sobre un fondo lila frío, Schibsted Grotesk + Martian Mono para los nombres técnicos, verde/ámbar solo para el nivel de confianza. Fuera el gradiente violeta, los emojis como iconos y las animaciones en cada sección.
+- Página de una sola columna desplazable (sin pestañas), accesible por teclado, con modo oscuro y `prefers-reduced-motion`.
+- Datos al día: más de 19.700 módulos, Odoo 14.0–19.0, 8 clientes, servidor en Eticco.
+
 ## [2.1.0] - 2026-10-14
 
 ### 🔄 Actualizado
